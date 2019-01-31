@@ -1,0 +1,575 @@
+[2018-10-04 12:24:09.283] [stdout] [info]  -Loading the data...
+[2018-10-04 12:24:09.467] [stdout] [info]  -Exporting CPLEX models...
+[2018-10-04 12:24:09.469] [stdout] [info]     Exporting formulation for master problem...
+[2018-10-04 12:24:31.678] [stdout] [info]  -Done!
+[2018-10-04 12:24:33.996] [stdout] [info]  -Parsing the args...
+[2018-10-04 12:24:34.005] [stdout] [info]  -Importing master model...
+[2018-10-04 12:24:34.010] [stdout] [info]     Master model successfully loaded.
+[2018-10-04 12:24:34.010] [stdout] [info]     Running master on 1 core(s).
+[2018-10-04 12:24:34.010] [stdout] [info]  -Pre-processing the models...
+[2018-10-04 12:24:52.871] [stdout] [info]  -Importing subproblem models...
+[2018-10-04 12:24:53.030] [stdout] [info]    Loading 456 subpropblems...
+[2018-10-04 12:24:58.458] [stdout] [info]    Subproblems loaded successfully.
+[2018-10-04 12:25:03.810] [stdout] [info]    Subproblems loaded successfully.
+[2018-10-04 12:25:04.247] [stdout] [info]     Using up to 7 cores to generate cuts.
+[2018-10-04 12:25:04.247] [stdout] [info]  -Analyzing the problem...
+[2018-10-04 12:25:04.247] [stdout] [info]  -Applying PD...
+[2018-10-04 12:25:04.247] [stdout] [info]  -Initalization took 30.242296 seconds.
+[2018-10-04 12:25:04.247] [stdout] [info]  -Solving the LP phase...
+[2018-10-04 12:25:04.247] [stdout] [info]    +Optimizing LP...
+[2018-10-04 12:25:06.043] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:06.052] [stdout] [info]      Iteration=0 UB=inf LB=-100000006144.000 LP_UB=0.421 LP_Gap=23706137001984.000% Gap=-nan% Time=1.804
+[2018-10-04 12:25:06.596] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:06.606] [stdout] [info]      Iteration=1 UB=inf LB=0.049 LP_UB=0.284 LP_Gap=82.695% Gap=-nan% Time=2.359
+[2018-10-04 12:25:07.043] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:07.052] [stdout] [info]      Iteration=2 UB=inf LB=0.084 LP_UB=0.274 LP_Gap=69.100% Gap=-nan% Time=2.804
+[2018-10-04 12:25:07.394] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:07.404] [stdout] [info]      Iteration=3 UB=inf LB=0.111 LP_UB=0.238 LP_Gap=53.252% Gap=-nan% Time=3.157
+[2018-10-04 12:25:07.740] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:07.749] [stdout] [info]      Iteration=4 UB=inf LB=0.139 LP_UB=0.220 LP_Gap=36.631% Gap=-nan% Time=3.501
+[2018-10-04 12:25:08.039] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:08.049] [stdout] [info]      Iteration=5 UB=inf LB=0.156 LP_UB=0.219 LP_Gap=28.829% Gap=-nan% Time=3.801
+[2018-10-04 12:25:08.358] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:08.367] [stdout] [info]      Iteration=6 UB=inf LB=0.173 LP_UB=0.202 LP_Gap=14.582% Gap=-nan% Time=4.120
+[2018-10-04 12:25:08.664] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:08.675] [stdout] [info]      Iteration=7 UB=inf LB=0.179 LP_UB=0.192 LP_Gap=6.504% Gap=-nan% Time=4.427
+[2018-10-04 12:25:08.928] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:08.938] [stdout] [info]      Iteration=8 UB=inf LB=0.182 LP_UB=0.184 LP_Gap=1.183% Gap=-nan% Time=4.691
+[2018-10-04 12:25:09.154] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:09.164] [stdout] [info]      Iteration=9 UB=inf LB=0.182 LP_UB=0.182 LP_Gap=0.158% Gap=-nan% Time=4.916
+[2018-10-04 12:25:09.343] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:09.353] [stdout] [info]      Iteration=10 UB=inf LB=0.182 LP_UB=0.182 LP_Gap=0.006% Gap=-nan% Time=5.105
+[2018-10-04 12:25:09.509] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:09.522] [stdout] [info]      Iteration=11 UB=inf LB=0.182 LP_UB=0.182 LP_Gap=0.001% Gap=-nan% Time=5.274
+[2018-10-04 12:25:09.681] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:09.691] [stdout] [info]      Iteration=12 UB=inf LB=0.182 LP_UB=0.182 LP_Gap=0.000% Gap=-nan% Time=5.443
+[2018-10-04 12:25:09.691] [stdout] [info]    +Terminating LP phase because it is optimal!
+[2018-10-04 12:25:09.696] [stdout] [info]  -Creating the parallel branches on master...
+[2018-10-04 12:25:09.696] [stdout] [error] I don't support parallelism of the MP yet, sorry!
+[2018-10-04 12:25:09.696] [stdout] [info]  -Switching to MIP MP...
+[2018-10-04 12:25:09.696] [stdout] [info]   +Setting up the branch-and-bound tree...
+[2018-10-04 12:25:09.990] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:09.998] [stdout] [info]    LB=0.182 UB=inf NumNodes=0 Gap%=inf Time=5.751 Iteration=14
+[2018-10-04 12:25:10.133] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:10.142] [stdout] [info]    LB=0.182 UB=inf NumNodes=0 Gap%=inf Time=5.894 Iteration=15
+[2018-10-04 12:25:10.725] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:10.734] [stdout] [info]    LB=0.204 UB=0.238 NumNodes=0 Gap%=14.193 Time=6.486 Iteration=16
+[2018-10-04 12:25:10.863] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:10.872] [stdout] [info]    LB=0.204 UB=0.238 NumNodes=0 Gap%=14.193 Time=6.624 Iteration=17
+[2018-10-04 12:25:11.276] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:11.285] [stdout] [info]    LB=0.207 UB=0.230 NumNodes=0 Gap%=10.139 Time=7.037 Iteration=18
+[2018-10-04 12:25:11.413] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:11.422] [stdout] [info]    LB=0.207 UB=0.230 NumNodes=0 Gap%=10.139 Time=7.174 Iteration=19
+[2018-10-04 12:25:11.849] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:11.858] [stdout] [info]    LB=0.209 UB=0.222 NumNodes=0 Gap%=5.980 Time=7.610 Iteration=20
+[2018-10-04 12:25:12.235] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:12.243] [stdout] [info]    LB=0.209 UB=0.222 NumNodes=0 Gap%=5.871 Time=7.996 Iteration=21
+[2018-10-04 12:25:12.290] [stdout] [info]  -Booster still looking...
+[2018-10-04 12:25:12.575] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:15.996] [stdout] [info] Int pool size= 456
+[2018-10-04 12:25:16.005] [stdout] [info]    LB=0.209 UB=0.222 NumNodes=0 Gap%=5.871 Time=11.758 Iteration=22
+[2018-10-04 12:25:16.080] [stdout] [info]  -Booster still looking...
+[2018-10-04 12:25:16.292] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:18.902] [stdout] [info] Int pool size= 912
+[2018-10-04 12:25:19.118] [stdout] [info]  +Booster successfully terminated with 14.894% lift.
+[2018-10-04 12:25:19.118] [stdout] [info]    LB=0.209 UB=0.222 NumNodes=0 Gap%=5.854 Time=14.871 Iteration=23
+[2018-10-04 12:25:19.138] [stdout] [info]   Heuristic fixer searching...
+[2018-10-04 12:25:19.273] [stdout] [info]    156 variables got permenantly fixed out of 320
+[2018-10-04 12:25:19.636] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:19.644] [stdout] [info]    LB=0.209 UB=0.222 NumNodes=0 Gap%=5.853 Time=15.397 Iteration=24
+[2018-10-04 12:25:19.774] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:19.782] [stdout] [info]    LB=0.209 UB=0.222 NumNodes=0 Gap%=5.853 Time=15.535 Iteration=25
+[2018-10-04 12:25:20.152] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:20.161] [stdout] [info]    LB=0.209 UB=0.220 NumNodes=0 Gap%=4.967 Time=15.914 Iteration=26
+[2018-10-04 12:25:20.285] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:20.294] [stdout] [info]    LB=0.209 UB=0.220 NumNodes=0 Gap%=4.967 Time=16.046 Iteration=27
+[2018-10-04 12:25:22.294] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:22.303] [stdout] [info]    LB=0.209 UB=0.220 NumNodes=20 Gap%=4.925 Time=18.056 Iteration=28
+[2018-10-04 12:25:22.434] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:22.443] [stdout] [info]    LB=0.209 UB=0.220 NumNodes=20 Gap%=4.925 Time=18.196 Iteration=29
+[2018-10-04 12:25:22.682] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:22.690] [stdout] [info]    LB=0.209 UB=0.220 NumNodes=20 Gap%=4.700 Time=18.443 Iteration=30
+[2018-10-04 12:25:23.048] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:23.056] [stdout] [info]    LB=0.209 UB=0.220 NumNodes=30 Gap%=4.700 Time=18.809 Iteration=31
+[2018-10-04 12:25:23.184] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:23.193] [stdout] [info]    LB=0.209 UB=0.220 NumNodes=30 Gap%=4.700 Time=18.945 Iteration=32
+[2018-10-04 12:25:26.680] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:26.689] [stdout] [info]    LB=0.210 UB=0.217 NumNodes=260 Gap%=2.905 Time=22.441 Iteration=33
+[2018-10-04 12:25:26.820] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:25:26.829] [stdout] [info]    LB=0.210 UB=0.217 NumNodes=260 Gap%=2.905 Time=22.582 Iteration=34
+[2018-10-04 12:26:35.804] [stdout] [info]      Iteration=34 UB=0.216 LB=0.216 LP_UB=0.182 LP_Gap=-18.487% Gap=0.000% Time=91.557
+[2018-10-04 12:26:35.804] [stdout] [info]  
+[2018-10-04 12:26:35.804] [stdout] [info] ***********************************
+[2018-10-04 12:26:35.804] [stdout] [info] SOLVER:
+[2018-10-04 12:26:35.804] [stdout] [info]   -BCompose.
+[2018-10-04 12:26:35.804] [stdout] [info] TIME(s):
+[2018-10-04 12:26:35.804] [stdout] [info]   -Initialization    = 30.242
+[2018-10-04 12:26:35.804] [stdout] [info]   -1st phase         = 5.448
+[2018-10-04 12:26:35.804] [stdout] [info]   -2nd phase         = 86.108
+[2018-10-04 12:26:35.804] [stdout] [info]   -Total             = 121.799
+[2018-10-04 12:26:35.804] [stdout] [info] BOUNDS:
+[2018-10-04 12:26:35.804] [stdout] [info]   -Root bound        = 0.182
+[2018-10-04 12:26:35.804] [stdout] [info]    -Distance from LB = 15.603%
+[2018-10-04 12:26:35.804] [stdout] [info]   -Root after lifter = 0.209
+[2018-10-04 12:26:35.804] [stdout] [info]    -Distance from LB = 3.032%
+[2018-10-04 12:26:35.804] [stdout] [info]   -LB                = 0.216
+[2018-10-04 12:26:35.804] [stdout] [info]   -UB                = 0.216
+[2018-10-04 12:26:35.804] [stdout] [info]   -Termination Gap   = 0.000%
+[2018-10-04 12:26:35.804] [stdout] [info] ITERATIONS:
+[2018-10-04 12:26:35.804] [stdout] [info]   -1st phase         = 13
+[2018-10-04 12:26:35.804] [stdout] [info]   -2nd phase         = 21
+[2018-10-04 12:26:35.804] [stdout] [info] TREE:
+[2018-10-04 12:26:35.804] [stdout] [info]   -#Nodes            = 13024
+[2018-10-04 12:26:35.804] [stdout] [info] CUTS:
+[2018-10-04 12:26:35.804] [stdout] [info]   -#Feas             = 0
+[2018-10-04 12:26:35.804] [stdout] [info]     -1st phase       = 0
+[2018-10-04 12:26:35.804] [stdout] [info]     -2nd phase       = 0
+[2018-10-04 12:26:35.804] [stdout] [info]   -#Opt              = 15504
+[2018-10-04 12:26:35.804] [stdout] [info]     -1st phase       = 5928
+[2018-10-04 12:26:35.804] [stdout] [info]     -2nd phase       = 9576
+[2018-10-04 12:26:35.804] [stdout] [info]   -Total             = 15504
+[2018-10-04 12:26:35.804] [stdout] [info] MEMORY:
+[2018-10-04 12:26:35.805] [stdout] [info]   -Usage             = 4.00 GB
+[2018-10-04 12:26:35.805] [stdout] [info] ***********************************
+[2018-10-04 12:26:35.805] [stdout] [info]  
+[2018-10-04 12:26:35.805] [stdout] [info]  -Optimization terminated successfully!
+[2018-10-04 12:26:36.088] [stdout] [info]  -Loading the data...
+[2018-10-04 12:26:36.267] [stdout] [info]  -Exporting CPLEX models...
+[2018-10-04 12:26:36.269] [stdout] [info]     Exporting formulation for master problem...
+[2018-10-04 12:26:58.933] [stdout] [info]  -Done!
+[2018-10-04 12:27:01.311] [stdout] [info]  -Parsing the args...
+[2018-10-04 12:27:01.319] [stdout] [info]  -Importing master model...
+[2018-10-04 12:27:01.324] [stdout] [info]     Master model successfully loaded.
+[2018-10-04 12:27:01.324] [stdout] [info]     Running master on 1 core(s).
+[2018-10-04 12:27:01.324] [stdout] [info]  -Pre-processing the models...
+[2018-10-04 12:27:20.193] [stdout] [info]  -Importing subproblem models...
+[2018-10-04 12:27:20.330] [stdout] [info]    Loading 456 subpropblems...
+[2018-10-04 12:27:25.716] [stdout] [info]    Subproblems loaded successfully.
+[2018-10-04 12:27:31.124] [stdout] [info]    Subproblems loaded successfully.
+[2018-10-04 12:27:31.560] [stdout] [info]     Using up to 7 cores to generate cuts.
+[2018-10-04 12:27:31.560] [stdout] [info]  -Analyzing the problem...
+[2018-10-04 12:27:31.560] [stdout] [info]  -Applying PD...
+[2018-10-04 12:27:31.560] [stdout] [info]  -Initalization took 30.240738 seconds.
+[2018-10-04 12:27:31.560] [stdout] [info]  -Solving the LP phase...
+[2018-10-04 12:27:31.560] [stdout] [info]    +Optimizing LP...
+[2018-10-04 12:27:33.377] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:33.386] [stdout] [info]      Iteration=0 UB=inf LB=-100000006144.000 LP_UB=0.331 LP_Gap=30193383112704.000% Gap=-nan% Time=1.825
+[2018-10-04 12:27:33.888] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:33.898] [stdout] [info]      Iteration=1 UB=inf LB=0.045 LP_UB=0.249 LP_Gap=81.612% Gap=-nan% Time=2.337
+[2018-10-04 12:27:34.322] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:34.332] [stdout] [info]      Iteration=2 UB=inf LB=0.079 LP_UB=0.242 LP_Gap=67.347% Gap=-nan% Time=2.772
+[2018-10-04 12:27:34.691] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:34.701] [stdout] [info]      Iteration=3 UB=inf LB=0.131 LP_UB=0.214 LP_Gap=38.506% Gap=-nan% Time=3.140
+[2018-10-04 12:27:35.022] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:35.032] [stdout] [info]      Iteration=4 UB=inf LB=0.149 LP_UB=0.205 LP_Gap=27.172% Gap=-nan% Time=3.471
+[2018-10-04 12:27:35.346] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:35.356] [stdout] [info]      Iteration=5 UB=inf LB=0.164 LP_UB=0.191 LP_Gap=14.197% Gap=-nan% Time=3.795
+[2018-10-04 12:27:35.619] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:35.629] [stdout] [info]      Iteration=6 UB=inf LB=0.169 LP_UB=0.187 LP_Gap=9.442% Gap=-nan% Time=4.068
+[2018-10-04 12:27:35.907] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:35.918] [stdout] [info]      Iteration=7 UB=inf LB=0.172 LP_UB=0.178 LP_Gap=3.502% Gap=-nan% Time=4.357
+[2018-10-04 12:27:36.176] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:36.186] [stdout] [info]      Iteration=8 UB=inf LB=0.173 LP_UB=0.175 LP_Gap=1.230% Gap=-nan% Time=4.626
+[2018-10-04 12:27:36.409] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:36.420] [stdout] [info]      Iteration=9 UB=inf LB=0.174 LP_UB=0.174 LP_Gap=0.283% Gap=-nan% Time=4.859
+[2018-10-04 12:27:36.617] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:36.627] [stdout] [info]      Iteration=10 UB=inf LB=0.174 LP_UB=0.174 LP_Gap=0.012% Gap=-nan% Time=5.067
+[2018-10-04 12:27:36.790] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:36.800] [stdout] [info]      Iteration=11 UB=inf LB=0.174 LP_UB=0.174 LP_Gap=0.003% Gap=-nan% Time=5.240
+[2018-10-04 12:27:36.947] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:36.957] [stdout] [info]      Iteration=12 UB=inf LB=0.174 LP_UB=0.174 LP_Gap=-0.000% Gap=-nan% Time=5.397
+[2018-10-04 12:27:36.957] [stdout] [info]    +Terminating LP phase because it is optimal!
+[2018-10-04 12:27:36.960] [stdout] [info]  -Creating the parallel branches on master...
+[2018-10-04 12:27:36.960] [stdout] [error] I don't support parallelism of the MP yet, sorry!
+[2018-10-04 12:27:36.960] [stdout] [info]  -Switching to MIP MP...
+[2018-10-04 12:27:36.960] [stdout] [info]   +Setting up the branch-and-bound tree...
+[2018-10-04 12:27:37.272] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:37.281] [stdout] [info]    LB=0.174 UB=inf NumNodes=0 Gap%=inf Time=5.720 Iteration=14
+[2018-10-04 12:27:37.409] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:37.418] [stdout] [info]    LB=0.174 UB=inf NumNodes=0 Gap%=inf Time=5.858 Iteration=15
+[2018-10-04 12:27:38.287] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:38.296] [stdout] [info]    LB=0.198 UB=0.222 NumNodes=0 Gap%=10.730 Time=6.736 Iteration=16
+[2018-10-04 12:27:38.427] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:38.435] [stdout] [info]    LB=0.198 UB=0.222 NumNodes=0 Gap%=10.730 Time=6.875 Iteration=17
+[2018-10-04 12:27:39.102] [stdout] [info]  -Booster still looking...
+[2018-10-04 12:27:39.386] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:42.707] [stdout] [info] Int pool size= 456
+[2018-10-04 12:27:42.716] [stdout] [info]    LB=0.201 UB=0.216 NumNodes=0 Gap%=6.755 Time=11.156 Iteration=18
+[2018-10-04 12:27:42.778] [stdout] [info]  -Booster still looking...
+[2018-10-04 12:27:42.957] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:45.454] [stdout] [info] Int pool size= 912
+[2018-10-04 12:27:45.672] [stdout] [info]  +Booster successfully terminated with 15.999% lift.
+[2018-10-04 12:27:45.672] [stdout] [info]    LB=0.201 UB=0.216 NumNodes=0 Gap%=6.748 Time=14.111 Iteration=19
+[2018-10-04 12:27:45.688] [stdout] [info]   Heuristic fixer searching...
+[2018-10-04 12:27:45.823] [stdout] [info]    142 variables got permenantly fixed out of 320
+[2018-10-04 12:27:46.156] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:46.164] [stdout] [info]    LB=0.201 UB=0.216 NumNodes=0 Gap%=6.746 Time=14.604 Iteration=20
+[2018-10-04 12:27:46.288] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:46.297] [stdout] [info]    LB=0.201 UB=0.216 NumNodes=0 Gap%=6.746 Time=14.736 Iteration=21
+[2018-10-04 12:27:46.598] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:46.607] [stdout] [info]    LB=0.201 UB=0.211 NumNodes=0 Gap%=4.691 Time=15.047 Iteration=22
+[2018-10-04 12:27:46.904] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:46.913] [stdout] [info]    LB=0.201 UB=0.211 NumNodes=0 Gap%=4.691 Time=15.352 Iteration=23
+[2018-10-04 12:27:48.784] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:48.793] [stdout] [info]    LB=0.202 UB=0.211 NumNodes=10 Gap%=4.459 Time=17.233 Iteration=24
+[2018-10-04 12:27:49.026] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:49.034] [stdout] [info]    LB=0.202 UB=0.211 NumNodes=10 Gap%=4.459 Time=17.474 Iteration=25
+[2018-10-04 12:27:49.372] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:49.381] [stdout] [info]    LB=0.202 UB=0.211 NumNodes=10 Gap%=4.459 Time=17.821 Iteration=26
+[2018-10-04 12:27:50.489] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:50.498] [stdout] [info]    LB=0.202 UB=0.211 NumNodes=70 Gap%=4.394 Time=18.937 Iteration=27
+[2018-10-04 12:27:50.632] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:50.641] [stdout] [info]    LB=0.202 UB=0.211 NumNodes=70 Gap%=4.394 Time=19.080 Iteration=28
+[2018-10-04 12:27:51.217] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:51.226] [stdout] [info]    LB=0.202 UB=0.211 NumNodes=90 Gap%=4.198 Time=19.665 Iteration=29
+[2018-10-04 12:27:52.017] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:52.025] [stdout] [info]    LB=0.202 UB=0.211 NumNodes=130 Gap%=4.114 Time=20.465 Iteration=30
+[2018-10-04 12:27:52.158] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:52.167] [stdout] [info]    LB=0.202 UB=0.211 NumNodes=130 Gap%=4.114 Time=20.607 Iteration=31
+[2018-10-04 12:27:52.464] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:52.472] [stdout] [info]    LB=0.202 UB=0.210 NumNodes=130 Gap%=3.693 Time=20.912 Iteration=32
+[2018-10-04 12:27:52.794] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:52.802] [stdout] [info]    LB=0.202 UB=0.210 NumNodes=130 Gap%=3.693 Time=21.242 Iteration=33
+[2018-10-04 12:27:53.177] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:53.185] [stdout] [info]    LB=0.202 UB=0.210 NumNodes=150 Gap%=3.693 Time=21.625 Iteration=34
+[2018-10-04 12:27:53.319] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:27:53.328] [stdout] [info]    LB=0.202 UB=0.210 NumNodes=150 Gap%=3.693 Time=21.768 Iteration=35
+[2018-10-04 12:28:01.666] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:28:01.675] [stdout] [info]    LB=0.204 UB=0.207 NumNodes=820 Gap%=1.611 Time=30.114 Iteration=36
+[2018-10-04 12:28:04.512] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:28:04.521] [stdout] [info]    LB=0.204 UB=0.207 NumNodes=1040 Gap%=1.475 Time=32.961 Iteration=37
+[2018-10-04 12:28:06.000] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:28:06.009] [stdout] [info]    LB=0.204 UB=0.207 NumNodes=1170 Gap%=1.435 Time=34.449 Iteration=38
+[2018-10-04 12:28:06.135] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:28:06.144] [stdout] [info]    LB=0.204 UB=0.207 NumNodes=1170 Gap%=1.435 Time=34.583 Iteration=39
+[2018-10-04 12:28:19.031] [stdout] [info]      Iteration=39 UB=0.207 LB=0.207 LP_UB=0.174 LP_Gap=-18.950% Gap=0.000% Time=47.471
+[2018-10-04 12:28:19.031] [stdout] [info]  
+[2018-10-04 12:28:19.031] [stdout] [info] ***********************************
+[2018-10-04 12:28:19.031] [stdout] [info] SOLVER:
+[2018-10-04 12:28:19.031] [stdout] [info]   -BCompose.
+[2018-10-04 12:28:19.031] [stdout] [info] TIME(s):
+[2018-10-04 12:28:19.031] [stdout] [info]   -Initialization    = 30.240
+[2018-10-04 12:28:19.031] [stdout] [info]   -1st phase         = 5.400
+[2018-10-04 12:28:19.031] [stdout] [info]   -2nd phase         = 42.071
+[2018-10-04 12:28:19.031] [stdout] [info]   -Total             = 77.712
+[2018-10-04 12:28:19.031] [stdout] [info] BOUNDS:
+[2018-10-04 12:28:19.031] [stdout] [info]   -Root bound        = 0.174
+[2018-10-04 12:28:19.031] [stdout] [info]    -Distance from LB = 15.931%
+[2018-10-04 12:28:19.031] [stdout] [info]   -Root after lifter = 0.201
+[2018-10-04 12:28:19.031] [stdout] [info]    -Distance from LB = 2.481%
+[2018-10-04 12:28:19.031] [stdout] [info]   -LB                = 0.207
+[2018-10-04 12:28:19.031] [stdout] [info]   -UB                = 0.207
+[2018-10-04 12:28:19.031] [stdout] [info]   -Termination Gap   = 0.000%
+[2018-10-04 12:28:19.031] [stdout] [info] ITERATIONS:
+[2018-10-04 12:28:19.031] [stdout] [info]   -1st phase         = 13
+[2018-10-04 12:28:19.031] [stdout] [info]   -2nd phase         = 26
+[2018-10-04 12:28:19.031] [stdout] [info] TREE:
+[2018-10-04 12:28:19.031] [stdout] [info]   -#Nodes            = 2811
+[2018-10-04 12:28:19.031] [stdout] [info] CUTS:
+[2018-10-04 12:28:19.031] [stdout] [info]   -#Feas             = 0
+[2018-10-04 12:28:19.031] [stdout] [info]     -1st phase       = 0
+[2018-10-04 12:28:19.031] [stdout] [info]     -2nd phase       = 0
+[2018-10-04 12:28:19.031] [stdout] [info]   -#Opt              = 17784
+[2018-10-04 12:28:19.031] [stdout] [info]     -1st phase       = 5928
+[2018-10-04 12:28:19.031] [stdout] [info]     -2nd phase       = 11856
+[2018-10-04 12:28:19.031] [stdout] [info]   -Total             = 17784
+[2018-10-04 12:28:19.031] [stdout] [info] MEMORY:
+[2018-10-04 12:28:19.032] [stdout] [info]   -Usage             = 3.96 GB
+[2018-10-04 12:28:19.032] [stdout] [info] ***********************************
+[2018-10-04 12:28:19.032] [stdout] [info]  
+[2018-10-04 12:28:19.032] [stdout] [info]  -Optimization terminated successfully!
+[2018-10-04 12:28:19.315] [stdout] [info]  -Loading the data...
+[2018-10-04 12:28:19.507] [stdout] [info]  -Exporting CPLEX models...
+[2018-10-04 12:28:19.508] [stdout] [info]     Exporting formulation for master problem...
+[2018-10-04 12:28:42.591] [stdout] [info]  -Done!
+[2018-10-04 12:28:45.111] [stdout] [info]  -Parsing the args...
+[2018-10-04 12:28:45.119] [stdout] [info]  -Importing master model...
+[2018-10-04 12:28:45.125] [stdout] [info]     Master model successfully loaded.
+[2018-10-04 12:28:45.125] [stdout] [info]     Running master on 1 core(s).
+[2018-10-04 12:28:45.125] [stdout] [info]  -Pre-processing the models...
+[2018-10-04 12:29:04.481] [stdout] [info]  -Importing subproblem models...
+[2018-10-04 12:29:04.627] [stdout] [info]    Loading 456 subpropblems...
+[2018-10-04 12:29:10.034] [stdout] [info]    Subproblems loaded successfully.
+[2018-10-04 12:29:15.391] [stdout] [info]    Subproblems loaded successfully.
+[2018-10-04 12:29:15.828] [stdout] [info]     Using up to 7 cores to generate cuts.
+[2018-10-04 12:29:15.828] [stdout] [info]  -Analyzing the problem...
+[2018-10-04 12:29:15.828] [stdout] [info]  -Applying PD...
+[2018-10-04 12:29:15.828] [stdout] [info]  -Initalization took 30.708351 seconds.
+[2018-10-04 12:29:15.828] [stdout] [info]  -Solving the LP phase...
+[2018-10-04 12:29:15.828] [stdout] [info]    +Optimizing LP...
+[2018-10-04 12:29:17.609] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:17.618] [stdout] [info]      Iteration=0 UB=inf LB=-100000006144.000 LP_UB=0.385 LP_Gap=25926918209536.000% Gap=-nan% Time=1.789
+[2018-10-04 12:29:18.124] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:18.134] [stdout] [info]      Iteration=1 UB=inf LB=0.053 LP_UB=0.278 LP_Gap=80.746% Gap=-nan% Time=2.306
+[2018-10-04 12:29:18.626] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:18.635] [stdout] [info]      Iteration=2 UB=inf LB=0.088 LP_UB=0.259 LP_Gap=65.932% Gap=-nan% Time=2.807
+[2018-10-04 12:29:18.997] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:19.007] [stdout] [info]      Iteration=3 UB=inf LB=0.118 LP_UB=0.230 LP_Gap=48.474% Gap=-nan% Time=3.179
+[2018-10-04 12:29:19.339] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:19.348] [stdout] [info]      Iteration=4 UB=inf LB=0.146 LP_UB=0.230 LP_Gap=36.475% Gap=-nan% Time=3.520
+[2018-10-04 12:29:19.631] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:19.641] [stdout] [info]      Iteration=5 UB=inf LB=0.160 LP_UB=0.211 LP_Gap=24.136% Gap=-nan% Time=3.813
+[2018-10-04 12:29:19.923] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:19.933] [stdout] [info]      Iteration=6 UB=inf LB=0.175 LP_UB=0.201 LP_Gap=12.846% Gap=-nan% Time=4.104
+[2018-10-04 12:29:20.210] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:20.221] [stdout] [info]      Iteration=7 UB=inf LB=0.181 LP_UB=0.190 LP_Gap=5.081% Gap=-nan% Time=4.393
+[2018-10-04 12:29:20.462] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:20.472] [stdout] [info]      Iteration=8 UB=inf LB=0.182 LP_UB=0.187 LP_Gap=2.845% Gap=-nan% Time=4.644
+[2018-10-04 12:29:20.693] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:20.703] [stdout] [info]      Iteration=9 UB=inf LB=0.182 LP_UB=0.186 LP_Gap=1.968% Gap=-nan% Time=4.875
+[2018-10-04 12:29:20.945] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:20.955] [stdout] [info]      Iteration=10 UB=inf LB=0.183 LP_UB=0.183 LP_Gap=0.238% Gap=-nan% Time=5.127
+[2018-10-04 12:29:21.150] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:21.160] [stdout] [info]      Iteration=11 UB=inf LB=0.183 LP_UB=0.183 LP_Gap=0.029% Gap=-nan% Time=5.332
+[2018-10-04 12:29:21.315] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:21.325] [stdout] [info]      Iteration=12 UB=inf LB=0.183 LP_UB=0.183 LP_Gap=0.000% Gap=-nan% Time=5.497
+[2018-10-04 12:29:21.325] [stdout] [info]    +Terminating LP phase because it is optimal!
+[2018-10-04 12:29:21.328] [stdout] [info]  -Creating the parallel branches on master...
+[2018-10-04 12:29:21.328] [stdout] [error] I don't support parallelism of the MP yet, sorry!
+[2018-10-04 12:29:21.328] [stdout] [info]  -Switching to MIP MP...
+[2018-10-04 12:29:21.328] [stdout] [info]   +Setting up the branch-and-bound tree...
+[2018-10-04 12:29:21.652] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:21.662] [stdout] [info]    LB=0.183 UB=inf NumNodes=0 Gap%=inf Time=5.833 Iteration=14
+[2018-10-04 12:29:21.793] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:21.802] [stdout] [info]    LB=0.183 UB=inf NumNodes=0 Gap%=inf Time=5.974 Iteration=15
+[2018-10-04 12:29:22.289] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:22.299] [stdout] [info]    LB=0.198 UB=0.248 NumNodes=0 Gap%=20.131 Time=6.470 Iteration=16
+[2018-10-04 12:29:22.426] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:22.435] [stdout] [info]    LB=0.198 UB=0.248 NumNodes=0 Gap%=20.131 Time=6.607 Iteration=17
+[2018-10-04 12:29:22.833] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:22.842] [stdout] [info]    LB=0.204 UB=0.237 NumNodes=0 Gap%=13.828 Time=7.014 Iteration=18
+[2018-10-04 12:29:22.971] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:22.980] [stdout] [info]    LB=0.204 UB=0.237 NumNodes=0 Gap%=13.828 Time=7.152 Iteration=19
+[2018-10-04 12:29:23.425] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:23.435] [stdout] [info]    LB=0.208 UB=0.228 NumNodes=0 Gap%=8.779 Time=7.606 Iteration=20
+[2018-10-04 12:29:23.694] [stdout] [info]  -Booster still looking...
+[2018-10-04 12:29:23.946] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:27.413] [stdout] [info] Int pool size= 456
+[2018-10-04 12:29:27.422] [stdout] [info]    LB=0.209 UB=0.228 NumNodes=0 Gap%=8.544 Time=11.593 Iteration=21
+[2018-10-04 12:29:27.461] [stdout] [info]  -Booster still looking...
+[2018-10-04 12:29:27.710] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:30.298] [stdout] [info] Int pool size= 912
+[2018-10-04 12:29:30.307] [stdout] [info]    LB=0.209 UB=0.228 NumNodes=0 Gap%=8.441 Time=14.479 Iteration=22
+[2018-10-04 12:29:30.374] [stdout] [info]  -Booster still looking...
+[2018-10-04 12:29:30.532] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:32.965] [stdout] [info] Int pool size= 1368
+[2018-10-04 12:29:33.182] [stdout] [info]  +Booster successfully terminated with 14.404% lift.
+[2018-10-04 12:29:33.182] [stdout] [info]    LB=0.209 UB=0.228 NumNodes=0 Gap%=8.435 Time=17.353 Iteration=23
+[2018-10-04 12:29:33.204] [stdout] [info]   Heuristic fixer searching...
+[2018-10-04 12:29:33.406] [stdout] [info]    143 variables got permenantly fixed out of 320
+[2018-10-04 12:29:33.717] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:33.726] [stdout] [info]    LB=0.209 UB=0.228 NumNodes=0 Gap%=8.435 Time=17.898 Iteration=24
+[2018-10-04 12:29:33.862] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:33.871] [stdout] [info]    LB=0.209 UB=0.228 NumNodes=0 Gap%=8.435 Time=18.042 Iteration=25
+[2018-10-04 12:29:34.178] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:34.186] [stdout] [info]    LB=0.209 UB=0.226 NumNodes=0 Gap%=7.569 Time=18.358 Iteration=26
+[2018-10-04 12:29:36.682] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:36.691] [stdout] [info]    LB=0.209 UB=0.226 NumNodes=30 Gap%=7.483 Time=20.863 Iteration=27
+[2018-10-04 12:29:36.820] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:36.829] [stdout] [info]    LB=0.209 UB=0.226 NumNodes=30 Gap%=7.483 Time=21.001 Iteration=28
+[2018-10-04 12:29:38.141] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:38.150] [stdout] [info]    LB=0.210 UB=0.226 NumNodes=90 Gap%=7.207 Time=22.321 Iteration=29
+[2018-10-04 12:29:39.268] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:39.277] [stdout] [info]    LB=0.210 UB=0.226 NumNodes=130 Gap%=7.063 Time=23.449 Iteration=30
+[2018-10-04 12:29:39.626] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:39.635] [stdout] [info]    LB=0.210 UB=0.226 NumNodes=130 Gap%=7.063 Time=23.806 Iteration=31
+[2018-10-04 12:29:39.764] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:39.773] [stdout] [info]    LB=0.210 UB=0.226 NumNodes=130 Gap%=7.063 Time=23.944 Iteration=32
+[2018-10-04 12:29:40.537] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:40.545] [stdout] [info]    LB=0.210 UB=0.225 NumNodes=170 Gap%=6.462 Time=24.717 Iteration=33
+[2018-10-04 12:29:40.685] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:40.693] [stdout] [info]    LB=0.210 UB=0.225 NumNodes=170 Gap%=6.462 Time=24.865 Iteration=34
+[2018-10-04 12:29:41.173] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:41.182] [stdout] [info]    LB=0.210 UB=0.221 NumNodes=190 Gap%=4.974 Time=25.353 Iteration=35
+[2018-10-04 12:29:41.316] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:41.325] [stdout] [info]    LB=0.210 UB=0.221 NumNodes=190 Gap%=4.974 Time=25.497 Iteration=36
+[2018-10-04 12:29:42.961] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:42.970] [stdout] [info]    LB=0.211 UB=0.220 NumNodes=290 Gap%=4.345 Time=27.141 Iteration=37
+[2018-10-04 12:29:56.585] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:56.594] [stdout] [info]    LB=0.215 UB=0.220 NumNodes=1730 Gap%=2.461 Time=40.766 Iteration=38
+[2018-10-04 12:29:56.721] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:29:56.730] [stdout] [info]    LB=0.215 UB=0.220 NumNodes=1730 Gap%=2.461 Time=40.901 Iteration=39
+[2018-10-04 12:30:03.772] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:30:03.781] [stdout] [info]    LB=0.216 UB=0.220 NumNodes=2600 Gap%=1.718 Time=47.952 Iteration=40
+[2018-10-04 12:30:07.037] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:30:07.046] [stdout] [info]    LB=0.216 UB=0.220 NumNodes=3088 Gap%=1.532 Time=51.218 Iteration=41
+[2018-10-04 12:30:07.172] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:30:07.181] [stdout] [info]    LB=0.216 UB=0.219 NumNodes=3088 Gap%=1.342 Time=51.353 Iteration=42
+[2018-10-04 12:30:31.272] [stdout] [info]      Iteration=42 UB=0.219 LB=0.219 LP_UB=0.183 LP_Gap=-19.984% Gap=0.000% Time=75.444
+[2018-10-04 12:30:31.272] [stdout] [info]  
+[2018-10-04 12:30:31.272] [stdout] [info] ***********************************
+[2018-10-04 12:30:31.272] [stdout] [info] SOLVER:
+[2018-10-04 12:30:31.272] [stdout] [info]   -BCompose.
+[2018-10-04 12:30:31.272] [stdout] [info] TIME(s):
+[2018-10-04 12:30:31.272] [stdout] [info]   -Initialization    = 30.708
+[2018-10-04 12:30:31.272] [stdout] [info]   -1st phase         = 5.500
+[2018-10-04 12:30:31.272] [stdout] [info]   -2nd phase         = 69.944
+[2018-10-04 12:30:31.272] [stdout] [info]   -Total             = 106.152
+[2018-10-04 12:30:31.272] [stdout] [info] BOUNDS:
+[2018-10-04 12:30:31.272] [stdout] [info]   -Root bound        = 0.183
+[2018-10-04 12:30:31.272] [stdout] [info]    -Distance from LB = 16.656%
+[2018-10-04 12:30:31.272] [stdout] [info]   -Root after lifter = 0.209
+[2018-10-04 12:30:31.272] [stdout] [info]    -Distance from LB = 4.651%
+[2018-10-04 12:30:31.272] [stdout] [info]   -LB                = 0.219
+[2018-10-04 12:30:31.272] [stdout] [info]   -UB                = 0.219
+[2018-10-04 12:30:31.272] [stdout] [info]   -Termination Gap   = 0.000%
+[2018-10-04 12:30:31.272] [stdout] [info] ITERATIONS:
+[2018-10-04 12:30:31.272] [stdout] [info]   -1st phase         = 13
+[2018-10-04 12:30:31.272] [stdout] [info]   -2nd phase         = 29
+[2018-10-04 12:30:31.272] [stdout] [info] TREE:
+[2018-10-04 12:30:31.272] [stdout] [info]   -#Nodes            = 7627
+[2018-10-04 12:30:31.272] [stdout] [info] CUTS:
+[2018-10-04 12:30:31.272] [stdout] [info]   -#Feas             = 0
+[2018-10-04 12:30:31.272] [stdout] [info]     -1st phase       = 0
+[2018-10-04 12:30:31.272] [stdout] [info]     -2nd phase       = 0
+[2018-10-04 12:30:31.272] [stdout] [info]   -#Opt              = 19152
+[2018-10-04 12:30:31.272] [stdout] [info]     -1st phase       = 5928
+[2018-10-04 12:30:31.272] [stdout] [info]     -2nd phase       = 13224
+[2018-10-04 12:30:31.272] [stdout] [info]   -Total             = 19152
+[2018-10-04 12:30:31.272] [stdout] [info] MEMORY:
+[2018-10-04 12:30:31.272] [stdout] [info]   -Usage             = 3.93 GB
+[2018-10-04 12:30:31.272] [stdout] [info] ***********************************
+[2018-10-04 12:30:31.272] [stdout] [info]  
+[2018-10-04 12:30:31.272] [stdout] [info]  -Optimization terminated successfully!
+[2018-10-04 12:30:31.554] [stdout] [info]  -Loading the data...
+[2018-10-04 12:30:31.734] [stdout] [info]  -Exporting CPLEX models...
+[2018-10-04 12:30:31.736] [stdout] [info]     Exporting formulation for master problem...
+[2018-10-04 12:30:54.873] [stdout] [info]  -Done!
+[2018-10-04 12:30:57.412] [stdout] [info]  -Parsing the args...
+[2018-10-04 12:30:57.420] [stdout] [info]  -Importing master model...
+[2018-10-04 12:30:57.426] [stdout] [info]     Master model successfully loaded.
+[2018-10-04 12:30:57.426] [stdout] [info]     Running master on 1 core(s).
+[2018-10-04 12:30:57.426] [stdout] [info]  -Pre-processing the models...
+[2018-10-04 12:31:16.407] [stdout] [info]  -Importing subproblem models...
+[2018-10-04 12:31:16.566] [stdout] [info]    Loading 456 subpropblems...
+[2018-10-04 12:31:21.939] [stdout] [info]    Subproblems loaded successfully.
+[2018-10-04 12:31:27.248] [stdout] [info]    Subproblems loaded successfully.
+[2018-10-04 12:31:27.684] [stdout] [info]     Using up to 7 cores to generate cuts.
+[2018-10-04 12:31:27.684] [stdout] [info]  -Analyzing the problem...
+[2018-10-04 12:31:27.684] [stdout] [info]  -Applying PD...
+[2018-10-04 12:31:27.685] [stdout] [info]  -Initalization took 30.264112 seconds.
+[2018-10-04 12:31:27.685] [stdout] [info]  -Solving the LP phase...
+[2018-10-04 12:31:27.685] [stdout] [info]    +Optimizing LP...
+[2018-10-04 12:31:29.477] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:29.485] [stdout] [info]      Iteration=0 UB=inf LB=-100000006144.000 LP_UB=0.375 LP_Gap=26598212370432.000% Gap=-nan% Time=1.800
+[2018-10-04 12:31:30.013] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:30.024] [stdout] [info]      Iteration=1 UB=inf LB=0.050 LP_UB=0.289 LP_Gap=82.407% Gap=-nan% Time=2.338
+[2018-10-04 12:31:30.451] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:30.460] [stdout] [info]      Iteration=2 UB=inf LB=0.095 LP_UB=0.253 LP_Gap=62.266% Gap=-nan% Time=2.775
+[2018-10-04 12:31:30.829] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:30.840] [stdout] [info]      Iteration=3 UB=inf LB=0.121 LP_UB=0.223 LP_Gap=45.941% Gap=-nan% Time=3.155
+[2018-10-04 12:31:31.159] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:31.169] [stdout] [info]      Iteration=4 UB=inf LB=0.148 LP_UB=0.215 LP_Gap=31.081% Gap=-nan% Time=3.484
+[2018-10-04 12:31:31.471] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:31.481] [stdout] [info]      Iteration=5 UB=inf LB=0.160 LP_UB=0.212 LP_Gap=24.499% Gap=-nan% Time=3.796
+[2018-10-04 12:31:31.733] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:31.743] [stdout] [info]      Iteration=6 UB=inf LB=0.169 LP_UB=0.204 LP_Gap=17.164% Gap=-nan% Time=4.058
+[2018-10-04 12:31:32.015] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:32.026] [stdout] [info]      Iteration=7 UB=inf LB=0.176 LP_UB=0.194 LP_Gap=8.923% Gap=-nan% Time=4.341
+[2018-10-04 12:31:32.266] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:32.276] [stdout] [info]      Iteration=8 UB=inf LB=0.179 LP_UB=0.187 LP_Gap=4.569% Gap=-nan% Time=4.591
+[2018-10-04 12:31:32.531] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:32.541] [stdout] [info]      Iteration=9 UB=inf LB=0.179 LP_UB=0.183 LP_Gap=2.204% Gap=-nan% Time=4.856
+[2018-10-04 12:31:32.769] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:32.779] [stdout] [info]      Iteration=10 UB=inf LB=0.180 LP_UB=0.181 LP_Gap=0.282% Gap=-nan% Time=5.094
+[2018-10-04 12:31:32.974] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:32.985] [stdout] [info]      Iteration=11 UB=inf LB=0.180 LP_UB=0.180 LP_Gap=0.032% Gap=-nan% Time=5.300
+[2018-10-04 12:31:33.136] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:33.147] [stdout] [info]      Iteration=12 UB=inf LB=0.180 LP_UB=0.180 LP_Gap=0.005% Gap=-nan% Time=5.462
+[2018-10-04 12:31:33.301] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:33.312] [stdout] [info]      Iteration=13 UB=inf LB=0.180 LP_UB=0.180 LP_Gap=0.000% Gap=-nan% Time=5.626
+[2018-10-04 12:31:33.312] [stdout] [info]    +Terminating LP phase because it is optimal!
+[2018-10-04 12:31:33.315] [stdout] [info]  -Creating the parallel branches on master...
+[2018-10-04 12:31:33.315] [stdout] [error] I don't support parallelism of the MP yet, sorry!
+[2018-10-04 12:31:33.315] [stdout] [info]  -Switching to MIP MP...
+[2018-10-04 12:31:33.315] [stdout] [info]   +Setting up the branch-and-bound tree...
+[2018-10-04 12:31:33.622] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:33.630] [stdout] [info]    LB=0.180 UB=inf NumNodes=0 Gap%=inf Time=5.945 Iteration=15
+[2018-10-04 12:31:33.772] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:33.780] [stdout] [info]    LB=0.180 UB=inf NumNodes=0 Gap%=inf Time=6.095 Iteration=16
+[2018-10-04 12:31:34.286] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:34.295] [stdout] [info]    LB=0.197 UB=0.241 NumNodes=0 Gap%=18.554 Time=6.610 Iteration=17
+[2018-10-04 12:31:34.429] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:34.438] [stdout] [info]    LB=0.197 UB=0.241 NumNodes=0 Gap%=18.554 Time=6.753 Iteration=18
+[2018-10-04 12:31:34.810] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:34.819] [stdout] [info]    LB=0.203 UB=0.230 NumNodes=0 Gap%=11.809 Time=7.134 Iteration=19
+[2018-10-04 12:31:34.944] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:34.953] [stdout] [info]    LB=0.203 UB=0.230 NumNodes=0 Gap%=11.809 Time=7.268 Iteration=20
+[2018-10-04 12:31:35.765] [stdout] [info]  -Booster still looking...
+[2018-10-04 12:31:36.059] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:39.526] [stdout] [info] Int pool size= 456
+[2018-10-04 12:31:39.535] [stdout] [info]    LB=0.209 UB=0.224 NumNodes=0 Gap%=6.519 Time=11.850 Iteration=21
+[2018-10-04 12:31:39.592] [stdout] [info]  -Booster still looking...
+[2018-10-04 12:31:39.719] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:42.048] [stdout] [info] Int pool size= 912
+[2018-10-04 12:31:42.264] [stdout] [info]  +Booster successfully terminated with 15.936% lift.
+[2018-10-04 12:31:42.264] [stdout] [info]    LB=0.209 UB=0.224 NumNodes=0 Gap%=6.518 Time=14.579 Iteration=22
+[2018-10-04 12:31:42.274] [stdout] [info]   Heuristic fixer searching...
+[2018-10-04 12:31:42.408] [stdout] [info]    141 variables got permenantly fixed out of 320
+[2018-10-04 12:31:42.696] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:42.704] [stdout] [info]    LB=0.209 UB=0.224 NumNodes=0 Gap%=6.518 Time=15.019 Iteration=23
+[2018-10-04 12:31:43.028] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:43.037] [stdout] [info]    LB=0.209 UB=0.224 NumNodes=0 Gap%=6.518 Time=15.352 Iteration=24
+[2018-10-04 12:31:43.172] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:43.181] [stdout] [info]    LB=0.209 UB=0.224 NumNodes=0 Gap%=6.518 Time=15.496 Iteration=25
+[2018-10-04 12:31:43.466] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:43.475] [stdout] [info]    LB=0.209 UB=0.223 NumNodes=0 Gap%=6.217 Time=15.790 Iteration=26
+[2018-10-04 12:31:43.601] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:43.610] [stdout] [info]    LB=0.209 UB=0.223 NumNodes=0 Gap%=6.217 Time=15.925 Iteration=27
+[2018-10-04 12:31:45.239] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:45.248] [stdout] [info]    LB=0.209 UB=0.218 NumNodes=10 Gap%=4.130 Time=17.563 Iteration=28
+[2018-10-04 12:31:45.378] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:45.387] [stdout] [info]    LB=0.209 UB=0.218 NumNodes=10 Gap%=4.130 Time=17.702 Iteration=29
+[2018-10-04 12:31:46.745] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:46.754] [stdout] [info]    LB=0.210 UB=0.216 NumNodes=90 Gap%=2.840 Time=19.069 Iteration=30
+[2018-10-04 12:31:52.001] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:52.010] [stdout] [info]    LB=0.211 UB=0.216 NumNodes=480 Gap%=2.367 Time=24.325 Iteration=31
+[2018-10-04 12:31:52.141] [stdout] [info]      Generated 456 optimality cuts and 0 feasbility cuts
+[2018-10-04 12:31:52.150] [stdout] [info]    LB=0.211 UB=0.216 NumNodes=480 Gap%=2.367 Time=24.465 Iteration=32
+[2018-10-04 12:33:04.385] [stdout] [info]      Iteration=32 UB=0.215 LB=0.215 LP_UB=0.180 LP_Gap=-19.443% Gap=0.000% Time=96.700
+[2018-10-04 12:33:04.385] [stdout] [info]  
+[2018-10-04 12:33:04.385] [stdout] [info] ***********************************
+[2018-10-04 12:33:04.385] [stdout] [info] SOLVER:
+[2018-10-04 12:33:04.385] [stdout] [info]   -BCompose.
+[2018-10-04 12:33:04.385] [stdout] [info] TIME(s):
+[2018-10-04 12:33:04.385] [stdout] [info]   -Initialization    = 30.264
+[2018-10-04 12:33:04.385] [stdout] [info]   -1st phase         = 5.630
+[2018-10-04 12:33:04.385] [stdout] [info]   -2nd phase         = 91.070
+[2018-10-04 12:33:04.385] [stdout] [info]   -Total             = 126.964
+[2018-10-04 12:33:04.385] [stdout] [info] BOUNDS:
+[2018-10-04 12:33:04.385] [stdout] [info]   -Root bound        = 0.180
+[2018-10-04 12:33:04.385] [stdout] [info]    -Distance from LB = 16.278%
+[2018-10-04 12:33:04.385] [stdout] [info]   -Root after lifter = 0.209
+[2018-10-04 12:33:04.385] [stdout] [info]    -Distance from LB = 2.935%
+[2018-10-04 12:33:04.385] [stdout] [info]   -LB                = 0.215
+[2018-10-04 12:33:04.385] [stdout] [info]   -UB                = 0.215
+[2018-10-04 12:33:04.385] [stdout] [info]   -Termination Gap   = 0.000%
+[2018-10-04 12:33:04.385] [stdout] [info] ITERATIONS:
+[2018-10-04 12:33:04.385] [stdout] [info]   -1st phase         = 14
+[2018-10-04 12:33:04.385] [stdout] [info]   -2nd phase         = 18
+[2018-10-04 12:33:04.385] [stdout] [info] TREE:
+[2018-10-04 12:33:04.385] [stdout] [info]   -#Nodes            = 11997
+[2018-10-04 12:33:04.385] [stdout] [info] CUTS:
+[2018-10-04 12:33:04.385] [stdout] [info]   -#Feas             = 0
+[2018-10-04 12:33:04.385] [stdout] [info]     -1st phase       = 0
+[2018-10-04 12:33:04.385] [stdout] [info]     -2nd phase       = 0
+[2018-10-04 12:33:04.385] [stdout] [info]   -#Opt              = 14592
+[2018-10-04 12:33:04.385] [stdout] [info]     -1st phase       = 6384
+[2018-10-04 12:33:04.385] [stdout] [info]     -2nd phase       = 8208
+[2018-10-04 12:33:04.385] [stdout] [info]   -Total             = 14592
+[2018-10-04 12:33:04.385] [stdout] [info] MEMORY:
+[2018-10-04 12:33:04.386] [stdout] [info]   -Usage             = 4.00 GB
+[2018-10-04 12:33:04.386] [stdout] [info] ***********************************
+[2018-10-04 12:33:04.386] [stdout] [info]  
+[2018-10-04 12:33:04.386] [stdout] [info]  -Optimization terminated successfully!
+[2018-10-04 12:33:04.671] [stdout] [info]  -Loading the data...
+[2018-10-04 12:33:04.855] [stdout] [info]  -Exporting CPLEX models...
+[2018-10-04 12:33:04.857] [stdout] [info]     Exporting formulation for master problem...
+[2018-10-04 12:33:27.655] [stdout] [info]  -Done!
+[2018-10-04 12:33:30.059] [stdout] [info]  -Parsing the args...
+[2018-10-04 12:33:30.068] [stdout] [info]  -Importing master model...
+[2018-10-04 12:33:30.073] [stdout] [info]     Master model successfully loaded.
+[2018-10-04 12:33:30.073] [stdout] [info]     Running master on 1 core(s).
+[2018-10-04 12:33:30.073] [stdout] [info]  -Pre-processing the models...
+[2018-10-04 12:33:48.936] [stdout] [info]  -Importing subproblem models...
+[2018-10-04 12:33:49.096] [stdout] [info]    Loading 456 subpropblems...
