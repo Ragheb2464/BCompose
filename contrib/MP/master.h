@@ -20,8 +20,8 @@
 
 class Master {
 public:
-  Master(){};
-  ~Master(){};
+  Master() {}
+  ~Master() {}
 
   void Initializer(const std::shared_ptr<spdlog::logger> console,
                    SharedInfo &shared_info,
@@ -303,7 +303,8 @@ public:
   }
 
   void SolveRootNode(const std::shared_ptr<spdlog::logger> console,
-                     SharedInfo &shared_info, std::unique_ptr<Subproblem> &SP) {
+                     SharedInfo &shared_info,
+                     const std::shared_ptr<Subproblem> &SP) {
     console->info("   +Optimizing LP...");
     SetSartTime();
     while (true) {
@@ -330,7 +331,7 @@ public:
         // master_model_.cplex.exportModel("MP_.lp");
         exit(0);
       }
-      master_model_.cplex.exportModel("MP_.lp");
+      // master_model_.cplex.exportModel("MP_.lp");
       ExtractVariablesValue(console, shared_info);
       // std::cout << shared_info.master_variables_value << std::endl;
       UpdateLBStats(console);
@@ -359,6 +360,10 @@ public:
       PrintStatus(console);
       solver_info_.iteration++;
       solver_info_.lp_phase_LB = solver_info_.LB;
+      if (solver_info_.iteration >=
+          Settings::StoppingConditions::max_num_iterations_phase_I) {
+        break;
+      }
     }
     solver_info_.lp_iteration = solver_info_.iteration;
     master_model_.cplex.solve();
@@ -468,7 +473,7 @@ public:
   // this func use the sols obbtined from the LR cuts to gen cuts and bounds
   bool RunLRBasedHeuristic(SharedInfo &shared_info,
                            const std::shared_ptr<spdlog::logger> console,
-                           std::unique_ptr<Subproblem> &SP) {
+                           const std::shared_ptr<Subproblem> &SP) {
     if (!Settings::CutGeneration::use_LR_cuts) {
       console->error(
           "Please turn on the use_LR_cuts to use run_lagrang_heuristic");
@@ -524,42 +529,55 @@ public:
                                  Settings::StoppingConditions::node_limit);
   }
 
-  void SetCallbacks(const std::shared_ptr<spdlog::logger> console,
-                    SharedInfo &shared_info, std::unique_ptr<Subproblem> &SP) {
+  void SetCallbacks(const std::shared_ptr<spdlog::logger> &console,
+                    SharedInfo &shared_info,
+                    const std::shared_ptr<Subproblem> &SP) {
+    console->info("  -Setting the callbacks...");
     master_model_.cplex.setParam(
         IloCplex::Param::TimeLimit,
         Settings::StoppingConditions::branching_time_limit);
     master_model_.cplex.setParam(IloCplex::Param::Threads, 1);
+    // ****Legacy callbacks
+    // master_model_.cplex.use(
+    //     BendersUserCallback(master_model_.env, console, shared_info, SP,
+    //                         master_model_.master_variables,
+    //                         master_model_.recourse_variables, solver_info_));
+    // master_model_.cplex.use(
+    //     BendersLazyCallback(master_model_.env, console, shared_info, SP,
+    //                         master_model_.master_variables,
+    //                         master_model_.recourse_variables, solver_info_));
 
-    master_model_.cplex.use(
-        BendersUserCallback(master_model_.env, console, shared_info, SP,
-                            master_model_.master_variables,
-                            master_model_.recourse_variables, solver_info_));
-    master_model_.cplex.use(
-        BendersLazyCallback(master_model_.env, console, shared_info, SP,
-                            master_model_.master_variables,
-                            master_model_.recourse_variables, solver_info_));
+    // ****Generic callbacks
+    console->info("  -Done.");
   }
 
   void BranchingPhase(const std::shared_ptr<spdlog::logger> console,
                       SharedInfo &shared_info,
-                      std::unique_ptr<Subproblem> &SP) {
+                      const std::shared_ptr<Subproblem> &SP) {
     assert(shared_info.retained_subproblem_ids.size() !=
            shared_info.num_subproblems);
+
     SetCallbacks(console, shared_info, SP);
+    BendersCustomCutCallback generic_cut_callback_(
+        console, shared_info, master_model_.master_variables,
+        master_model_.recourse_variables, solver_info_, SP);
+    contextmask_ = IloCplex::Callback::Context::Id::Candidate;
+    // |
+    // IloCplex::Callback::Context::Id::Relaxation;
+    master_model_.cplex.use(&generic_cut_callback_, contextmask_);
 
     if (Settings::Heuristic::run_lagrang_heuristic) {
       RunLRBasedHeuristic(shared_info, console, SP);
     }
 
     console->info("  +Setting up the branch-and-bound tree...");
-
     if (!master_model_.cplex.solve()) {
       console->error("Failed to solve MIP master, please examine the exported "
                      "MP_BCompose.lp model");
       master_model_.cplex.exportModel("MP_BCompose.lp");
       exit(0);
     }
+    solver_info_ = generic_cut_callback_.GetSolverInfo();
     solver_info_.global_UB = master_model_.cplex.getObjValue();
     solver_info_.LB = master_model_.cplex.getBestObjValue();
     solver_info_.num_nodes = master_model_.cplex.getNnodes64();
@@ -681,7 +699,11 @@ public:
 private:
   MasterModel master_model_;
   MasterSolverInfo solver_info_;
-  uint64_t num_threads_;
+  uint64_t num_threads_ = 1;
+  //
+  CPXLONG contextmask_ = 0;
+  //
+  Master(const Master &copy);
 };
 
 #endif

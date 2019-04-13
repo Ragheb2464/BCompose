@@ -27,8 +27,8 @@ def main():
         logger.info('Cleaning up the old stuff...')
         subprocess.call('rm' + " " + 'main', shell=True)
         subprocess.call('rm' + " " + 'main.o', shell=True)
-        subprocess.call('rm' + " " + '../models/*.sav', shell=True)
-        subprocess.call('rm' + " " + '../models/*.lp', shell=True)
+        subprocess.call('rm' + " " + '../models/*', shell=True)
+        subprocess.call('rm' + " " + '../opt_model_dir/*', shell=True)
     except Exception as e:
         logger.error('Failed to clean up')
         logger.error(e)
@@ -101,7 +101,7 @@ def main():
                                         instance_file_path + ' --scenario_path=' +
                                         scenario_file_path, shell=True)
                         subprocess.call('cp' + " " + model_files_path +
-                                        '/*.sav' + " " + pwd + '/lifted_SP_models/', shell=True)
+                                        '/*.sav' + " " + pwd + '/opt_model_dir/', shell=True)
                         # os.chdir(pwd)
                         # logger.info('Starting the optimization...')
                         # subprocess.call('./main  --model_dir=' + model_files_path +

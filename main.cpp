@@ -46,7 +46,7 @@ static const char USAGE[] =
 )";
 
 int main(int argc, char *argv[]) {
-  auto console = spdlog::stdout_logger_mt("stdout");
+  const auto console = spdlog::stdout_logger_mt("stdout");
 
   console->info(" -Parsing the args...");
   const std::map<std::string, docopt::value> args{
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
   const std::string current_directory = args.at("--current_dir").asString();
   if (current_directory[current_directory.size() - 1] == '/' ||
       model_directory[model_directory.size() - 1] == '/') {
-    console->error("Directory shouldn't finish with '/'");
+    console->error("Directory shouldn't end with '/'");
     exit(0);
   }
   SharedInfo shared_info{}; // here you can find all the info which is possibly
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
   }
 
   console->info(" -Importing subproblem models...");
-  std::unique_ptr<Subproblem> SP{new Subproblem()};
+  std::shared_ptr<Subproblem> SP = std::make_shared<Subproblem>();
   SP->Initializer(console, shared_info, current_directory);
 
   console->info(" -Analyzing the problem...");
@@ -111,8 +111,8 @@ int main(int argc, char *argv[]) {
       MP->Cleaner(console);
     }
 
-    console->info(" -Creating the parallel branches on master...");
-    MP->ParallelPreparer(console, shared_info, 2);
+    // console->info(" -Creating the parallel branches on master...");
+    // MP->ParallelPreparer(console, shared_info, 2);
 
     console->info(" -Switching to MIP MP...");
     MP->ConvertLPtoMIP();

@@ -96,8 +96,8 @@ void CreateSubproblemModels(const std::shared_ptr<spdlog::logger> console) {
         }
       } else {
         lost_demand += it.second;
-        std::cout << "Customer without near facility site: " << it.first
-                  << '\n';
+        // std::cout << "Customer without near facility site: " << it.first
+        //           << '\n';
       }
       expr -= x_var[it.first];
       constraints.add(IloRange(env, 0, expr, IloInfinity));
@@ -116,7 +116,24 @@ void CreateSubproblemModels(const std::shared_ptr<spdlog::logger> console) {
     constraints.add(IloRange(env, -IloInfinity, expr_f, B));
     expr_f.end();
   }
-
+  {  // anti symmetry
+     // if z_i and z_j has the same exact contribution, force z_i<=z_j
+     // we know that their contribution is the same in the budget constraint
+    // we need to check their contribution to coverage
+    for (const auto& it : facility_to_covered_demand) {
+      const uint64_t f_id = it.first;
+      const double covered_demand = it.second;
+      // std::cout << covered_demand << '\n';
+      for (uint64_t i = f_id + 1; i < facility_to_covered_demand.size(); ++i) {
+        if (covered_demand == facility_to_covered_demand.at(i)) {
+          // constraints.add(
+          //     IloRange(env, -IloInfinity, z_var[i] - z_var[f_id], 0));
+          std::cout << "Equal facilities => " << f_id << "=" << i << '\n';
+        }
+      }
+    }
+  }
+  // 3484664.000000
   // console->info("  -VI");
   // {
   //   IloExpr expr(env);
@@ -143,7 +160,7 @@ void CreateSubproblemModels(const std::shared_ptr<spdlog::logger> console) {
     // infeasible
     // cplex.setOut(env.getNullStream());
     // this is only to faster check the model
-    cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
+    // cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
     // cplex.setParam(IloCplex::Param::Preprocessing::Linear, 0);
     // cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 0);
     cplex.setParam(IloCplex::Param::Threads, 7);
@@ -152,6 +169,7 @@ void CreateSubproblemModels(const std::shared_ptr<spdlog::logger> console) {
       console->error(" Subproblem is infeasible!");
       exit(0);
     }
+    console->error(" Obj val is " + std::to_string(cplex.getObjValue()));
   }
 
   console->info("    Exporting formulation for subproblem " +

@@ -279,5 +279,7 @@ public:
 private:
   uint64_t num_subproblems_, num_threads_;
   std::mutex mtx_;
+  //
+  Subproblem(const Subproblem &copy);
 };
 #endif

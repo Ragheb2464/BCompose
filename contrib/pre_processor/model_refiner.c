@@ -75,6 +75,7 @@ void lifter(const char *model_dir, const int sp_id, const int aggressiveness,
   status = CPXsetsolvecallbackfunc(env, usersolve, (void *)model_dir);
   {
     { /* Let MIP callbacks work on the original model */
+      status = CPXsetintparam(env, CPXPARAM_Preprocessing_Symmetry, 3);
       status = CPXsetintparam(env, CPXPARAM_Preprocessing_Linear, 0);
       if (status) goto TERMINATE;
       status =

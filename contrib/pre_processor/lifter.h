@@ -32,7 +32,7 @@ void LiftSPs(const std::string current_directory, const SharedInfo &shared_info,
 
   std::vector<std::string> dir_vec;
   for (uint64_t sp_id = 0; sp_id < shared_info.num_subproblems; ++sp_id) {
-    dir_vec.push_back(current_directory + "/lifted_SP_models/SP_" +
+    dir_vec.push_back(current_directory + "/opt_model_dir/SP_" +
                       std::to_string(sp_id) + ".sav");
   }
 

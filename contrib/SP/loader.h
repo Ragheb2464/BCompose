@@ -349,8 +349,7 @@ bool Loader(const std::shared_ptr<spdlog::logger> console,
             subproblem_model[sp_id].env.getNullStream());
         subproblem_model[sp_id].cplex.setWarning(
             subproblem_model[sp_id].env.getNullStream());
-        const std::string model_dir = current_directory +
-                                      "/lifted_SP_models/SP_" +
+        const std::string model_dir = current_directory + "/opt_model_dir/SP_" +
                                       std::to_string(sp_id) + ".sav";
         subproblem_model[sp_id].cplex.importModel(
             subproblem_model[sp_id].model, model_dir.c_str(),
@@ -414,7 +413,7 @@ uint64_t GetSubproblemCount() {
   uint64_t number_of_files = 0;
   const int possible_max = 1e5;  // some number you can expect.
   for (int s = 0; s < possible_max; s++) {
-    std::string file_name = "lifted_SP_models/SP_" + std::to_string(s) + ".sav";
+    std::string file_name = "opt_model_dir/SP_" + std::to_string(s) + ".sav";
     std::fstream file;
     file.open(file_name);
     if (file) {

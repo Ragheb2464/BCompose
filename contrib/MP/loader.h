@@ -139,8 +139,7 @@ bool Loader(const std::shared_ptr<spdlog::logger> console,
 
   master_model.cplex.setWarning(master_model.env.getNullStream());
 
-  const std::string MP_model_dir =
-      current_directory + "/lifted_SP_models/MP.sav";
+  const std::string MP_model_dir = current_directory + "/opt_model_dir/MP.sav";
 
   master_model.cplex.importModel(master_model.model, MP_model_dir.c_str(),
                                  master_model.objective, master_model.variables,

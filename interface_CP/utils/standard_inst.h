@@ -19,6 +19,10 @@ const int B = 20;
 const float R = 3.25;
 
 std::unordered_map<uint64_t, std::unordered_set<uint64_t>> set_J_i;
+// facility_id to demand it can cover; used in symmetry breaking
+std::unordered_map<uint64_t, double> facility_to_covered_demand;
+std::unordered_map<uint64_t, std::unordered_set<uint64_t>>
+    facility_to_covered_customers;
 
 double Euclidean(uint64_t i, uint64_t j) {
   return std::sqrt(
@@ -84,12 +88,27 @@ void SetData(const std::string file_path) {
 
   // D = percentage * D_bar;
 
-  for (uint64_t i = 0; i < I; i++) {
-    for (uint64_t j = 0; j < J; j++) {
+  for (uint64_t i = 0; i < I; i++) {    // facility
+    for (uint64_t j = 0; j < J; j++) {  // customer
       if (Euclidean(i, j) <= R) {
         const auto& res = set_J_i[j].insert(i);
         assert(res.second);
+        {
+          facility_to_covered_demand[i] =
+              (facility_to_covered_demand.count(i))
+                  ? facility_to_covered_demand[i] + demand.at(j)
+                  : demand.at(j);
+
+          facility_to_covered_customers[i].insert(j);
+        }
       }
+    }
+  }
+
+  for (const auto& it : facility_to_covered_customers) {
+    std::cout << "\n" << it.first << "=>";
+    for (const auto j : it.second) {
+      std::cout << j << ", ";
     }
   }
 }

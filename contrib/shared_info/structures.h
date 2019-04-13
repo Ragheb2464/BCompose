@@ -28,10 +28,10 @@ struct CopiedVarsValPool {
   // I dont want to skip repetion
   inline bool operator==(const CopiedVarsValPool &other) const {
     assert(solution.size() == other.solution.size());
-    return false; // solution == other.solution;
+    return false;  // solution == other.solution;
   }
   inline bool operator<(const CopiedVarsValPool &other) const {
-    return true; // solution == other.solution ? false : true;
+    return true;  // solution == other.solution ? false : true;
   }
 };
 // struct CopiedVarsValPoolHasher {
@@ -63,12 +63,12 @@ struct SharedInfo {
   std::set<uint64_t> retained_subproblem_ids;
 
   std::unordered_map<uint64_t, double>
-      fixed_master_variables; // the pre-solve in C API may fix some variables,
-                              // we extract them and fix them in the master
-                              // problem: var_id->value
+      fixed_master_variables;  // the pre-solve in C API may fix some variables,
+                               // we extract them and fix them in the master
+                               // problem: var_id->value
 
-  std::vector<IloNum> subproblem_objective_value;
-  std::vector<bool> subproblem_status; // true:opt, false:inf
+  std::vector<double> subproblem_objective_value;
+  std::vector<bool> subproblem_status;  // true:opt, false:inf
   std::vector<IloNumArray> dual_values;
   std::vector<IloNumArray> copied_variables_value;
 };

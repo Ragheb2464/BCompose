@@ -18,7 +18,7 @@ struct Settings {
   struct ImproveFormulations {
     static const bool improve_SP_representation = true;
     static const uint32_t aggressiveness =
-        3;  // 0 moderate, 1 agreessive, 2 more
+        1;  // 0 moderate, 1 agreessive, 2 more
             // aggressive, 3 very aggressive
   };
   struct Solver {
@@ -125,6 +125,8 @@ struct Settings {
   struct StoppingConditions {
     static const size_t node_limit =
         9223372036800000000;  // defualt 9223372036800000000
+    static const uint32_t max_num_iterations_phase_I =
+        1000;  // ++iter, each time a master solution is used to gen cuts,
     static const uint32_t max_num_iterations =
         1000;  // ++iter, each time a master solution is used to gen cuts,
 
@@ -158,7 +160,7 @@ struct ProblemSpecificSettings {
         false;  // conditions apply
   };
   struct ProblemProperties {
-    static const bool is_complete_recourse = true;  //
+    static const bool is_complete_recourse = false;  //
   };
 };
 

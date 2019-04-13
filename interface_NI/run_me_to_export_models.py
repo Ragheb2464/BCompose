@@ -28,7 +28,7 @@ def main():
         subprocess.call('rm' + " " + 'main', shell=True)
         subprocess.call('rm' + " " + 'main.o', shell=True)
         # subprocess.call('rm' + " " + '../models/*.sav', shell=True)
-        subprocess.call('rm' + " " + '../models/*.lp', shell=True)
+        subprocess.call('rm' + " " + '../models/*', shell=True)
     except Exception as e:
         logger.error('Failed to clean up')
         logger.error(e)
@@ -48,9 +48,9 @@ def main():
         logger.error(e)
 
     logger.info('Setting the instances to be solved...')
-    snipno = [3, 4]  # 4
-    budget = [30, 40, 50, 60, 70, 80, 90]  # 30 40 50 60  70 80 90
-    instanceNo = [0, 1, 2, 3, 4]  # 0 1 2 3 4
+    snipno = [3]  # , 4]  # 4
+    budget = [50]  # 30, 40, 50, 60, 70, 80, 90]  # 30 40 50 60  70 80 90
+    instanceNo = [3]  # 0, 1, 2, 3, 4]  # 0 1 2 3 4
     for snipnokey in range(len(snipno)):
         for inskey in range(len(budget)):
             for fcrkey in range(len(instanceNo)):
@@ -69,7 +69,7 @@ def main():
                                 intd_arcname + ' ' + psiname + ' ' + scenname
                                 + ' ' + str(budget[inskey]) + ' ' + str(instanceNo[fcrkey]) + ' ' + str(snipno[snipnokey]), shell=True)
                 subprocess.call('cp' + " " + model_files_path +
-                                '/*.sav' + " " + pwd + '/contrib/lifted_SP_models/', shell=True)
+                                '/*.sav' + " " + pwd + '/contrib/opt_model_dir/', shell=True)
                 # os.chdir(pwd)
                 # logger.info('Starting the optimization...')
                 # subprocess.call('./main  --model_dir=' + model_files_path +

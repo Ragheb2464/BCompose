@@ -5,6 +5,7 @@ __email______ = 'Ragheb.Rahmaniani@Gmail.Com'
 __copyright__ = 'All Rights Reserved.'
 __revision___ = '02.01.0isr'
 __update_____ = '8/11/2018'
+__usage______ = 'python run_me.py'
 __note_______ = 'This python scripts can be used to run the algorithm.\
                  It can be used to solve R data set from SND problems'
 
@@ -22,9 +23,9 @@ pwd = "/home/rahrag/Bureau/GeorgiaTech/ND/BDD"
 
 subprocess.call('rm' + " " + 'main', shell=True)
 subprocess.call('rm' + " " + 'main.o', shell=True)
-subprocess.call('rm' + " " + pwd + '/lifted_SP_models/*', shell=True)
+subprocess.call('rm' + " " + pwd + '/opt_model_dir/*', shell=True)
 subprocess.call('cp' + " " + model_files_path +
-                '/*.sav' + " " + pwd + '/lifted_SP_models/', shell=True)
+                '/*.sav' + " " + pwd + '/opt_model_dir/', shell=True)
 
 
 try:
