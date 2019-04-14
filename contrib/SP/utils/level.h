@@ -66,27 +66,27 @@ public:
 
   void SetInitialDualValues(const IloNumArray &dual) {
     assert(dual.getSize() == dual_vals_.getSize());
-    for (uint64_t i = 0; i < dual.getSize(); ++i) {
+    for (IloInt i = 0; i < dual.getSize(); ++i) {
       dual_vals_[i] = dual[i];
       best_dual_vals_[i] = dual[i];
     }
   }
   void GetBestDualValues(IloNumArray &dual) {
     assert(dual.getSize() == best_dual_vals_.getSize());
-    for (uint64_t i = 0; i < best_dual_vals_.getSize(); ++i) {
+    for (IloInt i = 0; i < best_dual_vals_.getSize(); ++i) {
       dual[i] = best_dual_vals_[i];
     }
   }
   void GetDualValues(IloNumArray &dual) {
     assert(dual.getSize() == dual_vals_.getSize());
-    for (uint64_t i = 0; i < dual.getSize(); ++i) {
+    for (IloInt i = 0; i < dual.getSize(); ++i) {
       dual[i] = dual_vals_[i];
     }
   }
 
   void UpdateBestDualValue(const IloNumArray &dual) {
     assert(dual.getSize() == best_dual_vals_.getSize());
-    for (uint64_t i = 0; i < dual.getSize(); ++i) {
+    for (IloInt i = 0; i < dual.getSize(); ++i) {
       best_dual_vals_[i] = dual[i];
     }
   }

@@ -10,13 +10,13 @@
 #include <mutex>
 #include "../control/solver_settings.h"
 #include "../shared_info/structures.h"
-extern "C" {
 // Get declaration for lifter(char *export_name)
 #include "../pre_processor/model_refiner.h"
-}
 
-void LiftSPs(const std::string current_directory, const SharedInfo &shared_info,
-             const std::shared_ptr<spdlog::logger> console) {
+void LiftSPs(const std::string current_directory,
+             const SharedInfo &shared_info) {
+  double *obj_vals =
+      (double *)malloc(shared_info.num_subproblems * sizeof(double));
   const size_t num_threads = Settings::Parallelization::num_proc;
   std::ios_base::sync_with_stdio(false);
   std::cin.tie(nullptr);
@@ -36,13 +36,13 @@ void LiftSPs(const std::string current_directory, const SharedInfo &shared_info,
                       std::to_string(sp_id) + ".sav");
   }
 
-  alloc_vec_size(shared_info.num_subproblems);
+  // alloc_vec_size(shared_info.num_subproblems, obj_vals);
 
   for (uint64_t sp_id = 0; sp_id < shared_info.num_subproblems; ++sp_id) {
-    io_service.dispatch(
-        boost::bind(lifter, dir_vec[sp_id].c_str(), sp_id,
-                    Settings::ImproveFormulations::aggressiveness,
-                    Settings::StoppingConditions::lifter_time_limit_per_SP));
+    io_service.dispatch(boost::bind(
+        lifter, dir_vec[sp_id].c_str(), sp_id,
+        Settings::ImproveFormulations::aggressiveness,
+        Settings::StoppingConditions::lifter_time_limit_per_SP, obj_vals));
     // lifter(dir_vec[sp_id].c_str(), sp_id,
     //        Settings::ImproveFormulations::aggressiveness,
     //        Settings::StoppingConditions::lifter_time_limit_per_SP);

@@ -58,7 +58,7 @@ void SetCplexSettings(MasterModel &master_model) noexcept {
 
 uint64_t ExtractVarId(const std::string &var_name) {
   std::string temp_str;
-  for (int j = 0; j < var_name.size(); j++) {
+  for (uint64_t j = 0; j < var_name.size(); j++) {
     if (var_name[j] >= '0' && var_name[j] <= '9') {
       temp_str += var_name[j];
     }
@@ -73,7 +73,7 @@ void GetMasterVariablesBound(const MasterModel &master_model,
       IloNumArray(master_model.env, master_model.master_variables.getSize());
   shared_info.master_variables_ub =
       IloNumArray(master_model.env, master_model.master_variables.getSize());
-  for (uint64_t i = 0; i < master_model.master_variables.getSize(); ++i) {
+  for (IloInt i = 0; i < master_model.master_variables.getSize(); ++i) {
     shared_info.master_variables_lb[i] =
         master_model.master_variables[i].getLB();
     shared_info.master_variables_ub[i] =
@@ -91,11 +91,13 @@ void Sorter(MasterModel &master_model, const SharedInfo &shared_info) {
     const std::string var_name = master_model.variables[i].getName();
     if (var_name.find("theta_") != std::string::npos) {
       var_id = ExtractVarId(var_name);
-      assert(var_id < master_model.recourse_variables.getSize());
+      assert(var_id <
+             static_cast<uint64_t>(master_model.recourse_variables.getSize()));
       master_model.recourse_variables[var_id] = master_model.variables[i];
     } else if (var_name.find("y_") != std::string::npos) {
       var_id = ExtractVarId(var_name);
-      assert(var_id < master_model.master_variables.getSize());
+      assert(var_id <
+             static_cast<uint64_t>(master_model.master_variables.getSize()));
       master_model.master_variables[var_id] = master_model.variables[i];
     }
   }
@@ -112,14 +114,18 @@ void GetObjectiveCoeffs(MasterModel &master_model, SharedInfo &shared_info) {
            IloExpr(master_model.objective.getExpr()).getLinearIterator();
        it.ok(); ++it) {
     const std::string var_name = it.getVar().getName();
-    std::size_t found_theta = var_name.find("theta_");
+    const auto found_theta = var_name.find("theta_");
     if (found_theta != std::string::npos) {
       var_id = ExtractVarId(var_name);
-      assert(var_id >= 0 && var_id < master_model.recourse_variables.getSize());
+      assert(var_id >= 0 &&
+             var_id < static_cast<uint64_t>(
+                          master_model.recourse_variables.getSize()));
       shared_info.subproblem_weight[var_id] = it.getCoef();
     } else {
       var_id = ExtractVarId(var_name);
-      assert(var_id >= 0 && var_id < master_model.master_variables.getSize());
+      assert(var_id >= 0 &&
+             var_id < static_cast<uint64_t>(
+                          master_model.master_variables.getSize()));
       shared_info.master_variable_obj_coeff[var_id] = it.getCoef();
     }
   }
@@ -127,7 +133,7 @@ void GetObjectiveCoeffs(MasterModel &master_model, SharedInfo &shared_info) {
 
 bool Loader(const std::shared_ptr<spdlog::logger> console,
             MasterModel &master_model, SharedInfo &shared_info,
-            const std::string current_directory) {
+            const std::string &current_directory) {
   master_model.env = IloEnv();
   master_model.model = IloModel(master_model.env);
   master_model.cplex = IloCplex(master_model.model);
@@ -136,15 +142,12 @@ bool Loader(const std::shared_ptr<spdlog::logger> console,
   master_model.opt_cuts = IloRangeArray(master_model.env);
   master_model.feas_cuts = IloRangeArray(master_model.env);
   master_model.variables = IloNumVarArray(master_model.env);
-
   master_model.cplex.setWarning(master_model.env.getNullStream());
 
   const std::string MP_model_dir = current_directory + "/opt_model_dir/MP.sav";
-
   master_model.cplex.importModel(master_model.model, MP_model_dir.c_str(),
                                  master_model.objective, master_model.variables,
                                  master_model.constraints);
-
   // getting number of master and recourse variables, we may use them for sanity
   // checks
   shared_info.num_recourse_variables = 0;

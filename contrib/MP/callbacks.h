@@ -14,25 +14,23 @@
 #include "structures.h"
 
 class BendersCustomCutCallback : public IloCplex::Callback::Function {
- public:
-  BendersCustomCutCallback(const std::shared_ptr<spdlog::logger>& _console,
-                           const SharedInfo& _shared_info,
-                           const IloNumVarArray& _master_variables,
-                           const IloNumVarArray& _recourse_variables,
-                           const MasterSolverInfo& _solver_info_,
-                           const std::shared_ptr<Subproblem>& _SP)
-      : console_(_console),
-        shared_info_(_shared_info),
+public:
+  BendersCustomCutCallback(const std::shared_ptr<spdlog::logger> &_console,
+                           const SharedInfo &_shared_info,
+                           const IloNumVarArray &_master_variables,
+                           const IloNumVarArray &_recourse_variables,
+                           const MasterSolverInfo &_solver_info_,
+                           const std::shared_ptr<Subproblem> &_SP)
+      : console_(_console), shared_info_(_shared_info),
         master_variables_(_master_variables),
-        recourse_variables_(_recourse_variables),
-        solver_info_(_solver_info_),
+        recourse_variables_(_recourse_variables), solver_info_(_solver_info_),
         SP_(_SP) {}
 
-  void invoke(const IloCplex::Callback::Context& context);
-  void AddLazyCuts(const IloCplex::Callback::Context& context);
+  void invoke(const IloCplex::Callback::Context &context);
+  void AddLazyCuts(const IloCplex::Callback::Context &context);
   MasterSolverInfo GetSolverInfo() { return solver_info_; }
 
- private:
+private:
   std::shared_ptr<spdlog::logger> console_;
   SharedInfo shared_info_;
   IloNumVarArray master_variables_;
@@ -42,32 +40,32 @@ class BendersCustomCutCallback : public IloCplex::Callback::Function {
   /* Empty constructor is forbidden. */
   BendersCustomCutCallback() {}
   /* Copy constructor is forbidden. */
-  BendersCustomCutCallback(const BendersCustomCutCallback& tocopy);
+  BendersCustomCutCallback(const BendersCustomCutCallback &tocopy);
 };
 
 void BendersCustomCutCallback::invoke(
-    const IloCplex::Callback::Context& context) {
+    const IloCplex::Callback::Context &context) {
   const uint32_t threadNo =
       context.getIntInfo(IloCplex::Callback::Context::Info::ThreadId);
   assert(threadNo == 0);
 
   switch (context.getId()) {
-    case IloCplex::Callback::Context::Id::Candidate:
-      if (!context.isCandidatePoint()) {  // The model is always bounded
-        throw IloCplex::Exception(-1, "Unbounded solution");
-      }
-      AddLazyCuts(context);
-      break;
-    case IloCplex::Callback::Context::Id::Relaxation:
-      throw IloCplex::Exception(-1, "Does not support contextID==Relaxation");
-      break;
-    defult:
-      throw IloCplex::Exception(-1, "Unexpected contextID");
+  case IloCplex::Callback::Context::Id::Candidate:
+    if (!context.isCandidatePoint()) { // The model is always bounded
+      throw IloCplex::Exception(-1, "Unbounded solution");
+    }
+    AddLazyCuts(context);
+    break;
+  case IloCplex::Callback::Context::Id::Relaxation:
+    throw IloCplex::Exception(-1, "Does not support contextID==Relaxation");
+    break;
+  default:
+    throw IloCplex::Exception(-1, "Unexpected contextID");
   }
 }
 
 void BendersCustomCutCallback::AddLazyCuts(
-    const IloCplex::Callback::Context& context) {
+    const IloCplex::Callback::Context &context) {
   assert(context.getId() == IloCplex::Callback::Context::Id::Candidate);
 
   IloEnv env = context.getEnv();

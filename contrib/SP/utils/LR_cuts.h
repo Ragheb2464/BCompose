@@ -39,7 +39,7 @@ void ExtractVariableValues(const SubproblemModel *mip_sp_model,
 
 void UpdateGradients(IloNumArray &gradient, const SharedInfo *shared_info,
                      const uint64_t sp_id) {
-  for (uint64_t i = 0; i < shared_info->master_variables_value.getSize(); i++)
+  for (IloInt i = 0; i < shared_info->master_variables_value.getSize(); i++)
     gradient[i] = shared_info->master_variables_value[i] -
                   shared_info->copied_variables_value[sp_id][i];
 }
@@ -78,7 +78,7 @@ void GenLRCuts(SubproblemModel *lp_sp_model, SubproblemModel *mip_sp_model,
     ExtractVariableValues(mip_sp_model, shared_info, sp_id);
     {
       std::vector<int> aux_vec;
-      for (size_t i = 0;
+      for (IloInt i = 0;
            i < shared_info->copied_variables_value[sp_id].getSize(); ++i) {
         aux_vec.push_back(shared_info->copied_variables_value[sp_id][i]);
       }
@@ -124,9 +124,9 @@ void GenLRCuts(SubproblemModel *lp_sp_model, SubproblemModel *mip_sp_model,
     level_method.Solve();
     level_method.GetDualValues(shared_info->dual_values[sp_id]);
     ++iter;
-  } // while
+  }  // while
   level_method.GetBestDualValues(shared_info->dual_values[sp_id]);
-  for (uint64_t i = 0; i < best_copied_variables_value.getSize(); ++i) {
+  for (IloInt i = 0; i < best_copied_variables_value.getSize(); ++i) {
     shared_info->copied_variables_value[sp_id][i] =
         best_copied_variables_value[i];
   }

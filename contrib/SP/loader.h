@@ -1,7 +1,7 @@
 #ifndef CONTRIB_SP_LOADER_H
 #define CONTRIB_SP_LOADER_H
 
-#include <omp.h>
+// #include <omp.h>
 #include "../control/solver_settings.h"
 #include "../shared_info/structures.h"
 /*!
@@ -25,11 +25,11 @@ void SetSPCplexSettings(SubproblemModel &subproblem_model) noexcept(true) {
 /*Extracting the copied variables nd those which have been fixed  */
 void GetCopiedAndFixedVars(SharedInfo &shared_info,
                            SubproblemModel &subproblem_model) {
-  assert(subproblem_model.copied_variables.getSize() ==
+  assert(static_cast<uint64_t>(subproblem_model.copied_variables.getSize()) ==
          shared_info.num_master_variables);
-  uint64_t num_master_variables = 0;
+  IloInt num_master_variables = 0;
   uint64_t var_id;
-  for (uint64_t i = 0; i < subproblem_model.variables.getSize(); ++i) {
+  for (IloInt i = 0; i < subproblem_model.variables.getSize(); ++i) {
     std::string var_name{subproblem_model.variables[i].getName()};
     std::size_t found = var_name.find("z_");
     if (found != std::string::npos) {
@@ -86,7 +86,7 @@ void AddSlack(const uint64_t con_id, SubproblemModel &subproblem_model) {
     for (int s = 0; s < 2; s++) {
       subproblem_model.slack_variables.add(
           IloNumVar(subproblem_model.env, 0, IloInfinity));
-      uint64_t slack_id = subproblem_model.slack_variables.getSize() - 1;
+      // uint64_t slack_id = subproblem_model.slack_variables.getSize() - 1;
       // subproblem_model.slack_variables[slack_id].setName(
       //     ("slack_" + std::to_string(slack_id)).c_str());
       subproblem_model.slacks_lb.add(0);
@@ -135,12 +135,11 @@ void AddSlack(const uint64_t con_id, SubproblemModel &subproblem_model) {
   same as the size of the master variables. At the same time, it extracts the
   NAC constraints and reorder them which we update repeatedly.
 !*/
-void HealthCheckAndNACExtraction(const std::shared_ptr<spdlog::logger> console,
-                                 SubproblemModel &subproblem_model,
+void HealthCheckAndNACExtraction(SubproblemModel &subproblem_model,
                                  const SharedInfo &shared_info) {
   {
     if (!ProblemSpecificSettings::ProblemProperties::is_complete_recourse) {
-      for (uint64_t con_id = 0; con_id < subproblem_model.constraints.getSize();
+      for (IloInt con_id = 0; con_id < subproblem_model.constraints.getSize();
            ++con_id) {
         // std::string constraint_name =
         //     subproblem_model.constraints[con_id].getName();
@@ -165,8 +164,8 @@ void HealthCheckAndNACExtraction(const std::shared_ptr<spdlog::logger> console,
   }
 
   {  // adding NAC to the model
-    uint64_t var_id;
-    for (uint64_t i = 0; i < subproblem_model.copied_variables.getSize(); ++i) {
+    IloInt var_id;
+    for (IloInt i = 0; i < subproblem_model.copied_variables.getSize(); ++i) {
       std::string var_name = subproblem_model.copied_variables[i].getName();
       std::size_t found = var_name.find("z_");
       assert(found != std::string::npos);
@@ -184,7 +183,7 @@ void HealthCheckAndNACExtraction(const std::shared_ptr<spdlog::logger> console,
       }
     }
     assert(shared_info.num_master_variables ==
-           subproblem_model.NAC_constraints.getSize());
+           static_cast<uint64_t>(subproblem_model.NAC_constraints.getSize()));
     subproblem_model.model.add(subproblem_model.NAC_constraints);
   }
 
@@ -202,7 +201,7 @@ void HealthCheckAndNACExtraction(const std::shared_ptr<spdlog::logger> console,
 */
 void PerturbRHS(SubproblemModel &subproblem_model) {
   const double alpha = Settings::CutGeneration::perturbation_weight;
-  for (uint64_t con_id = 0; con_id < subproblem_model.constraints.getSize();
+  for (IloInt con_id = 0; con_id < subproblem_model.constraints.getSize();
        ++con_id) {
     // const std::string con_name =
     // subproblem_model.constraints[con_id].getName();
@@ -226,7 +225,7 @@ void PerturbRHS(SubproblemModel &subproblem_model) {
   This func extrct all the data in the model, used to create art SPs
 !*/
 void GetObjectiveCoeffs(SubproblemData &data, SubproblemModel &model) {
-  uint64_t var_id;
+  // uint64_t var_id;
   data.obj_coeffs = IloNumArray(model.env);
   for (IloExpr::LinearIterator it =
            IloExpr(model.objective.getExpr()).getLinearIterator();
@@ -238,7 +237,7 @@ void GetObjectiveCoeffs(SubproblemData &data, SubproblemModel &model) {
 }
 uint64_t GetNumRegularConstraints(SubproblemModel &subproblem_model) {
   uint64_t num_con_without_cplex_cuts_or_NAC = 0;
-  for (uint64_t con_id = 0; con_id < subproblem_model.constraints.getSize();
+  for (IloInt con_id = 0; con_id < subproblem_model.constraints.getSize();
        ++con_id) {
     const std::string con_name = subproblem_model.constraints[con_id].getName();
     if (con_name.find("Reg_") != std::string::npos) {
@@ -256,7 +255,7 @@ void GetRHS(SubproblemData &data, SubproblemModel &subproblem_model) {
       IloNumArray(subproblem_model.env, num_con_without_cplex_cuts_or_NAC);
 
   uint64_t t = 0;
-  for (uint64_t con_id = 0; con_id < subproblem_model.constraints.getSize();
+  for (IloInt con_id = 0; con_id < subproblem_model.constraints.getSize();
        ++con_id) {
     const std::string con_name = subproblem_model.constraints[con_id].getName();
     if (con_name.find("Reg_") != std::string::npos) {
@@ -276,7 +275,7 @@ void GetConstraintMatrix(SubproblemData &data,
       IloNumArray2(subproblem_model.env, num_con_without_cplex_cuts_or_NAC);
 
   uint64_t t = 0;
-  for (uint64_t con_id = 0; con_id < subproblem_model.constraints.getSize();
+  for (IloInt con_id = 0; con_id < subproblem_model.constraints.getSize();
        ++con_id) {
     const std::string con_name = subproblem_model.constraints[con_id].getName();
     if (con_name.find("Reg_") != std::string::npos) {
@@ -297,7 +296,7 @@ void GetConstraintMatrix(SubproblemData &data,
 !*/
 bool Loader(const std::shared_ptr<spdlog::logger> console,
             std::vector<SubproblemModel> &subproblem_model,
-            SharedInfo &shared_info, const std::string current_directory) {
+            SharedInfo &shared_info, const std::string &current_directory) {
   if (Settings::GlobalScenarios::num_retention +
       Settings::GlobalScenarios::num_creation) {
     shared_info.subproblem_data.resize(shared_info.num_recourse_variables);
@@ -307,8 +306,8 @@ bool Loader(const std::shared_ptr<spdlog::logger> console,
     subproblem_model.emplace_back(SubproblemModel());
   }
   //! TODO: Make this part parallel
-  const std::size_t num_proc = omp_get_max_threads();
-  omp_set_num_threads(num_proc);
+  // const std::size_t num_proc = omp_get_max_threads();
+  // omp_set_num_threads(num_proc);
   // #pragma omp parallel
   {
     // #pragma omp for private(sp_id) schedule(dynamic)
@@ -360,8 +359,7 @@ bool Loader(const std::shared_ptr<spdlog::logger> console,
 
       GetCopiedAndFixedVars(shared_info, subproblem_model[sp_id]);
       DropMasterVarsFromObj(subproblem_model[sp_id]);
-      HealthCheckAndNACExtraction(console, subproblem_model[sp_id],
-                                  shared_info);
+      HealthCheckAndNACExtraction(subproblem_model[sp_id], shared_info);
 
       if (false && Settings::GlobalScenarios::num_creation) {
         // we will only load the basic information, nothing for cplex

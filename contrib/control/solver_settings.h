@@ -23,7 +23,7 @@ struct Settings {
   };
   struct Solver {
     static const uint32_t solver =
-        2;  // 0: Cplex's B&C, 1 Cplex's Benders, 2 BCompose
+        2;  // 0: Cplex's B&C, 1 IloBenders, 2 BCompose
             // NOTE for 0 and 1, num_retention must be equal to number of SPs
             // and
     // num_creation=0
@@ -56,7 +56,7 @@ struct Settings {
         1000;  // after how many nodes activate the heuristic
   };
   struct GlobalScenarios {
-    static const uint32_t num_retention = 0;
+    static const uint32_t num_retention = 1;
     static const uint32_t num_creation = 0;  // 0 or 1 only at this version
     static const uint32_t mood =
         1;  // 0 random (defult), 1 maxcost (recommended), 2 mincost, 3

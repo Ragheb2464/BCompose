@@ -1,6 +1,9 @@
 reated by https://www.gitignore.io/api/c,sbt,git,vim,c++,java,node,swift,scala,linux,emacs,python,haskell,sublimetext,coffeescript,intellij+all
 # Edit at https://www.gitignore.io/?templates=c,sbt,git,vim,c++,java,node,swift,scala,linux,emacs,python,haskell,sublimetext,coffeescript,intellij+all
 
+#Mac
+.DS_Store
+
 #CPLEX
 *.lp
 *.sav

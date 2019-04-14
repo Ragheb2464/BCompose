@@ -11,8 +11,7 @@ public:
   ~Heuristic(){};
   /*This func counts how many times a var has taken a specific value in the
    * solutions extracted from the MIP SPs*/
-  bool SetVarValFreq(const std::shared_ptr<spdlog::logger> console,
-                     const SharedInfo &shared_info) {
+  bool SetVarValFreq(const SharedInfo &shared_info) {
     // for each master var, we map to all its values it has taken and its
     // frequency
     for (const auto &it : shared_info.copied_vars_val_pool) {
@@ -65,10 +64,11 @@ public:
     std::cout << rand_num << " " << accum_weight << std::endl;
     assert(false);
   }
+
   std::pair<bool, uint64_t> GenVarStatus(const uint64_t var_id) {
     assert(sol_vals_freq.count(var_id));
     assert(num_sols_in_pool > 0);
-    int max_freq = 0;
+    uint64_t max_freq = 0;
     std::pair<bool, uint64_t> bool_val = std::make_pair(false, 0);
     for (const auto it : sol_vals_freq.at(var_id)) {
       if (it.second >= Settings::Heuristic::tolerance * num_sols_in_pool &&
@@ -80,12 +80,12 @@ public:
 
       // printf("%d - %d - %d\n", var_id, it.first, it.second);
     }
-    return std::move(bool_val);
+    return bool_val;
   }
 
 private:
   std::unordered_map<uint64_t, std::unordered_map<uint64_t, uint64_t>>
       sol_vals_freq; // var_id=>val=>freq
-  uint64_t num_sols_in_pool;
+  uint64_t num_sols_in_pool = 0;
 };
 #endif

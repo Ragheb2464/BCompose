@@ -9,10 +9,12 @@
 // TODO:  user sanetizers,
 
 #include <chrono>
-#include <ilcplex/ilocplex.h>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <set>
+
+#include <ilcplex/ilocplex.h>
 
 #include "externals/docopt/docopt.h"
 #include "externals/rss/current_rss.h"
@@ -67,7 +69,7 @@ int main(int argc, char *argv[]) {
 
   if (Settings::ImproveFormulations::improve_SP_representation) {
     console->info(" -Pre-processing the models...");
-    LiftSPs(current_directory, shared_info, console);
+    LiftSPs(current_directory, shared_info);
   }
 
   console->info(" -Importing subproblem models...");

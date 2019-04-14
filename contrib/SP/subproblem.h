@@ -26,7 +26,7 @@ public:
 
   void Initializer(const std::shared_ptr<spdlog::logger> console,
                    SharedInfo &shared_info,
-                   const std::string current_directory) {
+                   const std::string &current_directory) {
     num_subproblems_ = GetSubproblemCount();
     if (num_subproblems_ != shared_info.num_recourse_variables) {
       console->error("   Number of recourse variables (theta_) does not match "
@@ -71,7 +71,7 @@ public:
     shared_info.subproblem_status.resize(num_subproblems_);
     shared_info.dual_values.resize(num_subproblems_);
     shared_info.copied_variables_value.resize(num_subproblems_);
-    for (int sp_id = 0; sp_id < num_subproblems_; ++sp_id) {
+    for (uint64_t sp_id = 0; sp_id < num_subproblems_; ++sp_id) {
       shared_info.dual_values[sp_id] =
           IloNumArray(subproblem_model_[sp_id].env,
                       subproblem_model_[sp_id].NAC_constraints.getSize());
@@ -89,10 +89,10 @@ public:
                   " cores to generate cuts.");
   }
 
-  void PerturbMasterSolution(SharedInfo &shared_info) {
+  static void PerturbMasterSolution(SharedInfo &shared_info) {
     const double alpha = Settings::CutGeneration::perturbation_weight;
     const double core_val = Settings::CutGeneration::initial_core_point;
-    for (uint64_t var_id = 0;
+    for (IloInt var_id = 0;
          var_id < shared_info.master_variables_value.getSize(); ++var_id) {
       shared_info.master_variables_value[var_id] = std::min(
           1.0, shared_info.master_variables_value[var_id] + alpha * core_val);
@@ -111,7 +111,7 @@ public:
           continue;
         }
         IloRangeArray cuts = IloRangeArray(subproblem_model_[sp_id].env);
-        for (size_t con_id = 0;
+        for (IloInt con_id = 0;
              con_id < subproblem_model_[sp_id].constraints.getSize();
              con_id++) {
           const std::string con_name =
@@ -193,7 +193,7 @@ public:
     // mtx_.unlock();
   }
 
-  void
+  static void
   UpdateSolPool(std::vector<std::vector<std::vector<int>>> &copy_sol_tmp_vec,
                 SharedInfo &shared_info,
                 const std::shared_ptr<spdlog::logger> console) {
@@ -277,7 +277,7 @@ public:
   SubproblemSolverInfo solver_info_;
 
 private:
-  uint64_t num_subproblems_, num_threads_;
+  uint64_t num_subproblems_ = 0, num_threads_ = 0;
   std::mutex mtx_;
   //
   Subproblem(const Subproblem &copy);

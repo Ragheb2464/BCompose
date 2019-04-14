@@ -7,8 +7,8 @@
 /*!
   This func gets subproblem id and addes it to (master) model
 !*/
-void AddSPToMP(const uint64_t sp_id, const SharedInfo &shared_info,
-               MasterModel &mp_model, const std::string current_directory) {
+void AddSPToMP(const uint64_t sp_id, MasterModel &mp_model,
+               const std::string &current_directory) {
   IloEnv env = mp_model.env;
   IloModel model = IloModel(env);
   IloCplex cplex = IloCplex(model);
@@ -18,8 +18,8 @@ void AddSPToMP(const uint64_t sp_id, const SharedInfo &shared_info,
 
   cplex.setOut(env.getNullStream());
   cplex.setWarning(env.getNullStream());
-  const std::string model_dir = current_directory + "/lifted_SP_models/SP_" +
-                                std::to_string(sp_id) + ".sav";
+  const std::string model_dir =
+      current_directory + "/opt_model_dir/SP_" + std::to_string(sp_id) + ".sav";
   cplex.importModel(model, model_dir.c_str(), objective, variables,
                     constraints);
 
@@ -49,12 +49,13 @@ void AddSPToMP(const uint64_t sp_id, const SharedInfo &shared_info,
   {  // enforcing z=y
     uint64_t var_id;
     uint64_t NAC_count = 0;
-    for (uint64_t i = 0; i < variables.getSize(); ++i) {
+    for (IloInt i = 0; i < variables.getSize(); ++i) {
       std::string var_name = variables[i].getName();
       std::size_t found = var_name.find("z_");
       if (found != std::string::npos) {
         var_id = std::stoi(var_name.erase(found, 2));
-        assert(var_id < mp_model.master_variables.getSize());
+        assert(var_id <
+               static_cast<uint64_t>(mp_model.master_variables.getSize()));
         constraints.add(IloRange(
             env, 0, variables[i] - mp_model.master_variables[var_id], 0));
         ++NAC_count;
@@ -65,7 +66,8 @@ void AddSPToMP(const uint64_t sp_id, const SharedInfo &shared_info,
         mp_model.model.add(IloConversion(env, variables, ILOFLOAT));
       }
     }
-    assert(NAC_count == mp_model.master_variables.getSize());
+    assert(NAC_count ==
+           static_cast<uint64_t>(mp_model.master_variables.getSize()));
   }
   mp_model.model.add(constraints);
   mp_model.cplex.exportModel("PD.lp");
@@ -78,7 +80,7 @@ void RandomSelection(SharedInfo &shared_info, const uint64_t num_retention) {
   while (shared_info.retained_subproblem_ids.size() < num_retention) {
     uint64_t chosen_id = RandInt(0, shared_info.num_subproblems - 1);
     assert(chosen_id < shared_info.num_subproblems);
-    const auto &res = shared_info.retained_subproblem_ids.insert(chosen_id);
+    shared_info.retained_subproblem_ids.insert(chosen_id);
     if (shared_info.retained_subproblem_ids.size() >= num_retention) {
       break;
     }
@@ -105,7 +107,7 @@ void RowCovering() {}
   0 and high cost.
 */
 void MaxCost(SharedInfo &shared_info, const uint64_t num_retention,
-             const std::string current_directory) {
+             const std::string &current_directory) {
   std::set<std::pair<double, uint64_t>> obj_sp_pair;
   const std::string path_to_SP_data_file =
       current_directory + "/contrib/pre_processor/SP_info.txt";
@@ -145,7 +147,7 @@ void MaxCost(SharedInfo &shared_info, const uint64_t num_retention,
   assert(shared_info.retained_subproblem_ids.size() == num_retention);
 }
 void MinCost(SharedInfo &shared_info, const uint64_t num_retention,
-             const std::string current_directory) {
+             const std::string &current_directory) {
   std::set<std::pair<double, uint64_t>> obj_sp_pair;
   const std::string path_to_SP_data_file =
       current_directory + "/contrib/pre_processor/SP_info.txt";

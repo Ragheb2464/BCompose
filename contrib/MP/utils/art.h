@@ -1,25 +1,26 @@
 #ifndef CONTRIB_MP_UTILES_ART_H
 #define CONTRIB_MP_UTILES_ART_H
 
+#include <limits>
+
 #include "../../shared_info/structures.h"
 #include "../structures.h"
 
 void PrintWarning(const uint64_t sp_id_1, const uint64_t sp_id_2) {
-
   std::cout << " Subproblems SP_" << sp_id_1 << " and SP_" << sp_id_2
             << " are different!";
   std::cout << " WARNING, Turnning off the articulation ..." << std::endl;
 }
 
 uint64_t PickFirstSP(const SharedInfo &shared_info) {
-  uint64_t picked_sp_id = -1;
+  uint64_t picked_sp_id = std::numeric_limits<uint64_t>::max();
   for (uint64_t sp_id = 0; sp_id < shared_info.num_subproblems; ++sp_id) {
     if (!shared_info.retained_subproblem_ids.count(sp_id)) {
       picked_sp_id = sp_id;
       break;
     }
   }
-  if (picked_sp_id == -1) {
+  if (picked_sp_id == 1e74) {
     std::cout << "Turn off subproblem creation strategy" << std::endl;
     exit(0);
   }
@@ -46,7 +47,7 @@ uint64_t CorrectObj(const IloEnv &env, IloObjective &objective,
 }
 
 void CorrectCons(IloRangeArray &constraints, const double weight) {
-  for (uint64_t con_id = 0; con_id < constraints.getSize(); ++con_id) {
+  for (IloInt con_id = 0; con_id < constraints.getSize(); ++con_id) {
     const std::string con_name = constraints[con_id].getName();
     assert(con_name.find("Reg_") != std::string::npos);
     IloExpr::LinearIterator it;
@@ -58,7 +59,7 @@ void CorrectCons(IloRangeArray &constraints, const double weight) {
 }
 
 void CorrectRHS(IloRangeArray &constraints, const double weight) {
-  for (uint64_t con_id = 0; con_id < constraints.getSize(); ++con_id) {
+  for (IloInt con_id = 0; con_id < constraints.getSize(); ++con_id) {
     const IloNum lb = constraints[con_id].getLB();
     const IloNum ub = constraints[con_id].getUB();
     const auto set_lb = lb > -IloInfinity ? weight * lb : -IloInfinity;
@@ -99,7 +100,7 @@ void UpdateConCoeffs(
     const std::unordered_map<std::string, IloNumVar> &master_var_map,
     const double weight) {
   assert(constraints.getSize() == aux_constraints.getSize());
-  for (uint64_t con_id = 0; con_id < aux_constraints.getSize(); ++con_id) {
+  for (IloInt con_id = 0; con_id < aux_constraints.getSize(); ++con_id) {
     // assert(constraints[con_id].getSize() ==
     // aux_constraints[con_id].getSize());
     const std::string con_name = aux_constraints[con_id].getName();
@@ -124,7 +125,7 @@ void UpdateConCoeffs(
 
 void UpdateRHS(IloRangeArray &constraints, const IloRangeArray &aux_constraints,
                const double weight) {
-  for (uint64_t con_id = 0; con_id < aux_constraints.getSize(); ++con_id) {
+  for (IloInt con_id = 0; con_id < aux_constraints.getSize(); ++con_id) {
     const IloNum lb =
         constraints[con_id].getLB() + weight * aux_constraints[con_id].getLB();
     const IloNum ub =
@@ -135,7 +136,7 @@ void UpdateRHS(IloRangeArray &constraints, const IloRangeArray &aux_constraints,
   }
 }
 
-bool AddArtSPTOMP(const std::string model_directory, SharedInfo &shared_info,
+void AddArtSPTOMP(const std::string &model_directory, SharedInfo &shared_info,
                   const MasterSolverInfo &solver_info_, MasterModel &mp_model) {
   assert(shared_info.subproblem_data.size() == shared_info.num_subproblems);
   //! the way it works is to load a SP and modify all its coeffs so that we
@@ -147,7 +148,7 @@ bool AddArtSPTOMP(const std::string model_directory, SharedInfo &shared_info,
     exit(0);
   }
   uint64_t picked_sp_id = PickFirstSP(shared_info);
-  std::unordered_map<std::string, IloNumVar> var_map; // var_name->var
+  std::unordered_map<std::string, IloNumVar> var_map;  // var_name->var
   std::unordered_map<std::string, IloNumVar> master_var_map;
 
   //! load the chosen SP
@@ -162,7 +163,7 @@ bool AddArtSPTOMP(const std::string model_directory, SharedInfo &shared_info,
   cplex.importModel(model, model_dir.c_str(), objective, variables,
                     constraints);
 
-  { // create the var map
+  {  // create the var map
     for (size_t var_id = 0; var_id < variables.getSize(); ++var_id) {
       const std::string var_name = variables[var_id].getName();
       if (var_name.find("z_") == std::string::npos) {
@@ -174,7 +175,7 @@ bool AddArtSPTOMP(const std::string model_directory, SharedInfo &shared_info,
       }
     }
   }
-  { // correct obj of picked_sp_id
+  {  // correct obj of picked_sp_id
     const auto num_mp_vars =
         CorrectObj(mp_model.env, objective,
                    solver_info_.sp_weights_to_create_art_sp[picked_sp_id]);
@@ -184,12 +185,12 @@ bool AddArtSPTOMP(const std::string model_directory, SharedInfo &shared_info,
       exit(0);
     }
   }
-  { // correct cons
+  {  // correct cons
     CorrectCons(constraints,
                 solver_info_.sp_weights_to_create_art_sp[picked_sp_id]);
   }
 
-  { // correcct rhs
+  {  // correcct rhs
     CorrectRHS(constraints,
                solver_info_.sp_weights_to_create_art_sp[picked_sp_id]);
   }
@@ -201,7 +202,7 @@ bool AddArtSPTOMP(const std::string model_directory, SharedInfo &shared_info,
         sp_id == picked_sp_id) {
       continue;
     }
-    { // loading the sp
+    {  // loading the sp
       IloEnv aux_env = mp_model.env;
       IloModel aux_model = IloModel(aux_env);
       IloCplex aux_cplex = IloCplex(aux_model);
@@ -226,9 +227,9 @@ bool AddArtSPTOMP(const std::string model_directory, SharedInfo &shared_info,
     }
   }
   // model.add(constraints);
-  { // adding art SP to mp
+  {  // adding art SP to mp
     mp_model.model.add(variables);
-    { // obj
+    {  // obj
       double weight_sum = 0;
       IloExpr expr(env);
       for (uint64_t sp_id = 0; sp_id < shared_info.num_subproblems; ++sp_id) {
@@ -245,7 +246,7 @@ bool AddArtSPTOMP(const std::string model_directory, SharedInfo &shared_info,
           IloRange(mp_model.env, -IloInfinity, objective.getExpr() - expr, 0));
       expr.end();
     }
-    { // enforcing z=y
+    {  // enforcing z=y
       uint64_t var_id;
       uint64_t NAC_count = 0;
       for (uint64_t i = 0; i < variables.getSize(); ++i) {
@@ -263,10 +264,10 @@ bool AddArtSPTOMP(const std::string model_directory, SharedInfo &shared_info,
     }
   }
   // cplex.exportModel("art.lp");
-  { // constraints
+  {  // constraints
     mp_model.model.add(constraints);
   }
-  { // relax z vars if they are int
+  {  // relax z vars if they are int
     if (cplex.isMIP()) {
       mp_model.model.add(IloConversion(env, variables, ILOFLOAT));
     }

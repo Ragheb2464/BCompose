@@ -8,11 +8,11 @@ void SimpleWS(const uint64_t iteration, const MasterModel &master_model,
               SharedInfo &shared_info) {
   if (!iteration) {
     const double core_value = Settings::CutGeneration::initial_core_point;
-    for (uint64_t var_id = 0;
+    for (IloInt var_id = 0;
          var_id < shared_info.master_variables_value.getSize(); ++var_id) {
       //
       if (master_model.master_variables[var_id].getUB() ==
-          master_model.master_variables[var_id].getLB()) { // if var is fixed
+          master_model.master_variables[var_id].getLB()) {  // if var is fixed
         shared_info.master_variables_value[var_id] =
             master_model.master_variables[var_id].getLB();
       } else {
@@ -22,7 +22,7 @@ void SimpleWS(const uint64_t iteration, const MasterModel &master_model,
     }
   } else {
     const double lambda = Settings::WarmStart::lambda;
-    for (uint64_t var_id = 0;
+    for (IloInt var_id = 0;
          var_id < shared_info.master_variables_value.getSize(); ++var_id) {
       shared_info.master_variables_value[var_id] =
           lambda * shared_info.master_variables_value[var_id] +

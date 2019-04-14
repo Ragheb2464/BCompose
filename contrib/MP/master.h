@@ -25,7 +25,7 @@ public:
 
   void Initializer(const std::shared_ptr<spdlog::logger> console,
                    SharedInfo &shared_info,
-                   const std::string current_directory) {
+                   const std::string &current_directory) {
     SetSartTime();
     //! Load the model
     const bool loading_status =
@@ -66,10 +66,10 @@ public:
     }
   }
 
-  void PartialDecompsoition(const std::string model_directory,
+  void PartialDecompsoition(const std::string &model_directory,
                             const std::shared_ptr<spdlog::logger> console,
                             SharedInfo &shared_info,
-                            const std::string current_directory) {
+                            const std::string &current_directory) {
     assert(shared_info.num_subproblems >=
            Settings::GlobalScenarios::num_retention);
     if (Settings::GlobalScenarios::num_creation &&
@@ -120,7 +120,7 @@ public:
         }
         for (const auto sp_id : shared_info.retained_subproblem_ids) {
           console->info("     SP_" + std::to_string(sp_id));
-          AddSPToMP(sp_id, shared_info, master_model_, current_directory);
+          AddSPToMP(sp_id, master_model_, current_directory);
         }
       }
     } // end if
@@ -129,10 +129,12 @@ public:
   bool CheckStoppingConditions(const std::shared_ptr<spdlog::logger> console) {
     // std::cout << solver_info_.lp_phase_UB << " " << solver_info_.LB << '\n';
     const double gap =
-        100 * std::fabs((solver_info_.lp_phase_UB - solver_info_.LB) /
-                        (1e-7 + solver_info_.lp_phase_UB));
-    if (gap <= Settings::StoppingConditions::root_node_optimality_gap) {
-      console->info("   +Terminating LP phase because it is optimal!");
+        std::min(100 * std::fabs((solver_info_.lp_phase_UB - solver_info_.LB) /
+                                 (1e-7 + solver_info_.lp_phase_UB)),
+                 100.0);
+    if (solver_info_.iteration > 1 &&
+        gap <= Settings::StoppingConditions::root_node_optimality_gap) {
+      console->info("   +Terminating LP phase because gap is " + ValToStr(gap));
       return true;
     } else if (solver_info_.duration >=
                Settings::StoppingConditions::root_node_time_limit) {
@@ -154,8 +156,8 @@ public:
     return false;
   }
 
-  void CheckCorrectness(const std::shared_ptr<spdlog::logger> console,
-                        SharedInfo &shared_info) {
+  static void CheckCorrectness(const std::shared_ptr<spdlog::logger> console,
+                               SharedInfo &shared_info) {
     /*
       IloNumArray previous_solution = shared_info.master_variables_value;
         // checking if the solution or lb has improved
@@ -240,6 +242,7 @@ public:
     if (solver_info_.current_UB < solver_info_.lp_phase_UB) {
       solver_info_.lp_phase_UB = solver_info_.current_UB;
     }
+    return true;
   }
 
   void Cleaner(const std::shared_ptr<spdlog::logger> console) {
@@ -259,14 +262,14 @@ public:
       break;
     }
     IloRangeArray cuts = IloRangeArray(master_model_.env);
-    for (size_t opt_id = 0; opt_id < master_model_.opt_cuts.getSize();
-         opt_id++) {
+    for (IloInt opt_id = 0; opt_id < master_model_.opt_cuts.getSize();
+         ++opt_id) {
       if (master_model_.cplex.getSlack(master_model_.opt_cuts[opt_id]) >
           tolerance) {
         cuts.add(master_model_.opt_cuts[opt_id]);
       }
     }
-    for (size_t fes_id = 0; fes_id < master_model_.feas_cuts.getSize();
+    for (IloInt fes_id = 0; fes_id < master_model_.feas_cuts.getSize();
          fes_id++) {
       if (master_model_.cplex.getSlack(master_model_.feas_cuts[fes_id]) >
           tolerance) {
@@ -421,6 +424,7 @@ public:
                   std::to_string(shared_info.master_variables_value.getSize()));
     console->info("    -num_fixed_lb= " + std::to_string(num_fixed_lb) +
                   " num_fixed_ub= " + std::to_string(num_fixed_ub));
+    return true;
   }
 
   void SolveWithCplexBenders(const std::shared_ptr<spdlog::logger> console) {
@@ -489,13 +493,13 @@ public:
     }
 
     Heuristic heur;
-    heur.SetVarValFreq(console, shared_info);
+    heur.SetVarValFreq(shared_info);
     heur.SetNumSolsInPool();
     for (uint64_t itr = 0; itr < Settings::Heuristic::run_lagrang_heuristic;
          ++itr) {
       console->info("  Heuristic searching...");
       // heur.GenSol();
-      for (size_t var_id = 0; var_id < master_model_.master_variables.getSize();
+      for (IloInt var_id = 0; var_id < master_model_.master_variables.getSize();
            var_id++) {
         shared_info.master_variables_value[var_id] = heur.GenRandVarVal(var_id);
       }
@@ -529,9 +533,9 @@ public:
                                  Settings::StoppingConditions::node_limit);
   }
 
-  void SetCallbacks(const std::shared_ptr<spdlog::logger> &console,
+  void SetCallbacks(const std::shared_ptr<spdlog::logger> console,
                     SharedInfo &shared_info,
-                    const std::shared_ptr<Subproblem> &SP) {
+                    const std::shared_ptr<Subproblem> SP) {
     console->info("  -Setting the callbacks...");
     master_model_.cplex.setParam(
         IloCplex::Param::TimeLimit,
