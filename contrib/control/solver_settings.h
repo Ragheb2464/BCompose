@@ -100,8 +100,8 @@ struct Settings {
     static constexpr const float alpha = 0.5;
   };
   struct Cleaner {
-    static const bool clean_master = true;
-    static const bool clean_SPs = true;
+    static const bool clean_master = false;
+    static const bool clean_SPs = false;
     static const uint32_t aggressiveness =
         0;  // 0 conservative, 1 moderate, 2 aggressive, 3 very aggressive,
   };

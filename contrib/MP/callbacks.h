@@ -111,8 +111,9 @@ void BendersCustomCutCallback::AddLazyCuts(
     expr -= IloScalProd(shared_info_.dual_values[sp_id],
                         shared_info_.master_variables_value);
     expr += IloScalProd(shared_info_.dual_values[sp_id], master_variables_);
-
-    if (shared_info_.subproblem_status[sp_id]) {
+    const bool status = shared_info_.subproblem_status[sp_id];
+    // assert(status == false || status == true);
+    if (status) {
       ++solver_info_.num_opt;
       expr -= recourse_variables_[sp_id];
       violation -= shared_info_.recourse_variables_value[sp_id];

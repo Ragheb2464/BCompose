@@ -9,10 +9,7 @@
   formulation.
 !*/
 void SetSPCplexSettings(SubproblemModel &subproblem_model) noexcept(true) {
-  if (Settings::Parallelization::num_proc > 1 ||
-      Settings::Parallelization::num_master_procs > 1) {
-    subproblem_model.cplex.setParam(IloCplex::Param::Threads, 1);
-  }
+  subproblem_model.cplex.setParam(IloCplex::Param::Threads, 1);
   subproblem_model.cplex.setParam(IloCplex::RootAlg,
                                   Settings::CplexSetting::SP_RootAlg);
   subproblem_model.cplex.setParam(IloCplex::Param::Emphasis::Numerical,

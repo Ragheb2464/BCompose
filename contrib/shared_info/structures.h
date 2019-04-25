@@ -41,10 +41,10 @@ struct CopiedVarsValPool {
 // };
 
 struct SharedInfo {
-  uint64_t num_subproblems;
-  uint64_t num_master_variables;
-  uint64_t num_recourse_variables;
-  uint64_t num_master_constraints;
+  uint64_t num_subproblems{0};
+  uint64_t num_master_variables{0};
+  uint64_t num_recourse_variables{0};
+  uint64_t num_master_constraints{0};
 
   IloNumArray master_variables_lb;
   IloNumArray master_variables_ub;
@@ -63,7 +63,7 @@ struct SharedInfo {
   std::set<uint64_t> retained_subproblem_ids;
 
   std::vector<double> subproblem_objective_value;
-  std::vector<bool> subproblem_status;  // true:opt, false:inf
+  std::vector<int> subproblem_status;  // true:opt, false:inf
   std::vector<IloNumArray> dual_values;
   std::vector<IloNumArray> copied_variables_value;
 };

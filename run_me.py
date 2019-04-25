@@ -36,7 +36,8 @@ CONCERTLIB = '/Applications/CPLEX_Studio129/concert/lib/x86-64_osx/static_pic/'
 #
 GCC = 'g++'
 
-Sanitation_Flags = 'address,undefined,signed-integer-overflow,null,alignment,bool,builtin,bounds,float-cast-overflow,float-divide-by-zero,function,integer-divide-by-zero,return,signed-integer-overflow,implicit-conversion,unsigned-integer-overflow -fno-sanitize-recover=null -fsanitize-trap=alignment -fno-omit-frame-pointer -fsanitize-memory-track-origins=2 -Wno-unused-variable '
+Sanitation_Flags = 'thread '
+# Sanitation_Flags = 'address,undefined,signed-integer-overflow,null,alignment,bool,builtin,bounds,float-cast-overflow,float-divide-by-zero,function,integer-divide-by-zero,return,signed-integer-overflow,implicit-conversion,unsigned-integer-overflow -fno-sanitize-recover=null -fsanitize-trap=alignment -fno-omit-frame-pointer -fsanitize-memory-track-origins=2 -Wno-unused-variable '
 OPT_FLAG = '-DIL_STD -Ofast'
 # DEBUG_FLAG = '-DGLIBCXX_DEBUG -g -O -DIL_STD -Wall -Wextra -pedantic'
 DEBUG_FLAG = '-DGLIBCXX_DEBUG -g -DIL_STD -Wall -Wextra -pedantic -fsanitize={0}'.format(

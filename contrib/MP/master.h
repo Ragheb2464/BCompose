@@ -31,7 +31,7 @@ class Master {
     const bool loading_status =
         Loader(console, master_model_, shared_info, current_directory);
     if (!loading_status) {
-      console->info("   Failed to load the MP.lp!");
+      console->info("   Failed to load the MP.sav!");
       console->info("  Exiting with error. ");
       exit(0);
     }
@@ -85,8 +85,8 @@ class Master {
           RandomSelection(shared_info,
                           Settings::GlobalScenarios::num_retention);
         } else {
-          const bool wrong_setting = false;
-          assert(wrong_setting);
+          console->error("Wrong seeting for partial decomposition");
+          exit(911);
         }
       }
       {  // creating SPs
@@ -101,7 +101,7 @@ class Master {
           AddArtSPToMP(model_directory, shared_info, solver_info_,
                        master_model_);
         }
-        for (const auto sp_id : shared_info.retained_subproblem_ids) {
+        for (const uint64_t sp_id : shared_info.retained_subproblem_ids) {
           console->info("     SP_" + std::to_string(sp_id));
           AddSPToMP(sp_id, master_model_, current_directory);
         }

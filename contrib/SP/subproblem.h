@@ -73,6 +73,9 @@ public:
     shared_info.dual_values.resize(num_subproblems_);
     shared_info.copied_variables_value.resize(num_subproblems_);
     for (uint64_t sp_id = 0; sp_id < num_subproblems_; ++sp_id) {
+      shared_info.subproblem_objective_value[sp_id] = 0;
+      shared_info.subproblem_status[sp_id] = true;
+      //
       shared_info.dual_values[sp_id] =
           IloNumArray(subproblem_model_[sp_id].env,
                       subproblem_model_[sp_id].NAC_constraints.getSize());
@@ -82,10 +85,10 @@ public:
     }
 
     num_threads_ = static_cast<uint64_t>(
-        std::min(std::thread::hardware_concurrency() + 0.0,
-                 shared_info.num_subproblems -
-                     shared_info.retained_subproblem_ids.size() + 0.0),
-        Settings::Parallelization::num_proc);
+        std::min(std::min(std::thread::hardware_concurrency() + 0.0,
+                          shared_info.num_subproblems -
+                              shared_info.retained_subproblem_ids.size() + 0.0),
+                 Settings::Parallelization::num_proc + 0.0));
     console->info("    Using up to " + std::to_string(num_threads_) +
                   " cores to generate cuts.");
   }
@@ -136,22 +139,27 @@ public:
 
   void GenBendersCuts(const std::shared_ptr<spdlog::logger> console,
                       SharedInfo &shared_info) {
+    for (uint64_t sp_id = 0; sp_id < shared_info.num_subproblems; ++sp_id) {
+      shared_info.subproblem_status[sp_id] = false;
+      shared_info.dual_values[sp_id].clear();
+      // std::cout << shared_info.dual_values[sp_id].getSize() << '\n';
+    }
+
     {
       std::ios_base::sync_with_stdio(false);
       std::cin.tie(nullptr);
       // Now, we create the threadpool.
       boost::asio::io_service io_service(num_threads_);
-      std::unique_ptr<boost::asio::io_service::work> work(
+      std::unique_ptr<boost::asio::io_service::work> work_(
           new boost::asio::io_service::work(io_service));
-      boost::thread_group threads;
-      for (size_t i = 0; i < num_threads_; ++i) {
-        threads.create_thread(
+      boost::thread_group thread_pool;
+      for (unsigned t = 0; t < num_threads_; ++t) {
+        thread_pool.create_thread(
             boost::bind(&boost::asio::io_service::run, &io_service));
       }
       // dispatch SPs
       for (uint64_t sp_id = 0; sp_id < shared_info.num_subproblems; ++sp_id) {
         if (shared_info.retained_subproblem_ids.count(sp_id)) {
-          shared_info.subproblem_status[sp_id] = true;
           continue;
         }
         subproblem_model_[sp_id].NAC_constraints.setBounds(
@@ -161,26 +169,27 @@ public:
             GenClassicalCuts, &subproblem_model_[sp_id], &shared_info, sp_id));
       }
       // We let the thread pool finish the computation.
-      work.reset();
-      threads.join_all();
+      work_.reset();
+      thread_pool.join_all();
       io_service.stop();
     }
+
     // get some stats
     uint64_t num_opt_cut = 0;
     uint64_t num_feas_cut = 0;
-    for (uint32_t sp_id = 0; sp_id < shared_info.num_subproblems; ++sp_id) {
+    for (uint64_t sp_id = 0; sp_id < shared_info.num_subproblems; ++sp_id) {
       if (shared_info.retained_subproblem_ids.count(sp_id)) {
         continue;
       }
-      if (shared_info.subproblem_objective_value[sp_id] <= -1e-7 &&
+      assert(shared_info.dual_values[sp_id].getSize());
+      if (shared_info.subproblem_objective_value[sp_id] <= 0 &&
           !shared_info.subproblem_status[sp_id]) {
         console->error(
-            "I am suffering from numerical issues, the pproblem is infeas but "
-            "the feasibility measure is " +
+            "The subproblem is infeasible but the feasibility measure is " +
             std::to_string(shared_info.subproblem_objective_value[sp_id]) +
-            ". Please examine the exported SP_numeric.lp offline");
+            ". Please examine the exported SP_numeric.lp");
         subproblem_model_[sp_id].cplex.exportModel("SP_numeric.lp");
-        exit(0);
+        exit(911);
       }
       num_opt_cut += shared_info.subproblem_status[sp_id];
       num_feas_cut += 1 - shared_info.subproblem_status[sp_id];
@@ -191,7 +200,7 @@ public:
     console->info("     Generated " + std::to_string(num_opt_cut) +
                   " optimality cuts and " + std::to_string(num_feas_cut) +
                   " feasbility cuts");
-    solver_info_.iteration++;
+    ++solver_info_.iteration;
     // mtx_.unlock();
   }
 
