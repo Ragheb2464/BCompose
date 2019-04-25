@@ -19,7 +19,7 @@
 #include "utils/warm_start.h"
 
 class Master {
-public:
+ public:
   Master() {}
   ~Master() {}
 
@@ -49,23 +49,6 @@ public:
     master_model_.cplex.setParam(IloCplex::Param::Threads, num_threads_);
   }
 
-  void FixSafeVariables(const std::shared_ptr<spdlog::logger> console,
-                        SharedInfo &shared_info) {
-    if (shared_info.fixed_master_variables.size() &&
-        Settings::Heuristic::safe_fix) {
-      for (const auto &it : shared_info.fixed_master_variables) {
-        uint64_t var_id = it.first;
-        double val = it.second;
-        master_model_.master_variables[var_id].setBounds(val, val);
-      }
-      console->info(
-          "   Aggressive presolve could permanently fix " +
-          std::to_string(shared_info.fixed_master_variables.size()) +
-          " master variables out of " +
-          std::to_string(shared_info.master_variables_value.getSize()));
-    }
-  }
-
   void PartialDecompsoition(const std::string &model_directory,
                             const std::shared_ptr<spdlog::logger> console,
                             SharedInfo &shared_info,
@@ -83,7 +66,7 @@ public:
     // TODO: Use other techniques to pick global SPs
     if (Settings::GlobalScenarios::num_retention +
         Settings::GlobalScenarios::num_creation) {
-      if (Settings::GlobalScenarios::num_retention) { // picking SPs
+      if (Settings::GlobalScenarios::num_retention) {  // picking SPs
         if (Settings::GlobalScenarios::mood == 3) {
           console->info("   Extracting global SP with optimal mood...");
         } else if (Settings::GlobalScenarios::mood == 1 &&
@@ -106,16 +89,16 @@ public:
           assert(wrong_setting);
         }
       }
-      { // creating SPs
+      {  // creating SPs
         if (Settings::GlobalScenarios::num_creation) {
           GetArtificialSubproblemWeights(shared_info, solver_info_);
         }
       }
-      { // adding the chosen ones
+      {  // adding the chosen ones
         console->info("    Adding these subproblems to master model:");
         if (Settings::GlobalScenarios::num_creation) {
           console->info("     Art_SP");
-          AddArtSPTOMP(model_directory, shared_info, solver_info_,
+          AddArtSPToMP(model_directory, shared_info, solver_info_,
                        master_model_);
         }
         for (const auto sp_id : shared_info.retained_subproblem_ids) {
@@ -123,7 +106,7 @@ public:
           AddSPToMP(sp_id, master_model_, current_directory);
         }
       }
-    } // end if
+    }  // end if
   }
 
   bool CheckStoppingConditions(const std::shared_ptr<spdlog::logger> console) {
@@ -248,39 +231,45 @@ public:
   void Cleaner(const std::shared_ptr<spdlog::logger> console) {
     int tolerance;
     switch (Settings::Cleaner::aggressiveness) {
-    case 0:
-      tolerance = 1000;
-      break;
-    case 1:
-      tolerance = 100;
-      break;
-    case 2:
-      tolerance = 10;
-      break;
-    case 3:
-      tolerance = 1;
-      break;
+      case 0:
+        tolerance = 1000;
+        break;
+      case 1:
+        tolerance = 100;
+        break;
+      case 2:
+        tolerance = 10;
+        break;
+      case 3:
+        tolerance = 1;
+        break;
     }
     IloRangeArray cuts = IloRangeArray(master_model_.env);
+    IloNumArray slacks_val(master_model_.env, master_model_.opt_cuts.getSize());
+    master_model_.cplex.getSlacks(slacks_val, master_model_.opt_cuts);
     for (IloInt opt_id = 0; opt_id < master_model_.opt_cuts.getSize();
          ++opt_id) {
-      if (master_model_.cplex.getSlack(master_model_.opt_cuts[opt_id]) >
-          tolerance) {
+      if (slacks_val[opt_id] > tolerance) {
         cuts.add(master_model_.opt_cuts[opt_id]);
       }
     }
+    slacks_val.end();
+    IloNumArray slacks_val_feas(master_model_.env,
+                                master_model_.feas_cuts.getSize());
+    master_model_.cplex.getSlacks(slacks_val_feas, master_model_.feas_cuts);
     for (IloInt fes_id = 0; fes_id < master_model_.feas_cuts.getSize();
-         fes_id++) {
-      if (master_model_.cplex.getSlack(master_model_.feas_cuts[fes_id]) >
-          tolerance) {
+         ++fes_id) {
+      if (slacks_val_feas[fes_id] > tolerance) {
         cuts.add(master_model_.feas_cuts[fes_id]);
       }
     }
+    slacks_val_feas.end();
     console->info("   -Cleaner removed " + std::to_string(cuts.getSize()) +
                   " useless cuts out of " +
                   std::to_string(master_model_.feas_cuts.getSize() +
                                  master_model_.opt_cuts.getSize()));
     cuts.removeFromAll();
+    cuts.endElements();
     cuts.end();
   }
 
@@ -292,12 +281,12 @@ public:
     assert(dual_values.getSize() == master_model_.master_variables.getSize());
     expr += IloScalProd(dual_values, master_model_.master_variables);
     if (status) {
-      solver_info_.lp_num_opt++;
+      ++solver_info_.lp_num_opt;
       expr -= master_model_.recourse_variables[sp_id];
       master_model_.opt_cuts.add(
           IloRange(master_model_.env, -IloInfinity, expr, 0));
     } else {
-      solver_info_.lp_num_feas++;
+      ++solver_info_.lp_num_feas;
       // assert(fixed_part > 0);
       master_model_.feas_cuts.add(
           IloRange(master_model_.env, -IloInfinity, expr, 0));
@@ -328,10 +317,11 @@ public:
         console->warn(
             "-Maybe turn off AdvInd and/or turn on NumericalEmphasis.");
         console->warn("-I am exporting a MP_.lp for you to examine offline.");
-        console->warn("-If the problem presists, contact Ragheb at "
-                      "ragheb.rahmaniani@gmail.com.");
+        console->warn(
+            "-If the problem presists, contact Ragheb at "
+            "ragheb.rahmaniani@gmail.com.");
         console->warn("______________________________________________________");
-        // master_model_.cplex.exportModel("MP_.lp");
+        master_model_.cplex.exportModel("MP_.lp");
         exit(0);
       }
       // master_model_.cplex.exportModel("MP_.lp");
@@ -397,8 +387,9 @@ public:
     if (Settings::Heuristic::frequency < 0) {
       return false;
     }
-    console->warn("Activating the heuristic, I wont guarantee an optimal "
-                  "or even a feasible solution, although do my best");
+    console->warn(
+        "Activating the heuristic, I wont guarantee an optimal "
+        "or even a feasible solution, although do my best");
     double tolerance = Settings::Heuristic::aggressiveness;
     uint64_t num_fixed_lb{0};
     uint64_t num_fixed_ub{0};
@@ -437,10 +428,13 @@ public:
         IloCplex::Param::TimeLimit,
         Settings::StoppingConditions::branching_time_limit);
     master_model_.cplex.setParam(IloCplex::Param::Benders::Strategy, 3);
+    master_model_.cplex.setParam(IloCplex::Param::Preprocessing::Linear, 1);
+    master_model_.cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 1);
     if (!master_model_.cplex.solve()) {
-      console->error("Failed to solve MIP model with Cplex Benders, please "
-                     "examine the exported "
-                     "MP_Cplex.lp model");
+      console->error(
+          "Failed to solve MIP model with Cplex Benders, please "
+          "examine the exported "
+          "MP_Cplex.lp model");
       master_model_.cplex.exportModel("MP_Cplex.lp");
       exit(0);
     }
@@ -459,8 +453,8 @@ public:
         IloCplex::Param::TimeLimit,
         Settings::StoppingConditions::branching_time_limit);
 
-    // master_model_.cplex.setParam(IloCplex::Param::Preprocessing::Linear, 1);
-    // master_model_.cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 1);
+    master_model_.cplex.setParam(IloCplex::Param::Preprocessing::Linear, 1);
+    master_model_.cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 1);
 
     if (!master_model_.cplex.solve()) {
       console->error(
@@ -478,13 +472,13 @@ public:
   bool RunLRBasedHeuristic(SharedInfo &shared_info,
                            const std::shared_ptr<spdlog::logger> console,
                            const std::shared_ptr<Subproblem> &SP) {
-    if (!Settings::CutGeneration::use_LR_cuts) {
+    if (!Settings::RootLifter::use_root_lifter) {
       console->error(
-          "Please turn on the use_LR_cuts to use run_lagrang_heuristic");
+          "Please turn on the use_root_lifter to use run_lagrang_heuristic");
       return false;
     }
     master_model_.cplex.setParam(IloCplex::NodeLim,
-                                 0); // need to run LR and return
+                                 0);  // need to run LR and return
     if (!master_model_.cplex.solve()) {
       console->error(
           "Something is wrong, please examine the exported MP_LR_.lp ");
@@ -541,6 +535,8 @@ public:
         IloCplex::Param::TimeLimit,
         Settings::StoppingConditions::branching_time_limit);
     master_model_.cplex.setParam(IloCplex::Param::Threads, 1);
+    // master_model_.cplex.setParam(IloCplex::PreLinear, 1);
+    // master_model_.cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 1);
     // ****Legacy callbacks
     // master_model_.cplex.use(
     //     BendersUserCallback(master_model_.env, console, shared_info, SP,
@@ -552,7 +548,6 @@ public:
     //                         master_model_.recourse_variables, solver_info_));
 
     // ****Generic callbacks
-    console->info("  -Done.");
   }
 
   void BranchingPhase(const std::shared_ptr<spdlog::logger> console,
@@ -561,23 +556,26 @@ public:
     assert(shared_info.retained_subproblem_ids.size() !=
            shared_info.num_subproblems);
 
+    console->info("  +Setting up the branch-and-bound tree...");
     SetCallbacks(console, shared_info, SP);
     BendersCustomCutCallback generic_cut_callback_(
         console, shared_info, master_model_.master_variables,
         master_model_.recourse_variables, solver_info_, SP);
     contextmask_ = IloCplex::Callback::Context::Id::Candidate;
-    // |
-    // IloCplex::Callback::Context::Id::Relaxation;
+    if (Settings::RootLifter::use_root_lifter) {
+      contextmask_ |= IloCplex::Callback::Context::Id::Relaxation;
+    }
     master_model_.cplex.use(&generic_cut_callback_, contextmask_);
 
     if (Settings::Heuristic::run_lagrang_heuristic) {
       RunLRBasedHeuristic(shared_info, console, SP);
     }
-
-    console->info("  +Setting up the branch-and-bound tree...");
+    console->info("  -Done.");
+    // master_model.cplex.setOut(master_model.env.getNullStream());
     if (!master_model_.cplex.solve()) {
-      console->error("Failed to solve MIP master, please examine the exported "
-                     "MP_BCompose.lp model");
+      console->error(
+          "Failed to solve MIP master, please examine the exported "
+          "MP_BCompose.lp model");
       master_model_.cplex.exportModel("MP_BCompose.lp");
       exit(0);
     }
@@ -592,8 +590,8 @@ public:
     // std::cout << shared_info.master_variables_value << std::endl;
   }
 
-  void
-  PrintStatus(const std::shared_ptr<spdlog::logger> console) noexcept(true) {
+  void PrintStatus(const std::shared_ptr<spdlog::logger> console) noexcept(
+      true) {
     assert(solver_info_.global_UB >= solver_info_.LB - 1e-7);
     std::string optimization_status = "    ";
     optimization_status +=
@@ -634,14 +632,14 @@ public:
     console->info("BOUNDS:");
     console->info("  -Root bound        = " +
                   ValToStr(solver_info_.lp_phase_LB));
-    console->info("   -Distance from LB = " +
+    console->info("   ->Distance from LB= " +
                   ValToStr(100 * (solver_info_.LB - solver_info_.lp_phase_LB) /
                            solver_info_.LB) +
                   "%");
     console->info("  -Root after lifter = " +
                   ValToStr(solver_info_.LB_after_lifter));
     console->info(
-        "   -Distance from LB = " +
+        "   ->Distance from LB= " +
         ValToStr(100 * (solver_info_.LB - solver_info_.LB_after_lifter) /
                  solver_info_.LB) +
         "%");
@@ -664,16 +662,16 @@ public:
     console->info(
         "  -#Feas             = " +
         std::to_string(solver_info_.lp_num_feas + solver_info_.num_feas));
-    console->info("    -1st phase       = " +
+    console->info("    ->1st phase      = " +
                   std::to_string(solver_info_.lp_num_feas));
-    console->info("    -2nd phase       = " +
+    console->info("    ->2nd phase      = " +
                   std::to_string(solver_info_.num_feas));
     console->info(
         "  -#Opt              = " +
         std::to_string(solver_info_.lp_num_opt + solver_info_.num_opt));
-    console->info("    -1st phase       = " +
+    console->info("    ->1st phase      = " +
                   std::to_string(solver_info_.lp_num_opt));
-    console->info("    -2nd phase       = " +
+    console->info("    ->2nd phase      = " +
                   std::to_string(solver_info_.num_opt));
     console->info(
         "  -Sum               = " +
@@ -700,7 +698,7 @@ public:
     return solver_info_.duration;
   }
 
-private:
+ private:
   MasterModel master_model_;
   MasterSolverInfo solver_info_;
   uint64_t num_threads_ = 1;

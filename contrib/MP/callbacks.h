@@ -14,23 +14,36 @@
 #include "structures.h"
 
 class BendersCustomCutCallback : public IloCplex::Callback::Function {
-public:
-  BendersCustomCutCallback(const std::shared_ptr<spdlog::logger> &_console,
+ public:
+  BendersCustomCutCallback(const std::shared_ptr<spdlog::logger> _console,
                            const SharedInfo &_shared_info,
                            const IloNumVarArray &_master_variables,
                            const IloNumVarArray &_recourse_variables,
                            const MasterSolverInfo &_solver_info_,
-                           const std::shared_ptr<Subproblem> &_SP)
-      : console_(_console), shared_info_(_shared_info),
+                           const std::shared_ptr<Subproblem> _SP)
+      : console_(_console),
+        shared_info_(_shared_info),
         master_variables_(_master_variables),
-        recourse_variables_(_recourse_variables), solver_info_(_solver_info_),
-        SP_(_SP) {}
+        recourse_variables_(_recourse_variables),
+        solver_info_(_solver_info_),
+        SP_(_SP) {
+    solver_info_.previous_root_obj =
+        solver_info_.lp_phase_LB *
+        (100 - 2 * Settings::RootLifter::min_lift_percentage);
+    solver_info_.LB_after_lifter = solver_info_.lp_phase_LB;
+  }
+
+  ~BendersCustomCutCallback() {
+    master_variables_.end();
+    recourse_variables_.end();
+  }
 
   void invoke(const IloCplex::Callback::Context &context);
   void AddLazyCuts(const IloCplex::Callback::Context &context);
-  MasterSolverInfo GetSolverInfo() { return solver_info_; }
+  void AddLRCuts(const IloCplex::Callback::Context &context);
+  MasterSolverInfo &GetSolverInfo() { return solver_info_; }
 
-private:
+ private:
   std::shared_ptr<spdlog::logger> console_;
   SharedInfo shared_info_;
   IloNumVarArray master_variables_;
@@ -50,17 +63,20 @@ void BendersCustomCutCallback::invoke(
   assert(threadNo == 0);
 
   switch (context.getId()) {
-  case IloCplex::Callback::Context::Id::Candidate:
-    if (!context.isCandidatePoint()) { // The model is always bounded
-      throw IloCplex::Exception(-1, "Unbounded solution");
-    }
-    AddLazyCuts(context);
-    break;
-  case IloCplex::Callback::Context::Id::Relaxation:
-    throw IloCplex::Exception(-1, "Does not support contextID==Relaxation");
-    break;
-  default:
-    throw IloCplex::Exception(-1, "Unexpected contextID");
+    case IloCplex::Callback::Context::Id::Candidate:
+      if (!context.isCandidatePoint()) {  // The model is always bounded
+        console_->error("Unbounded solution!");
+        throw IloCplex::Exception(-1, "Unbounded solution");
+      }
+      AddLazyCuts(context);
+      break;
+    case IloCplex::Callback::Context::Id::Relaxation:
+      AddLRCuts(context);
+      break;
+    default:
+      console_->error("Unexpected context!");
+      throw IloCplex::Exception(-1, "Unexpected contextID");
+      break;
   }
 }
 
@@ -75,7 +91,7 @@ void BendersCustomCutCallback::AddLazyCuts(
                             shared_info_.master_variables_value);
 
   SP_->GenBendersCuts(console_, shared_info_);
-  bool is_sol_infes = false;
+  bool is_sol_infeas = false;
   double total_violation = 0;
   uint64_t num_violated_cuts = 0;
   IloRangeArray violated_cuts(env);
@@ -83,10 +99,13 @@ void BendersCustomCutCallback::AddLazyCuts(
     if (shared_info_.retained_subproblem_ids.count(sp_id)) {
       continue;
     }
+
+    // sp_obj = shared_info_.subproblem_objective_value[sp_id];
+
     IloExpr expr(env);
-    double violation_sum = 0;
+    double violation = 0;
     expr += shared_info_.subproblem_objective_value[sp_id];
-    violation_sum += shared_info_.subproblem_objective_value[sp_id];
+    violation += shared_info_.subproblem_objective_value[sp_id];
     assert(shared_info_.dual_values[sp_id].getSize() ==
            master_variables_.getSize());
     expr -= IloScalProd(shared_info_.dual_values[sp_id],
@@ -96,34 +115,113 @@ void BendersCustomCutCallback::AddLazyCuts(
     if (shared_info_.subproblem_status[sp_id]) {
       ++solver_info_.num_opt;
       expr -= recourse_variables_[sp_id];
-      violation_sum -= shared_info_.recourse_variables_value[sp_id];
-    } else {
-      is_sol_infes = true;
+      violation -= shared_info_.recourse_variables_value[sp_id];
+    } else if (shared_info_.subproblem_objective_value[sp_id] > 0) {
+      is_sol_infeas = true;
       ++solver_info_.num_feas;
-      // assert(shared_info_.subproblem_objective_value[sp_id] > 0);
+    } else {  // SP has been infeas but unviolated (i.e., slightly infeasible)
+      expr.end();
+      continue;
     }
-    total_violation += violation_sum;
-    if (violation_sum > 1e-6) {
+    total_violation += violation;
+    if (violation > Settings::ParetoCuts::violation_threshold) {
       ++num_violated_cuts;
       violated_cuts.add(expr <= 0);
     }
     expr.end();
   }
-  if (total_violation > 1e-6) {
+  if (total_violation > Settings::ParetoCuts::violation_threshold) {
     context.rejectCandidate(violated_cuts);
+  } else {
+    num_violated_cuts = 0;
   }
+  violated_cuts.end();
   ++solver_info_.iteration;
   {
     std::chrono::duration<float> diff =
         std::chrono::steady_clock::now() - solver_info_.start_time;
     solver_info_.duration = diff.count();
-    // console_->info("**Added " + std::to_string(num_violated_cuts) +
-    //                " lazy cuts.");
     console_->info("   UB=" + ValToStr(context.getIncumbentObjective()) +
                    " Candidate=" + ValToStr(context.getCandidateObjective()) +
                    " #Cuts=" + std::to_string(num_violated_cuts) +
                    " Time=" + ValToStr(solver_info_.duration) +
                    " Iteration=" + std::to_string(solver_info_.iteration));
+  }
+}
+
+void BendersCustomCutCallback::AddLRCuts(
+    const IloCplex::Callback::Context &context) {
+  if (solver_info_.gen_user_cuts &&
+      context.getIntInfo(IloCplex::Callback::Context::Info::NodeCount) == 0) {
+    assert(context.getId() == IloCplex::Callback::Context::Id::Relaxation);
+    console_->info(" -Booster still working...");
+    IloEnv env = context.getEnv();
+    context.getRelaxationPoint(recourse_variables_,
+                               shared_info_.recourse_variables_value);
+    context.getRelaxationPoint(master_variables_,
+                               shared_info_.master_variables_value);
+
+    SP_->GenBendersCuts(console_, shared_info_);
+    SP_->GenAdvancedCuts(console_, shared_info_);
+
+    uint64_t num_violated_cuts = 0;
+    for (uint64_t sp_id = 0; sp_id < shared_info_.num_subproblems; ++sp_id) {
+      if (shared_info_.retained_subproblem_ids.count(sp_id)) {
+        continue;
+      }
+      double fixed_part = 0;
+      const bool status = shared_info_.subproblem_status[sp_id];
+      if (status) {  // we have lifted only opt cuts
+        ++solver_info_.num_opt;
+        fixed_part = shared_info_.subproblem_objective_value[sp_id] -
+                     IloScalProd(shared_info_.dual_values[sp_id],
+                                 shared_info_.copied_variables_value[sp_id]);
+      } else if (shared_info_.subproblem_objective_value[sp_id] >
+                 Settings::ParetoCuts::violation_threshold) {  // feas cuts
+        ++solver_info_.num_feas;
+        fixed_part = shared_info_.subproblem_objective_value[sp_id];
+        assert(fixed_part > 0);
+        fixed_part -= IloScalProd(shared_info_.dual_values[sp_id],
+                                  shared_info_.master_variables_value);
+      } else {
+        continue;
+      }
+
+      IloExpr expr(env);
+      expr += fixed_part;
+      expr += IloScalProd(shared_info_.dual_values[sp_id], master_variables_);
+      if (status) {
+        expr -= recourse_variables_[sp_id];
+      }
+      ++num_violated_cuts;
+      context.addUserCut(expr <= 0, IloCplex::UseCutPurge, IloFalse);
+      expr.end();
+    }
+    ++solver_info_.iteration;
+    console_->info(" -Booster added " + std::to_string(num_violated_cuts) +
+                   " cuts.");
+    if (100 * std::fabs((context.getRelaxationObjective() -
+                         solver_info_.previous_root_obj) /
+                        (1e-75 + solver_info_.previous_root_obj)) <
+        Settings::RootLifter::min_lift_percentage) {
+      console_->info(
+          "  -Booster terminating because lift was " +
+          std::to_string(100 *
+                         std::fabs((context.getRelaxationObjective() -
+                                    solver_info_.previous_root_obj) /
+                                   (1e-75 + solver_info_.previous_root_obj))) +
+          "%");
+      solver_info_.gen_user_cuts = false;
+      SP_->DeleteLRSubproblems();
+      console_->info(
+          " +Booster successfully terminated with " +
+          ValToStr(100 * std::fabs((context.getRelaxationObjective() -
+                                    solver_info_.lp_phase_LB) /
+                                   (1e-75 + solver_info_.lp_phase_LB))) +
+          "% lift.");
+      solver_info_.LB_after_lifter = context.getRelaxationObjective();
+    }
+    solver_info_.previous_root_obj = context.getRelaxationObjective();
   }
 }
 
@@ -138,7 +236,7 @@ void BendersCustomCutCallback::AddLazyCuts(
 //   getValues(shared_info.recourse_variables_value, recourse_variables);
 //   getValues(shared_info.master_variables_value, master_variables);
 //   SP->GenBendersCuts(console, shared_info);
-//   bool is_sol_infes = false;
+//   bool is_sol_infeas = false;
 //   for (uint64_t sp_id = 0; sp_id < shared_info.num_subproblems; ++sp_id) {
 //     if (shared_info.retained_subproblem_ids.count(sp_id)) {
 //       continue;
@@ -156,7 +254,7 @@ void BendersCustomCutCallback::AddLazyCuts(
 //       expr -= recourse_variables[sp_id];
 //       add(expr <= 0).end();
 //     } else {
-//       is_sol_infes = true;
+//       is_sol_infeas = true;
 //       solver_info_.num_feas++;
 //       assert(shared_info.subproblem_objective_value[sp_id] > -1e-7);
 //       add(expr <= 0).end();
@@ -165,7 +263,7 @@ void BendersCustomCutCallback::AddLazyCuts(
 //   }
 //   {
 //     if (ProblemSpecificSettings::AdvancedCuts::gen_combinatorial_cuts &&
-//         is_sol_infes) {
+//         is_sol_infeas) {
 //       IloExpr expr(env);
 //       for (size_t var_id = 0;
 //            var_id < shared_info.master_variables_value.getSize(); var_id++) {
@@ -206,7 +304,7 @@ void BendersCustomCutCallback::AddLazyCuts(
 //                     master_variables, IloNumVarArray, recourse_variables,
 //                     MasterSolverInfo &, solver_info_) {
 //   const auto nodeId = getNnodes();
-//   if (solver_info_.gen_user_cuts && Settings::CutGeneration::use_LR_cuts &&
+//   if (solver_info_.gen_user_cuts && Settings::RootLifter::use_LR_cuts &&
 //       isAfterCutLoop() && nodeId == 0) {
 //     console->info(" -Booster still looking...");
 //     IloEnv env = getEnv();

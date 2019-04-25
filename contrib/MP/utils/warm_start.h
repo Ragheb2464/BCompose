@@ -7,7 +7,7 @@
 void SimpleWS(const uint64_t iteration, const MasterModel &master_model,
               SharedInfo &shared_info) {
   if (!iteration) {
-    const double core_value = Settings::CutGeneration::initial_core_point;
+    const double core_value = Settings::ParetoCuts::initial_core_point;
     for (IloInt var_id = 0;
          var_id < shared_info.master_variables_value.getSize(); ++var_id) {
       //
@@ -21,13 +21,14 @@ void SimpleWS(const uint64_t iteration, const MasterModel &master_model,
       }
     }
   } else {
-    const double lambda = Settings::WarmStart::lambda;
+    const double alpha = Settings::WarmStart::alpha;
+    assert(alpha >= 0 && alpha <= 1);
     for (IloInt var_id = 0;
          var_id < shared_info.master_variables_value.getSize(); ++var_id) {
       shared_info.master_variables_value[var_id] =
-          lambda * shared_info.master_variables_value[var_id] +
-          (1 - lambda) * master_model.cplex.getValue(
-                             master_model.master_variables[var_id]);
+          alpha * shared_info.master_variables_value[var_id] +
+          (1 - alpha) * master_model.cplex.getValue(
+                            master_model.master_variables[var_id]);
     }
   }
 }

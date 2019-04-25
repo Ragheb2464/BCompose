@@ -35,6 +35,8 @@ void CreateSubproblemModels(const std::shared_ptr<spdlog::logger> console) {
   constraints = IloRangeArray(env);
   objective = IloMinimize(env);
 
+  assert(I && J);
+
   //! WARNING: copied variables must be INTEGRAL, otherwise main accelerator
   //! will be truned  off
   {  // Creating the SP variables and a copy of the master variables

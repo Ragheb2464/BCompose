@@ -20,10 +20,12 @@ struct MasterSolverInfo {
   uint64_t num_feas{0};
   uint64_t num_opt{0};
   std::chrono::steady_clock::time_point start_time;
-  float duration;
+  float duration{0};
   bool gen_user_cuts{true};
 
   std::vector<double> sp_weights_to_create_art_sp;
+
+  double previous_root_obj{0};
 };
 
 struct MasterModel {

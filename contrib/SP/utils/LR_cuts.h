@@ -53,8 +53,7 @@ double GetUB(SubproblemModel *lp_sp_model, const IloNumArray &var_val) {
   return ub;
 }
 
-void GenLRCuts(SubproblemModel *lp_sp_model, SubproblemModel *mip_sp_model,
-               SharedInfo *shared_info,
+void GenLRCuts(SubproblemModel *mip_sp_model, SharedInfo *shared_info,
                std::vector<std::vector<int>> *copy_sol_tmp_vec,
                const uint64_t sp_id) {
   assert(shared_info->subproblem_status[sp_id]);
@@ -111,7 +110,7 @@ void GenLRCuts(SubproblemModel *lp_sp_model, SubproblemModel *mip_sp_model,
 
     if (std::fabs(IloSum(gradient)) < 1e-7 ||
         (cut_violation - 1e-7 <= cut_violation_0 && iter >= 1) ||
-        iter >= Settings::CutGeneration::aggressiveness) {
+        iter >= Settings::RootLifter::aggressiveness) {
       break;
     }
     cut_violation_0 = cut_violation;

@@ -47,7 +47,7 @@ public:
         }
       }
     }
-    if (Settings::CutGeneration::use_LR_cuts) { // FOR LR CUTS
+    if (Settings::RootLifter::use_root_lifter) { // FOR LR CUTS
       Loader(console, LR_subproblem_model_, shared_info, current_directory);
       shared_info.copied_variables_value.resize(num_subproblems_);
       for (uint64_t sp_id = 0; sp_id < num_subproblems_; ++sp_id) {
@@ -63,6 +63,7 @@ public:
               LR_subproblem_model_[sp_id].copied_variables, ILOINT));
         }
         LR_subproblem_model_[sp_id].NAC_constraints.removeFromAll();
+        LR_subproblem_model_[sp_id].NAC_constraints.endElements();
         LR_subproblem_model_[sp_id].NAC_constraints.end();
       }
     }
@@ -90,8 +91,8 @@ public:
   }
 
   static void PerturbMasterSolution(SharedInfo &shared_info) {
-    const double alpha = Settings::CutGeneration::perturbation_weight;
-    const double core_val = Settings::CutGeneration::initial_core_point;
+    const double alpha = Settings::ParetoCuts::perturbation_weight;
+    const double core_val = Settings::ParetoCuts::initial_core_point;
     for (IloInt var_id = 0;
          var_id < shared_info.master_variables_value.getSize(); ++var_id) {
       shared_info.master_variables_value[var_id] = std::min(
@@ -104,7 +105,7 @@ public:
   void Cleaner(const std::shared_ptr<spdlog::logger> console,
                const SharedInfo &shared_info) {
     if (Settings::ImproveFormulations::improve_SP_representation &&
-        !Settings::CutGeneration::use_LR_cuts) {
+        !Settings::RootLifter::use_root_lifter) {
       int t = 0, num_con = 0;
       for (uint64_t sp_id = 0; sp_id < num_subproblems_; ++sp_id) {
         if (shared_info.retained_subproblem_ids.count(sp_id)) {
@@ -123,6 +124,7 @@ public:
           ++num_con;
         }
         cuts.removeFromAll();
+        cuts.endElements();
         cuts.end();
       }
       console->info("   -Cleaner removed " + std::to_string(t) +
@@ -248,9 +250,9 @@ public:
         if (!shared_info.subproblem_status[sp_id]) { // dont lift for infeas SPs
           continue;
         }
-        io_service.dispatch(boost::bind(
-            GenLRCuts, &subproblem_model_[sp_id], &LR_subproblem_model_[sp_id],
-            &shared_info, &copy_sol_tmp_vec[sp_id], sp_id));
+        io_service.dispatch(boost::bind(GenLRCuts, &LR_subproblem_model_[sp_id],
+                                        &shared_info, &copy_sol_tmp_vec[sp_id],
+                                        sp_id));
       }
       // We let the thread pool finish the computation.
       work.reset();

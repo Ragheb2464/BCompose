@@ -48,8 +48,7 @@ int main(int argc, char *argv[]) {
 
   console->info(" -Loading the data...");
   const std::string file_path =
-      "/home/rahrag/Bureau/GeorgiaTech/ND/BDD/interface_CP/data/"
-      "GRID_MCLP_n100_m100000_d1_100_f1_1_s5.dat";
+      "data/GRID_MCLP_n100_m100000_d1_100_f1_1_s3.dat";
   SetData(file_path);
 
   console->info(" -Exporting CPLEX models...");

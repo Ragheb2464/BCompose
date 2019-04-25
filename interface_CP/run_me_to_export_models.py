@@ -20,25 +20,42 @@ def main():
     logger.info('Running a {0} machine.'.format(subprocess.os.uname()[0]))
     logger.info('Working directory is {0}'.format(
         subprocess.os.getcwd()))
+    model_files_path = "/Users/raghebrahmaniani/BCompose/models"
+    pwd = "/Users/raghebrahmaniani/BCompose/models"
+    CONCERTDIR = '/Applications/CPLEX_Studio129/concert/include/'
+    CPLEXDIR = '/Applications/CPLEX_Studio129/cplex/include/'
+    CPLEXLIB = '/Applications/CPLEX_Studio129/cplex/lib/x86-64_osx/static_pic/'
+    CONCERTLIB = '/Applications/CPLEX_Studio129/concert/lib/x86-64_osx/static_pic/'
+    Sanitation_Flags = 'address,undefined,signed-integer-overflow,null,alignment,bool,builtin,bounds,float-cast-overflow,float-divide-by-zero,function,integer-divide-by-zero,return,signed-integer-overflow,implicit-conversion,unsigned-integer-overflow -fno-sanitize-recover=null -fsanitize-trap=alignment -fno-omit-frame-pointer'
+    GCC = 'g++'
+    OPT_FLAG = '-Ofast'
+    DEBUG_FLAG = '-DGLIBCXX_DEBUG -g -O -DIL_STD -Wall -Wextra -pedantic'
+    # DEBUG_FLAG = '-DGLIBCXX_DEBUG -g -O -DIL_STD -Wall -Wextra -pedantic -fsanitize={0}'.format(
+    #     Sanitation_Flags)
+    FLAG = DEBUG_FLAG
     try:
         logger.info('Cleaning up the old stuff...')
         subprocess.call('rm' + " " + 'main', shell=True)
         subprocess.call('rm' + " " + 'main.o', shell=True)
-        subprocess.call('rm' + " " + '../models/*.sav', shell=True)
-        subprocess.call('rm' + " " + '../models/*.lp', shell=True)
+        subprocess.call('rm' + " " + '../models/*', shell=True)
+        subprocess.call('rm' + " " + '../opt_model_dir/*', shell=True)
     except Exception as e:
         logger.error('Failed to clean up')
         logger.error(e)
 
     try:
         logger.info('Compiling the export program with c++11...')
-        # gcc -o model_refiner  model_refiner.c -lilocplex -lconcert -lcplex -lm -lpthread
-        # !!!!! Complie following line if you dont have docopt.o in the directory
-        # arg_base = 'g++ -std=c++11 -lstdc++ -DNDEBUG -DIL_STD -c externals/docopt/docopt.cpp   -g'
-        # subprocess.call(arg_base, shell=True)
-        arg_base = 'gcc -DGLIBCXX_DEBUG -g -static-libstdc++ -std=c++11 -DNDEBUG -DIL_STD -c    main.cpp'
+        logger.info(' -Compiling docopt...')
+        arg_base = '{0} {1} -std=c++17 -DNDEBUG -DIL_STD -c ../externals/docopt/docopt.cpp  -g'.format(
+            GCC, FLAG)
         subprocess.call(arg_base, shell=True)
-        arg_base = 'gcc -static-libstdc++ -DGLIBCXX_DEBUG -g -L/home/rahrag/builds/lib -o main main.o ../docopt.o -fopenmp -lboost_system -lboost_thread-mt -lilocplex -lconcert -lcplex -lm -lpthread'
+        logger.info(' -Compiling exporter...')
+        arg_base = '{0} {1} -I{2} -I{3} -std=c++17  -DIL_STD -c  main.cpp  -g'.format(
+            GCC, FLAG, CPLEXDIR, CONCERTDIR)
+        subprocess.call(arg_base, shell=True)
+        logger.info(" -Linking...")
+        arg_base = '{0} {1} -L{2} -L{3}  -std=c++17 -o main main.o docopt.o  -ldl -lboost_system -lboost_thread-mt -lilocplex -lconcert -lcplex -lm -lpthread'.format(
+            GCC, FLAG, CPLEXLIB, CONCERTLIB)
         subprocess.call(arg_base, shell=True)
     except Exception as e:
         logger.error('Failed to compile the exporter...')

@@ -42,7 +42,7 @@ void SetCoordinates(const std::string file_path) {
   uint64_t f, d;
   for (uint64_t line = 0; line < I; ++line) {
     file >> tag;
-    assert(tag == 'F');
+    assert(tag == "F");
     file >> id;
     assert(id == line);
     file >> x;
@@ -62,7 +62,7 @@ void SetCoordinates(const std::string file_path) {
 
   for (uint64_t line = 0; line < J; ++line) {
     file >> tag;
-    assert(tag == 'C');
+    assert(tag == "C");
     file >> id;
     assert(id == line);
     file >> x;
@@ -83,7 +83,7 @@ void SetCoordinates(const std::string file_path) {
   // exit(1);
 }
 
-void SetData(const std::string file_path) {
+void SetData(const std::string& file_path) {
   SetCoordinates(file_path);
 
   // D = percentage * D_bar;

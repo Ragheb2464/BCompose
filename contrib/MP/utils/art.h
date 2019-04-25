@@ -20,7 +20,7 @@ uint64_t PickFirstSP(const SharedInfo &shared_info) {
       break;
     }
   }
-  if (picked_sp_id == 1e74) {
+  if (picked_sp_id == std::numeric_limits<uint64_t>::max()) {
     std::cout << "Turn off subproblem creation strategy" << std::endl;
     exit(0);
   }
@@ -136,7 +136,7 @@ void UpdateRHS(IloRangeArray &constraints, const IloRangeArray &aux_constraints,
   }
 }
 
-void AddArtSPTOMP(const std::string &model_directory, SharedInfo &shared_info,
+void AddArtSPToMP(const std::string &model_directory, SharedInfo &shared_info,
                   const MasterSolverInfo &solver_info_, MasterModel &mp_model) {
   assert(shared_info.subproblem_data.size() == shared_info.num_subproblems);
   //! the way it works is to load a SP and modify all its coeffs so that we
@@ -176,7 +176,7 @@ void AddArtSPTOMP(const std::string &model_directory, SharedInfo &shared_info,
     }
   }
   {  // correct obj of picked_sp_id
-    const auto num_mp_vars =
+    const uint64_t num_mp_vars =
         CorrectObj(mp_model.env, objective,
                    solver_info_.sp_weights_to_create_art_sp[picked_sp_id]);
     if (num_mp_vars && num_mp_vars != master_var_map.size()) {
@@ -194,7 +194,7 @@ void AddArtSPTOMP(const std::string &model_directory, SharedInfo &shared_info,
     CorrectRHS(constraints,
                solver_info_.sp_weights_to_create_art_sp[picked_sp_id]);
   }
-  // getting convex combnation of the uncertain paramters
+  // getting convex combination of the uncertain paramters
   // NOTE: we have the data for all constraints except for the NACs and CPLEX
   // cuts
   for (uint64_t sp_id = 0; sp_id < shared_info.num_subproblems; ++sp_id) {

@@ -18,7 +18,7 @@ void GenClassicalCuts(SubproblemModel *sp_model, SharedInfo *shared_info,
     if (!sp_model->cplex.solve()) {
       std::cout << "ERROR: Feasibility problem is infeasible!" << std::endl;
       sp_model->cplex.exportModel(("SP_" + std::to_string(sp_id)).c_str());
-      exit(1);
+      exit(911);
     }
     shared_info->subproblem_objective_value[sp_id] =
         sp_model->cplex.getObjValue();
@@ -27,7 +27,7 @@ void GenClassicalCuts(SubproblemModel *sp_model, SharedInfo *shared_info,
       std::cout << "ERROR:: Objective of the feasibility problem is "
                 << shared_info->subproblem_objective_value[sp_id]
                 << "!. Most likely numeric issue." << std::endl;
-      exit(1);
+      exit(911);
     }
     sp_model->cplex.getDuals(shared_info->dual_values[sp_id],
                              sp_model->NAC_constraints);

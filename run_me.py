@@ -33,37 +33,42 @@ CONCERTDIR = '/Applications/CPLEX_Studio129/concert/include/'
 CPLEXDIR = '/Applications/CPLEX_Studio129/cplex/include/'
 CPLEXLIB = '/Applications/CPLEX_Studio129/cplex/lib/x86-64_osx/static_pic/'
 CONCERTLIB = '/Applications/CPLEX_Studio129/concert/lib/x86-64_osx/static_pic/'
-Sanitation_Flags = 'address,undefined,signed-integer-overflow,null,alignment,bool,builtin,bounds,float-cast-overflow,float-divide-by-zero,function,integer-divide-by-zero,return,signed-integer-overflow,implicit-conversion,unsigned-integer-overflow -fno-sanitize-recover=null -fsanitize-trap=alignment -fno-omit-frame-pointer'
+#
 GCC = 'g++'
+
+Sanitation_Flags = 'address,undefined,signed-integer-overflow,null,alignment,bool,builtin,bounds,float-cast-overflow,float-divide-by-zero,function,integer-divide-by-zero,return,signed-integer-overflow,implicit-conversion,unsigned-integer-overflow -fno-sanitize-recover=null -fsanitize-trap=alignment -fno-omit-frame-pointer -fsanitize-memory-track-origins=2 -Wno-unused-variable '
 OPT_FLAG = '-DIL_STD -Ofast'
 # DEBUG_FLAG = '-DGLIBCXX_DEBUG -g -O -DIL_STD -Wall -Wextra -pedantic'
-DEBUG_FLAG = '-DGLIBCXX_DEBUG -g -O -DIL_STD -Wall -Wextra -pedantic -fsanitize={0}'.format(
+DEBUG_FLAG = '-DGLIBCXX_DEBUG -g -DIL_STD -Wall -Wextra -pedantic -fsanitize={0}'.format(
     Sanitation_Flags)
+# chose the first two or the last two
 FLAG = DEBUG_FLAG
+DEBUG_SYMBOLS = '-g'
+DEBUG_SYMBOLS = ' '
 FLAG = OPT_FLAG
 
 try:
-    logger.info('Compiling the solver with c++17...')
+    logger.info('Compiling the solver with c++11...')
     logger.info(' -Compiling pre-processor...')
-    arg_base = '{0} {1} -I{2} -I{3} -c -o  model_refiner.o  contrib/pre_processor/model_refiner.cpp'.format(
-        GCC, FLAG, CPLEXDIR, CONCERTDIR)
+    arg_base = '{0} {1} -I{2} -I{3} -c -o  model_refiner.o  contrib/pre_processor/model_refiner.cpp {4}'.format(
+        GCC, FLAG, CPLEXDIR, CONCERTDIR, DEBUG_SYMBOLS)
     subprocess.call(arg_base, shell=True)
     # Complie following line if you dont have docopt.o in the directory
     logger.info(' -Compiling docopt...')
-    arg_base = '{0} {1} -std=c++17 -DNDEBUG -DIL_STD -c externals/docopt/docopt.cpp  -g'.format(
-        GCC, FLAG)
+    arg_base = '{0} {1} -std=c++11 -DNDEBUG -DIL_STD -c externals/docopt/docopt.cpp {2}'.format(
+        GCC, FLAG, DEBUG_SYMBOLS)
     subprocess.call(arg_base, shell=True)
     logger.info(' -Compiling rss...')
-    arg_base = '{0} {1}  -std=c++17  -DIL_STD -c  externals/rss/current_rss.cpp  -g'.format(
-        GCC, FLAG)
+    arg_base = '{0} {1}  -std=c++11  -DIL_STD -c  externals/rss/current_rss.cpp  {2}'.format(
+        GCC, FLAG, DEBUG_SYMBOLS)
     subprocess.call(arg_base, shell=True)
     logger.info(' -Compiling BCompose...')
-    arg_base = '{0} {1} -I{2} -I{3} -std=c++17  -DIL_STD -c  main.cpp  -g'.format(
-        GCC, FLAG, CPLEXDIR, CONCERTDIR)
+    arg_base = '{0} {1} -I{2} -I{3} -std=c++11  -DIL_STD -c  main.cpp {4}'.format(
+        GCC, FLAG, CPLEXDIR, CONCERTDIR, DEBUG_SYMBOLS)
     subprocess.call(arg_base, shell=True)
 
     logger.info(" -Linking...")
-    arg_base = '{0} {1} -L{2} -L{3}  -std=c++17 -o main main.o model_refiner.o current_rss.o docopt.o  -ldl -lboost_system -lboost_thread-mt -lilocplex -lconcert -lcplex -lm -lpthread'.format(
+    arg_base = '{0} {1} -L{2} -L{3}  -std=c++11 -o main main.o model_refiner.o current_rss.o docopt.o  -ldl -lboost_system -lboost_thread-mt -lilocplex -lconcert -lcplex -lm -lpthread'.format(
         GCC, FLAG, CPLEXLIB, CONCERTLIB)
     subprocess.call(arg_base, shell=True)
 except Exception as e:

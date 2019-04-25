@@ -62,11 +62,6 @@ struct SharedInfo {
 
   std::set<uint64_t> retained_subproblem_ids;
 
-  std::unordered_map<uint64_t, double>
-      fixed_master_variables;  // the pre-solve in C API may fix some variables,
-                               // we extract them and fix them in the master
-                               // problem: var_id->value
-
   std::vector<double> subproblem_objective_value;
   std::vector<bool> subproblem_status;  // true:opt, false:inf
   std::vector<IloNumArray> dual_values;

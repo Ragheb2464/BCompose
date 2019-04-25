@@ -12,10 +12,10 @@
 #include <memory>
 #include <set>
 
+#include <ilcplex/ilocplex.h>
 #include "../externals/docopt/docopt.h"
 #include "../externals/spdlog/spdlog.h"
 #include "../externals/util/pair_hasher.h"
-#include <ilcplex/ilocplex.h>
 
 #include "../contrib/control/solver_settings.h"
 #include "utils/data.h"
@@ -62,6 +62,6 @@ int main(int argc, char *argv[]) {
   console->info(" -Exporting CPLEX models...");
   CreateMasterModel(data, console);
   CreateSubproblemModels(data, console);
-  console->info(" -Done!");
+  console->info(" -Done exporting!");
   return 0;
-} // end main
+}  // end main

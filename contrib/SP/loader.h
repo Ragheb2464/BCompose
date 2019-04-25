@@ -9,7 +9,8 @@
   formulation.
 !*/
 void SetSPCplexSettings(SubproblemModel &subproblem_model) noexcept(true) {
-  if (Settings::Parallelization::num_proc > 1) {
+  if (Settings::Parallelization::num_proc > 1 ||
+      Settings::Parallelization::num_master_procs > 1) {
     subproblem_model.cplex.setParam(IloCplex::Param::Threads, 1);
   }
   subproblem_model.cplex.setParam(IloCplex::RootAlg,
@@ -43,15 +44,6 @@ void GetCopiedAndFixedVars(SharedInfo &shared_info,
         subproblem_model.copied_variables[var_id].setBounds(
             shared_info.master_variables_lb[var_id],
             shared_info.master_variables_ub[var_id]);
-        const auto &res =
-            shared_info.fixed_master_variables.emplace(var_id, var_ub);
-        if (!res.second &&
-            Settings::Heuristic::safe_fix) {  // making sure the var is
-                                              // fixed to the same value in
-          // all SPs
-          assert(res.first->first == var_id);
-          assert(res.first->second == var_lb);
-        }
       }
     }
   }  // for
@@ -200,7 +192,8 @@ void HealthCheckAndNACExtraction(SubproblemModel &subproblem_model,
   This purturbs the RHS for parto cut generator
 */
 void PerturbRHS(SubproblemModel &subproblem_model) {
-  const double alpha = Settings::CutGeneration::perturbation_weight;
+  assert(false);
+  const double alpha = Settings::ParetoCuts::perturbation_weight;
   for (IloInt con_id = 0; con_id < subproblem_model.constraints.getSize();
        ++con_id) {
     // const std::string con_name =
@@ -356,7 +349,6 @@ bool Loader(const std::shared_ptr<spdlog::logger> console,
             subproblem_model[sp_id].variables,
             subproblem_model[sp_id].constraints);
       }
-
       GetCopiedAndFixedVars(shared_info, subproblem_model[sp_id]);
       DropMasterVarsFromObj(subproblem_model[sp_id]);
       HealthCheckAndNACExtraction(subproblem_model[sp_id], shared_info);

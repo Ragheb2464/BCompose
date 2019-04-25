@@ -4,10 +4,9 @@
 #include <unordered_map>
 #include <unordered_set>
 
-// #include "./scenario_selection.h"
 struct NodeInfo {
-  std::unordered_set<int> exiting_edges;  // head node ids
-  std::unordered_set<int> entering_edges; // tail node ids
+  std::unordered_set<int> exiting_edges;   // head node ids
+  std::unordered_set<int> entering_edges;  // tail node ids
   bool is_origin = false;
   bool is_destination = false;
 };
@@ -17,26 +16,29 @@ struct ArcInfo {
 };
 struct Data {
   int num_nodes, num_arcs, num_dummy_arcs, num_od, num_scenario;
-
-  std::unordered_map<int, NodeInfo> nodes_info; // node->NodeInfo
+  // for a node, it gives those neighbors which are head/tail of an arc
+  // exiting/entering from the given node
+  std::unordered_map<int, std::unordered_set<int>> node_id_to_head_neighbors;
+  std::unordered_map<int, std::unordered_set<int>> node_id_to_tail_neighbors;
+  //
   std::unordered_map<std::pair<int, int>, ArcInfo, Hasher>
-      arcs_info;                                        // tail-head->ArcInfo
-  std::unordered_set<int> origin_nodes;                 // origin node id
-  std::unordered_set<int> destination_nodes;            // destination node id
-  std::unordered_map<int, std::pair<int, int>> od_pair; // k->origin-destination
+      arcs_info;                              // tail-head->ArcInfo
+  std::unordered_set<int> origin_nodes;       // origin node id
+  std::unordered_set<int> destination_nodes;  // destination node id
+  std::unordered_map<int, std::pair<int, int>>
+      od_pair;  // k->origin-destination
 
-  std::vector<double> scenario_probability; // scenario prob
-  std::vector<std::vector<double>> demands; // demand for each scenario:s->k
+  std::vector<double> scenario_probability;  // scenario prob
+  std::vector<std::vector<double>> demands;  // demand for each scenario:s->k
 
-  uint64_t total_num_constraints_in_subproblem; // in the determinstic version
+  uint64_t total_num_constraints_in_subproblem;  // in the determinstic version
 };
 
 /*!
   This function reads the input graph files for the R instances
 */
-void GraphFileReader(const std::string file_path, Data &data,
+void GraphFileReader(const std::string &file_path, Data &data,
                      const std::shared_ptr<spdlog::logger> console) {
-
   //! Read the graph data
   std::fstream instance_file;
   instance_file.open(file_path, std::ios::in);
@@ -45,13 +47,12 @@ void GraphFileReader(const std::string file_path, Data &data,
   std::string value;
   int t = 0;
   int k = 0;
-  int arc_id = 0; // to number arcs in the order they are read
+  int arc_id = 0;  // to number arcs in the order they are read
   while (true) {
     instance_file >> value;
     if (instance_file.eof()) {
       break;
     }
-
     if (t == 0) {
       ++t;
       continue;
@@ -61,7 +62,7 @@ void GraphFileReader(const std::string file_path, Data &data,
       assert(data.num_arcs == std::atoi(value.c_str()));
     } else if (t == 3) {
       assert(data.num_od == std::atoi(value.c_str()));
-      data.num_dummy_arcs = data.num_od; // for the complete recourse
+      data.num_dummy_arcs = data.num_od;  // for the complete recourse
     } else if (t >= 4 && t < 4 + 7 * data.num_arcs) {
       ArcInfo arc_info;
       const int tail = std::atoi(value.c_str()) - 1;
@@ -74,7 +75,7 @@ void GraphFileReader(const std::string file_path, Data &data,
       assert(res.second);
       auto &arc = res.first->second;
       arc.arc_id = arc_id;
-      arc_id++;
+      ++arc_id;
 
       instance_file >> value;
       ++t;
@@ -91,7 +92,6 @@ void GraphFileReader(const std::string file_path, Data &data,
       instance_file >> value;
       ++t;
     } else if (t >= 4 + 7 * data.num_arcs) {
-
       const int origin = std::atoi(value.c_str());
 
       instance_file >> value;
@@ -101,7 +101,8 @@ void GraphFileReader(const std::string file_path, Data &data,
       data.origin_nodes.insert(origin);
       data.destination_nodes.insert(destination);
       const auto &res =
-          data.od_pair.emplace(k++, std::make_pair(origin, destination));
+          data.od_pair.emplace(k, std::make_pair(origin, destination));
+      ++k;
       if (!res.second) {
         console->error("   ++Something wrong with data");
         exit(0);
@@ -117,37 +118,18 @@ void GraphFileReader(const std::string file_path, Data &data,
   for (const auto &it : data.arcs_info) {
     const int tail = it.first.first;
     const int head = it.first.second;
-    { // tail
-      const auto &res = data.nodes_info.emplace(tail, NodeInfo());
-      auto &node = res.first->second;
-      node.exiting_edges.insert(
-          head); // this helps to see the node_id=tail is can send flow where
-      if (data.origin_nodes.count(tail)) {
-        node.is_origin = true;
-      }
-      if (data.destination_nodes.count(tail)) {
-        node.is_destination = true;
-      }
-    }
-    { // head
-      const auto &res = data.nodes_info.emplace(head, NodeInfo());
-      auto &node = res.first->second;
-      node.entering_edges.insert(tail);
-      if (data.origin_nodes.count(head)) {
-        node.is_origin = true;
-      }
-      if (data.destination_nodes.count(head)) {
-        node.is_destination = true;
-      }
-    }
+    data.node_id_to_head_neighbors[tail].insert(head);
+    data.node_id_to_tail_neighbors[head].insert(tail);
   }
 
   data.total_num_constraints_in_subproblem =
       data.num_nodes * data.num_od + data.num_arcs;
-  //! Extra sanity check
+  //! Extra sanity checks
   assert(data.arcs_info.size() == data.num_arcs);
   assert(data.od_pair.size() == data.num_od);
-  assert(data.nodes_info.size() == data.num_nodes);
+  assert(data.node_id_to_head_neighbors.size() ==
+         data.node_id_to_tail_neighbors.size());
+  assert(data.node_id_to_head_neighbors.size() == data.num_nodes);
   console->info("   +Done reading the graph file.");
 }
 

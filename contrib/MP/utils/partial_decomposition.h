@@ -189,15 +189,23 @@ void GetArtificialSubproblemWeights(const SharedInfo &shared_info,
                                     MasterSolverInfo &solver_info_) {
   solver_info_.sp_weights_to_create_art_sp.resize(shared_info.num_subproblems);
   double weight_sum = IloSum(shared_info.subproblem_weight);
-  for (const auto sp_id : shared_info.retained_subproblem_ids) {
+  for (const uint64_t sp_id : shared_info.retained_subproblem_ids) {
     weight_sum -= shared_info.subproblem_weight[sp_id];
     solver_info_.sp_weights_to_create_art_sp[sp_id] = 0;
   }
+  assert(weight_sum > 0);
+  uint64_t num_sps = 0;
+  double total_weight_sum = 0;
   for (uint64_t sp_id = 0; sp_id < shared_info.num_subproblems; ++sp_id) {
     if (!shared_info.retained_subproblem_ids.count(sp_id)) {
       solver_info_.sp_weights_to_create_art_sp[sp_id] =
           shared_info.subproblem_weight[sp_id] / (0.0 + weight_sum);
+      ++num_sps;
     }
+    total_weight_sum += solver_info_.sp_weights_to_create_art_sp[sp_id];
   }
+  assert(num_sps + shared_info.retained_subproblem_ids.size() ==
+         shared_info.num_subproblems);
+  assert(total_weight_sum > 0.999 && total_weight_sum <= 1.000001);
 }
 #endif

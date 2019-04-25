@@ -18,7 +18,8 @@ logger.basicConfig(level=logger.INFO,
 
 def main():
     model_files_path = "/Users/raghebrahmaniani/BCompose/models"
-    pwd = "/Users/raghebrahmaniani/BCompose/models"
+    pwd = "/Users/raghebrahmaniani/BCompose"
+
     CONCERTDIR = '/Applications/CPLEX_Studio129/concert/include/'
     CPLEXDIR = '/Applications/CPLEX_Studio129/cplex/include/'
     CPLEXLIB = '/Applications/CPLEX_Studio129/cplex/lib/x86-64_osx/static_pic/'
@@ -46,19 +47,10 @@ def main():
 
     try:
         logger.info('Compiling the export program with c++11...')
-        # !!!!! Complie following line if you dont have docopt.o in the directory
-        # arg_base = 'g++ -std=c++11 -lstdc++ -DNDEBUG -DIL_STD -c externals/docopt/docopt.cpp   -g'
+        # logger.info(' -Compiling docopt...')
+        # arg_base = '{0} {1} -std=c++17 -DNDEBUG -DIL_STD -c ../externals/docopt/docopt.cpp  -g'.format(
+        #     GCC, FLAG)
         # subprocess.call(arg_base, shell=True)
-        # arg_base = '{0} {1} -I{2} -I{3}  -std=c++17 -DNDEBUG -DIL_STD -c  main.cpp -g'.format(
-        #     GCC, FLAG, CPLEXDIR, CONCERTDIR)
-        # subprocess.call(arg_base, shell=True)
-        # arg_base = '{0} {1} -L{2} -L{3}  -std=c++17 -g  -o main main.o ../docopt.o  -lboost_system -lboost_thread-mt -lilocplex -lconcert -lcplex -lm -lpthread'.format(
-        #     GCC, FLAG, CPLEXLIB, CONCERTLIB)
-        # subprocess.call(arg_base, shell=True)
-        logger.info(' -Compiling docopt...')
-        arg_base = '{0} {1} -std=c++17 -DNDEBUG -DIL_STD -c ../externals/docopt/docopt.cpp  -g'.format(
-            GCC, FLAG)
-        subprocess.call(arg_base, shell=True)
         logger.info(' -Compiling exporter...')
         arg_base = '{0} {1} -I{2} -I{3} -std=c++17  -DIL_STD -c  main.cpp  -g'.format(
             GCC, FLAG, CPLEXDIR, CONCERTDIR)
@@ -75,7 +67,7 @@ def main():
     logger.info('Setting the instances to be solved...')
     # , '05', '06', '07', '08', '09', '10', '11']  # [04,05,06,07,08,09,10,11]
     INSTANCE_LIST = ['04']
-    COST_CAP_RATIOS = [5]  # [3,5,7,9]
+    COST_CAP_RATIOS = [9]  # [3,5,7,9]
     CORRELATION = [0.2]  # [0,0.2,0.8]
     SCENARIOS = [64]  # [16,32,64]
 

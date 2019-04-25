@@ -81,8 +81,6 @@ int main(int argc, char *argv[]) {
     AnalyzeSubproblems(console, shared_info);
   }
 
-  MP->FixSafeVariables(console, shared_info);
-
   console->info(" -Applying PD...");
   MP->PartialDecompsoition(model_directory, console, shared_info,
                            current_directory);
