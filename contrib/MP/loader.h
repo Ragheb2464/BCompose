@@ -177,7 +177,7 @@ bool Loader(const std::shared_ptr<spdlog::logger> console,
         "Please make sure that your MP.sav model is corrrect and try again!");
     exit(0);
   }
-  console->info("    Master model successfully loaded.");
+  console->info("  ->Master model successfully loaded.");
 
   return true;
 }

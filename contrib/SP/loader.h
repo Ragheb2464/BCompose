@@ -387,7 +387,7 @@ bool Loader(const std::shared_ptr<spdlog::logger> console,
       SetSPCplexSettings(subproblem_model[sp_id]);
     }
   }
-  console->info("   Subproblems loaded successfully.");
+  console->info("   ->Subproblems loaded successfully.");
 
   return true;
 }

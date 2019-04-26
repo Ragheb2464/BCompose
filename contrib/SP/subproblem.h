@@ -34,7 +34,7 @@ public:
       exit(0);
     }
 
-    console->info("   Loading " + std::to_string(num_subproblems_) +
+    console->info("  ->Loading " + std::to_string(num_subproblems_) +
                   " subpropblems...");
     //! TODO: Make it possible to load only one subproblem
     { // loading LP SPs
@@ -83,13 +83,12 @@ public:
           IloNumArray(subproblem_model_[sp_id].env,
                       subproblem_model_[sp_id].NAC_constraints.getSize());
     }
+  }
 
-    num_threads_ = static_cast<uint64_t>(
-        std::min(std::min(std::thread::hardware_concurrency() + 0.0,
-                          shared_info.num_subproblems -
-                              shared_info.retained_subproblem_ids.size() + 0.0),
-                 Settings::Parallelization::num_proc + 0.0));
-    console->info("    Using up to " + std::to_string(num_threads_) +
+  void SetNumThreads(const std::shared_ptr<spdlog::logger> console,
+                     const uint64_t _num_threads) {
+    num_threads_ = _num_threads;
+    console->info("  *Using up to " + std::to_string(num_threads_) +
                   " cores to generate cuts.");
   }
 
@@ -197,9 +196,9 @@ public:
     assert(num_opt_cut + num_feas_cut +
                shared_info.retained_subproblem_ids.size() ==
            shared_info.num_subproblems);
-    console->info("     Generated " + std::to_string(num_opt_cut) +
+    console->info("   ->Generated " + std::to_string(num_opt_cut) +
                   " optimality cuts and " + std::to_string(num_feas_cut) +
-                  " feasbility cuts");
+                  " feasbility cuts.");
     ++solver_info_.iteration;
     // mtx_.unlock();
   }
@@ -288,7 +287,7 @@ public:
   SubproblemSolverInfo solver_info_;
 
 private:
-  uint64_t num_subproblems_ = 0, num_threads_ = 0;
+  uint64_t num_subproblems_ = 0, num_threads_ = 1;
   std::mutex mtx_;
   //
   Subproblem(const Subproblem &copy);

@@ -31,8 +31,7 @@ class Master {
     const bool loading_status =
         Loader(console, master_model_, shared_info, current_directory);
     if (!loading_status) {
-      console->info("   Failed to load the MP.sav!");
-      console->info("  Exiting with error. ");
+      console->info("Failed to load the MP.sav!");
       exit(0);
     }
 
@@ -42,11 +41,6 @@ class Master {
     shared_info.recourse_variables_value =
         IloNumArray(master_model_.env, shared_info.num_recourse_variables);
     shared_info.num_subproblems = shared_info.num_recourse_variables;
-    //
-    num_threads_ = 1;
-    console->info("    Running master on " + std::to_string(num_threads_) +
-                  " core(s).");
-    master_model_.cplex.setParam(IloCplex::Param::Threads, num_threads_);
   }
 
   void PartialDecompsoition(const std::string &model_directory,
@@ -172,7 +166,7 @@ class Master {
       master_model_.cplex.getValues(shared_info.recourse_variables_value,
                                     master_model_.recourse_variables);
     } else {
-      console->info("     Using WS solution to generate cuts...");
+      console->info("    +Using WS solution to generate cuts...");
       SimpleWS(solver_info_.iteration, master_model_, shared_info);
     }
   }
@@ -297,7 +291,17 @@ class Master {
   void SolveRootNode(const std::shared_ptr<spdlog::logger> console,
                      SharedInfo &shared_info,
                      const std::shared_ptr<Subproblem> &SP) {
-    console->info("   +Optimizing LP...");
+    console->info("  *Running master on " + std::to_string(num_threads_) +
+                  " core.");
+    master_model_.cplex.setParam(IloCplex::Param::Threads, num_threads_);
+    SP->SetNumThreads(
+        console,
+        std::min(shared_info.num_subproblems -
+                     shared_info.retained_subproblem_ids.size() + 0.0,
+                 Settings::Parallelization::num_worker_processors +
+                     Settings::Parallelization::num_master_processors - 1.0));
+
+    console->info("Optimizing the LP...");
     SetSartTime();
     while (true) {
       if (CheckStoppingConditions(console)) {
@@ -371,17 +375,6 @@ class Master {
         master_model_.env, master_model_.master_variables, ILOINT));
   }
 
-  /*This func prepares for parallelization of the MP
-    It  creates two branches, export one in LP master_formulation
-    One thread reads and solves that branch and this processor continues on this
-    branch*/
-  bool ParallelPreparer(const std::shared_ptr<spdlog::logger> console,
-                        SharedInfo &shared_info,
-                        const uint64_t num_branches = 2) {
-    console->error("I don't support parallelism of the MP yet, sorry!");
-    return false;
-  }
-
   bool RunAsHeuristic(const std::shared_ptr<spdlog::logger> console,
                       SharedInfo &shared_info) {
     if (Settings::Heuristic::frequency < 0) {
@@ -422,14 +415,16 @@ class Master {
     assert(Settings::GlobalScenarios::num_retention ==
            master_model_.recourse_variables.getSize());
     ConvertLPtoMIP();
-    master_model_.cplex.setParam(IloCplex::Param::Threads,
-                                 Settings::Parallelization::num_proc);
+    master_model_.cplex.setParam(
+        IloCplex::Param::Threads,
+        Settings::Parallelization::num_worker_processors +
+            Settings::Parallelization::num_master_processors);
     master_model_.cplex.setParam(
         IloCplex::Param::TimeLimit,
         Settings::StoppingConditions::branching_time_limit);
     master_model_.cplex.setParam(IloCplex::Param::Benders::Strategy, 3);
-    master_model_.cplex.setParam(IloCplex::Param::Preprocessing::Linear, 1);
-    master_model_.cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 1);
+    // master_model_.cplex.setParam(IloCplex::Param::Preprocessing::Linear, 1);
+    // master_model_.cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 1);
     if (!master_model_.cplex.solve()) {
       console->error(
           "Failed to solve MIP model with Cplex Benders, please "
@@ -447,14 +442,16 @@ class Master {
     assert(Settings::GlobalScenarios::num_retention ==
            master_model_.recourse_variables.getSize());
     ConvertLPtoMIP();
-    master_model_.cplex.setParam(IloCplex::Param::Threads,
-                                 Settings::Parallelization::num_proc);
+    master_model_.cplex.setParam(
+        IloCplex::Param::Threads,
+        Settings::Parallelization::num_worker_processors +
+            Settings::Parallelization::num_master_processors);
     master_model_.cplex.setParam(
         IloCplex::Param::TimeLimit,
         Settings::StoppingConditions::branching_time_limit);
 
-    master_model_.cplex.setParam(IloCplex::Param::Preprocessing::Linear, 1);
-    master_model_.cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 1);
+    // master_model_.cplex.setParam(IloCplex::Param::Preprocessing::Linear, 1);
+    // master_model_.cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 1);
 
     if (!master_model_.cplex.solve()) {
       console->error(
@@ -469,13 +466,13 @@ class Master {
   }
 
   // this func use the sols obbtined from the LR cuts to gen cuts and bounds
-  bool RunLRBasedHeuristic(SharedInfo &shared_info,
+  void RunLRBasedHeuristic(SharedInfo &shared_info,
                            const std::shared_ptr<spdlog::logger> console,
                            const std::shared_ptr<Subproblem> &SP) {
     if (!Settings::RootLifter::use_root_lifter) {
       console->error(
           "Please turn on the use_root_lifter to use run_lagrang_heuristic");
-      return false;
+      exit(911);
     }
     master_model_.cplex.setParam(IloCplex::NodeLim,
                                  0);  // need to run LR and return
@@ -483,7 +480,7 @@ class Master {
       console->error(
           "Something is wrong, please examine the exported MP_LR_.lp ");
       master_model_.cplex.exportModel("MP_LR_.lp");
-      exit(0);
+      exit(911);
     }
 
     Heuristic heur;
@@ -530,24 +527,23 @@ class Master {
   void SetCallbacks(const std::shared_ptr<spdlog::logger> console,
                     SharedInfo &shared_info,
                     const std::shared_ptr<Subproblem> SP) {
-    console->info("  -Setting the callbacks...");
+    num_threads_ = Settings::Parallelization::num_master_processors;
+    console->info("  +Setting up the branch-and-bound tree on " +
+                  std::to_string(num_threads_) + " threads.");
     master_model_.cplex.setParam(
         IloCplex::Param::TimeLimit,
         Settings::StoppingConditions::branching_time_limit);
-    master_model_.cplex.setParam(IloCplex::Param::Threads, 1);
-    // master_model_.cplex.setParam(IloCplex::PreLinear, 1);
-    // master_model_.cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 1);
-    // ****Legacy callbacks
-    // master_model_.cplex.use(
-    //     BendersUserCallback(master_model_.env, console, shared_info, SP,
-    //                         master_model_.master_variables,
-    //                         master_model_.recourse_variables, solver_info_));
-    // master_model_.cplex.use(
-    //     BendersLazyCallback(master_model_.env, console, shared_info, SP,
-    //                         master_model_.master_variables,
-    //                         master_model_.recourse_variables, solver_info_));
+    master_model_.cplex.setParam(IloCplex::Param::Threads, num_threads_);
+    contextmask_ = IloCplex::Callback::Context::Id::Candidate;
+    if (Settings::RootLifter::use_root_lifter) {
+      contextmask_ |= IloCplex::Callback::Context::Id::Relaxation;
+    }
 
-    // ****Generic callbacks
+    SP->SetNumThreads(
+        console,
+        std::min(shared_info.num_subproblems -
+                     shared_info.retained_subproblem_ids.size() + 0.0,
+                 Settings::Parallelization::num_worker_processors - 0.0));
   }
 
   void BranchingPhase(const std::shared_ptr<spdlog::logger> console,
@@ -556,21 +552,18 @@ class Master {
     assert(shared_info.retained_subproblem_ids.size() !=
            shared_info.num_subproblems);
 
-    console->info("  +Setting up the branch-and-bound tree...");
     SetCallbacks(console, shared_info, SP);
     BendersCustomCutCallback generic_cut_callback_(
         console, shared_info, master_model_.master_variables,
         master_model_.recourse_variables, solver_info_, SP);
-    contextmask_ = IloCplex::Callback::Context::Id::Candidate;
-    if (Settings::RootLifter::use_root_lifter) {
-      contextmask_ |= IloCplex::Callback::Context::Id::Relaxation;
-    }
     master_model_.cplex.use(&generic_cut_callback_, contextmask_);
 
     if (Settings::Heuristic::run_lagrang_heuristic) {
       RunLRBasedHeuristic(shared_info, console, SP);
     }
-    console->info("  -Done.");
+    console->info(" -Done.");
+
+    console->info("Exploring the tree...");
     // master_model.cplex.setOut(master_model.env.getNullStream());
     if (!master_model_.cplex.solve()) {
       console->error(
@@ -592,11 +585,8 @@ class Master {
 
   void PrintStatus(const std::shared_ptr<spdlog::logger> console) noexcept(
       true) {
-    assert(solver_info_.global_UB >= solver_info_.LB - 1e-7);
-    std::string optimization_status = "    ";
-    optimization_status +=
-        " Iteration=" + std::to_string(solver_info_.iteration);
-    optimization_status += " UB=" + ValToStr(solver_info_.global_UB);
+    assert(solver_info_.global_UB >= solver_info_.LB - 1e-17);
+    std::string optimization_status = " UB=" + ValToStr(solver_info_.global_UB);
     optimization_status += " LB=" + ValToStr(solver_info_.LB) +
                            " LP_UB=" + ValToStr(solver_info_.lp_phase_UB);
     optimization_status +=
@@ -606,7 +596,8 @@ class Master {
         "% Gap=" +
         ValToStr((100 * (solver_info_.global_UB - solver_info_.LB) /
                   std::fabs(solver_info_.global_UB + 1e-7)));
-    optimization_status += "% Time=" + ValToStr(GetDuration());
+    optimization_status += "% #Iter=" + std::to_string(solver_info_.iteration);
+    optimization_status += " Time=" + ValToStr(GetDuration());
     console->info(optimization_status);
   }
 

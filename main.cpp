@@ -50,7 +50,7 @@ static const char USAGE[] =
 int main(int argc, char *argv[]) {
   const auto console = spdlog::stdout_logger_mt("stdout");
 
-  console->info(" -Parsing the args...");
+  console->info("Parsing the args...");
   const std::map<std::string, docopt::value> args{
       docopt::docopt(USAGE, {argv + 1, argv + argc}, true, "02.01.0isr")};
   const std::string model_directory = args.at("--model_dir").asString();
@@ -63,29 +63,40 @@ int main(int argc, char *argv[]) {
   SharedInfo shared_info{}; // here you can find all the info which is possibly
   // shared among master and subproblems
 
-  console->info(" -Importing master model...");
+  if (std::thread::hardware_concurrency() <
+      Settings::Parallelization::num_worker_processors +
+          Settings::Parallelization::num_master_processors) {
+    console->info(
+        "This system has at most " +
+        std::to_string(std::thread::hardware_concurrency()) +
+        " while you want to use " +
+        std::to_string(Settings::Parallelization::num_worker_processors +
+                       Settings::Parallelization::num_master_processors));
+    exit(911);
+  }
+
+  console->info("Importing master model...");
   std::unique_ptr<Master> MP{new Master()};
   MP->Initializer(console, shared_info, current_directory);
 
   if (Settings::ImproveFormulations::improve_SP_representation) {
-    console->info(" -Pre-processing the models...");
+    console->info("Pre-processing the models...");
     LiftSPs(current_directory, shared_info);
   }
 
-  console->info(" -Importing subproblem models...");
+  console->info("Importing subproblem models...");
   std::shared_ptr<Subproblem> SP = std::make_shared<Subproblem>();
   SP->Initializer(console, shared_info, current_directory);
 
-  console->info(" -Analyzing the problem...");
+  console->info("Analyzing the problem...");
   if (Settings::GlobalScenarios::num_creation) {
     AnalyzeSubproblems(console, shared_info);
   }
-
-  console->info(" -Applying PD...");
+  console->info(" ->Applying PD...");
   MP->PartialDecompsoition(model_directory, console, shared_info,
                            current_directory);
 
-  console->info(" -Initalization took " + std::to_string(MP->GetDuration()) +
+  console->info("Initalization took " + std::to_string(MP->GetDuration()) +
                 " seconds.");
   MP->SetInitTime();
 
@@ -94,7 +105,7 @@ int main(int argc, char *argv[]) {
   } else if (Settings::Solver::solver == 1) {
     MP->SolveWithCplexBenders(console);
   } else {
-    console->info(" -Solving the LP phase...");
+    console->info("Setting up 1st phase...");
     MP->SolveRootNode(console, shared_info, SP);
 
     if (Settings::Heuristic::run_as_heuristic) {

@@ -11,6 +11,23 @@
 **/
 
 struct Settings {
+  struct Parallelization {
+    /*
+      This setting allows the user to generate cuts in parallel
+    */
+    static const uint32_t num_worker_processors = 4;
+    /*
+      This setting allows the user to solve the master branch-and-bound in
+      parallel
+    */
+    static const uint32_t num_master_processors = 4;
+    /*NOTES
+      -Didive number of the processors on your system to balace the workload.
+      -BCompose will may dynamically change number of the master or   worker
+      processors to improve performance.
+    */
+  };
+
   struct RootLifter {
     /*
       This settings allows the user to further tighten the root node before any
@@ -33,14 +50,14 @@ struct Settings {
       This setting allows the user to  to improve the representation of the cut
       generation subproblems.
     */
-    static const bool improve_SP_representation = false;
+    static const bool improve_SP_representation = true;
     /*
         0: moderate
         1: agreessive
         2: more aggressive
         3: very aggressive
     */
-    static const uint32_t aggressiveness = 0;
+    static const uint32_t aggressiveness = 3;
   };
   struct Solver {
     /*
@@ -50,7 +67,7 @@ struct Settings {
       1: IloBenders
       2: BCompose
 
-      NOTE:: for 0 and 1, num_retention must be equal to number of SPs
+      NOTE:: for options 0 and 1, num_retention must be equal to number of SPs
             and num_creation=0
     */
     static const uint32_t solver = 2;
@@ -61,7 +78,7 @@ struct Settings {
     */
     static const uint32_t num_retention = 0;
     /*
-      0 or 1 only at this version
+      0 or 1 at this version
     */
     static const uint32_t num_creation = 0;
     /*
@@ -145,18 +162,6 @@ struct Settings {
         1;  // 1 defualt; maybe use 3 when in heuristic mode
   };
 
-  struct Parallelization {
-    /*
-      This setting allows the user to generate cuts in parallel
-    */
-    static const uint32_t num_proc = 7;
-    /*
-      This setting allows the user to solve the master branch-and-bound in
-      parallel
-    */
-    static const uint32_t num_master_procs = 468366449;
-  };
-
   struct StoppingConditions {
     static const size_t node_limit =
         9223372036800000000;  // defualt 9223372036800000000
@@ -165,7 +170,8 @@ struct Settings {
     static const uint32_t max_num_iterations =
         1000;  // ++iter, each time a master solution is used to gen cuts,
 
-    static constexpr const float optimality_gap = 0.001;             // in %
+    static constexpr const float optimality_gap =
+        1;  // 0.001;             // in %
     static constexpr const float root_node_optimality_gap = 0.0005;  // in %
     // static constexpr const float sp_tolerance = 0.001;               // in %
 

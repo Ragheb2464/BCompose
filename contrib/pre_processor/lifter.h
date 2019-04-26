@@ -17,7 +17,8 @@ void LiftSPs(const std::string current_directory,
              const SharedInfo &shared_info) {
   double *obj_vals =
       (double *)malloc(shared_info.num_subproblems * sizeof(double));
-  const size_t num_threads = Settings::Parallelization::num_proc;
+  const size_t num_threads = Settings::Parallelization::num_worker_processors +
+                             Settings::Parallelization::num_master_processors;
   std::ios_base::sync_with_stdio(false);
   std::cin.tie(nullptr);
   // Now, we create the threadpool.
