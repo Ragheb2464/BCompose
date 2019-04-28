@@ -9,7 +9,7 @@ void GenClassicalCuts(SubproblemModel *sp_model, SharedInfo *shared_info_,
                              sp_model->NAC_constraints);
     shared_info_->subproblem_objective_value[sp_id] =
         sp_model->cplex.getObjValue();
-  } else {  // feas
+  } else if (!_is_complete_recourse) {  // feas
     shared_info_->subproblem_status[sp_id] = 0;
     // set the feas cut generator
     sp_model->slack_variables.setBounds(sp_model->slacks_lb,
@@ -35,6 +35,11 @@ void GenClassicalCuts(SubproblemModel *sp_model, SharedInfo *shared_info_,
     sp_model->slack_variables.setBounds(sp_model->slacks_lb,
                                         sp_model->slacks_lb);
     sp_model->objective.setExpr(sp_model->regular_objective);
+  } else {
+    std::cout
+        << "According to the settings, the subproblem must always be feasible"
+        << std::endl;
+    throw IloCplex::Exception(-1, "Infeasible Subproblem!");
   }
 }
 

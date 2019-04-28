@@ -71,8 +71,7 @@ public:
     uint64_t max_freq = 0;
     std::pair<bool, uint64_t> bool_val = std::make_pair(false, 0);
     for (const auto it : sol_vals_freq.at(var_id)) {
-      if (it.second >= Settings::Heuristic::tolerance * num_sols_in_pool &&
-          it.second > max_freq) {
+      if (it.second >= _tolerance * num_sols_in_pool && it.second > max_freq) {
         bool_val.first = true;
         bool_val.second = it.first;
         max_freq = it.second;

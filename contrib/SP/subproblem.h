@@ -13,7 +13,7 @@
 
 #include "loader.h"
 
-#include "../control/solver_settings.h"
+#include "../../solver_settings.h"
 #include "../heuristic/heuristic.h"
 #include "../shared_info/structures.h"
 #include "utils/LR_cuts.h"
@@ -47,13 +47,12 @@ public:
         }
       }
     }
-    if (Settings::RootLifter::use_root_lifter) { // FOR LR CUTS
+    if (_use_root_lifter) { // FOR LR CUTS
       Loader(console, LR_subproblem_model_, shared_info, current_directory);
       shared_info.copied_variables_value.resize(num_subproblems_);
       for (uint64_t sp_id = 0; sp_id < num_subproblems_; ++sp_id) {
-        LR_subproblem_model_[sp_id].cplex.setParam(
-            IloCplex::Param::TimeLimit,
-            Settings::StoppingConditions::subpproblem_time_limit);
+        LR_subproblem_model_[sp_id].cplex.setParam(IloCplex::Param::TimeLimit,
+                                                   _subpproblem_time_limit);
 
         shared_info.copied_variables_value[sp_id] =
             IloNumArray(LR_subproblem_model_[sp_id].env);
@@ -93,8 +92,8 @@ public:
   }
 
   static void PerturbMasterSolution(SharedInfo &shared_info) {
-    const double alpha = Settings::ParetoCuts::perturbation_weight;
-    const double core_val = Settings::ParetoCuts::initial_core_point;
+    const double alpha = _perturbation_weight;
+    const double core_val = _initial_core_point;
     for (IloInt var_id = 0;
          var_id < shared_info.master_variables_value.getSize(); ++var_id) {
       shared_info.master_variables_value[var_id] = std::min(
@@ -106,8 +105,7 @@ public:
    * the cuts from SP if supposed to gen LR  cuts*/
   void Cleaner(const std::shared_ptr<spdlog::logger> console,
                const SharedInfo &shared_info) {
-    if (Settings::ImproveFormulations::improve_SP_representation &&
-        !Settings::RootLifter::use_root_lifter) {
+    if (_improve_SP_representation && !_use_root_lifter) {
       int t = 0, num_con = 0;
       for (uint64_t sp_id = 0; sp_id < num_subproblems_; ++sp_id) {
         if (shared_info.retained_subproblem_ids.count(sp_id)) {
@@ -267,8 +265,7 @@ public:
       threads.join_all();
       io_service.stop();
       // record the sols
-      if (Settings::Heuristic::run_lagrang_heuristic ||
-          Settings::Heuristic::run_lagrang_fixer) {
+      if (_run_lagrang_heuristic || _run_lagrang_fixer) {
         UpdateSolPool(copy_sol_tmp_vec, shared_info, console);
       }
     }

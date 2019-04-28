@@ -17,7 +17,7 @@
 #include "../../externals/spdlog/spdlog.h"
 #include "../../externals/util/pair_hasher.h"
 
-#include "../../contrib/control/solver_settings.h"
+#include "../../solver_settings.h"
 #include "utils/data.h"
 
 #include "utils/master_formulation.h"

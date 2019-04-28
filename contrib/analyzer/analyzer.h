@@ -13,8 +13,7 @@ void AnalyzeSubproblems(const std::shared_ptr<spdlog::logger> console,
                         SharedInfo &shared_info) {
   shared_info.problem_info.is_determinstic =
       true ? shared_info.num_subproblems == 1 : false;
-  if (false && Settings::GlobalScenarios::num_retention +
-                   Settings::GlobalScenarios::num_creation) {
+  if (false && _num_retention + _num_creation) {
     //! obj
     for (uint64_t sp_id = 1; sp_id < shared_info.num_subproblems; ++sp_id) {
       for (uint64_t var_id = 0;

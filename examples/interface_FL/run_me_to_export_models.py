@@ -22,7 +22,7 @@ def main():
         subprocess.os.getcwd()))
 
     model_files_path = "../../models"
-    pwd = "../.."
+    pwd = "/Users/raghebrahmaniani/BCompose/"
 
     CONCERTDIR = '/Applications/CPLEX_Studio129/concert/include/'
     CPLEXDIR = '/Applications/CPLEX_Studio129/cplex/include/'
@@ -37,8 +37,8 @@ def main():
     FLAG = DEBUG_FLAG
     try:
         logger.info('Cleaning up the old stuff...')
-        subprocess.call('rm' + " " + 'main', shell=True)
-        subprocess.call('rm' + " " + 'main.o', shell=True)
+        # subprocess.call('rm' + " " + 'main', shell=True)
+        # subprocess.call('rm' + " " + 'main.o', shell=True)
         subprocess.call('rm' + " " + '../../models/*', shell=True)
         subprocess.call('rm' + " " + '../../opt_model_dir/*', shell=True)
     except Exception as e:
@@ -47,18 +47,18 @@ def main():
 
     try:
         logger.info('Compiling the export program with c++11...')
-        logger.info(' -Compiling docopt...')
-        arg_base = '{0} {1} -std=c++17 -DNDEBUG -DIL_STD -c ../../externals/docopt/docopt.cpp  -g'.format(
-            GCC, FLAG)
-        subprocess.call(arg_base, shell=True)
-        logger.info(' -Compiling exporter...')
-        arg_base = '{0} {1} -I{2} -I{3} -std=c++17  -DIL_STD -c  main.cpp  -g'.format(
-            GCC, FLAG, CPLEXDIR, CONCERTDIR)
-        subprocess.call(arg_base, shell=True)
-        logger.info(" -Linking...")
-        arg_base = '{0} {1} -L{2} -L{3}  -std=c++17 -o main main.o docopt.o  -ldl -lboost_system -lboost_thread-mt -lilocplex -lconcert -lcplex -lm -lpthread'.format(
-            GCC, FLAG, CPLEXLIB, CONCERTLIB)
-        subprocess.call(arg_base, shell=True)
+        # logger.info(' -Compiling docopt...')
+        # arg_base = '{0} {1} -std=c++17 -DNDEBUG -DIL_STD -c ../../externals/docopt/docopt.cpp  -g'.format(
+        #     GCC, FLAG)
+        # subprocess.call(arg_base, shell=True)
+        # logger.info(' -Compiling exporter...')
+        # arg_base = '{0} {1} -I{2} -I{3} -std=c++17  -DIL_STD -c  main.cpp  -g'.format(
+        #     GCC, FLAG, CPLEXDIR, CONCERTDIR)
+        # subprocess.call(arg_base, shell=True)
+        # logger.info(" -Linking...")
+        # arg_base = '{0} {1} -L{2} -L{3}  -std=c++17 -o main main.o docopt.o  -ldl -lboost_system -lboost_thread-mt -lilocplex -lconcert -lcplex -lm -lpthread'.format(
+        #     GCC, FLAG, CPLEXLIB, CONCERTLIB)
+        # subprocess.call(arg_base, shell=True)
     except Exception as e:
         logger.error('Failed to compile the exporter...')
         logger.error(e)
@@ -66,10 +66,11 @@ def main():
     # Problem Info
     #
     # [102, 103, 104, 111, 112, 113, 114,          121, 122, 123, 124, 131, 132, 133, 134]
-    ID = [102]
-    scenario = [500]  # 1 500 1500
-    scenarioC = [0]  # 250 500 1500
-    scenarioCap = [0]  # 250 500 1500
+    # [102, 103, 104, 111, 112, 113, 114,          121, 122, 123, 124, 131, 132, 133, 134]
+    ID = [134]
+    scenario = [1500]  # 1 500 1500
+    scenarioC = [1500]  # 0 250 500 1500
+    scenarioCap = [1500]  # 0 250 500 1500
     for IDkey in range(len(ID)):
         for scenariokey in range(len(scenario)):
             for scenarioCkey in range(len(scenarioC)):
@@ -81,13 +82,14 @@ def main():
 
                     subprocess.call('./main ' + insname + ' ' + str(ID[IDkey]) + ' ' + str(scenario[scenariokey]) + ' ' + str(
                         scenarioC[scenarioCkey]) + ' ' + str(scenarioCap[scenarioCapkey]), shell=True)
-                    # subprocess.call('cp' + " " + model_files_path +
-                    #                 '/*.sav' + " " + pwd + '/opt_model_dir/', shell=True)
-                    # os.chdir(pwd)
-                    # logger.info('Starting the optimization...')
-                    # subprocess.call('./main  --model_dir=' + model_files_path +
-                    #                 ' --current_dir=' + pwd, shell=True)
-                    # os.chdir(pwd + 'examples/interface_FL')
+                    subprocess.call('cp' + " " + model_files_path +
+                                    '/*.sav' + " " + pwd + 'opt_model_dir/', shell=True)
+                    # running the optimizer
+                    os.chdir("../..")
+                    logger.info('Starting the optimization...')
+                    subprocess.call('./main  --model_dir=/Users/raghebrahmaniani/BCompose/models' +
+                                    ' --current_dir=/Users/raghebrahmaniani/BCompose', shell=True)
+                    os.chdir('examples/interface_FL')
 
     logger.info('Done With Exporting.')
 

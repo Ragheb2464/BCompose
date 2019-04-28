@@ -21,8 +21,8 @@
 
 typedef IloArray<IloNumVarArray> IloNumVarArray2;
 
-void CreateSubproblemModels(const std::shared_ptr<Data> data,
-                            const std::shared_ptr<spdlog::logger> console) {
+void SolveExtForm(const std::shared_ptr<Data> data,
+                  const std::shared_ptr<spdlog::logger> console) {
   const int n_sc = 456;
   IloEnv env;
   IloModel model;
@@ -102,22 +102,22 @@ void CreateSubproblemModels(const std::shared_ptr<Data> data,
 
   model.add(con);
   // cplex.exportModel("f.lp");
-  { // Make sure that the exported SP is feasible, otherwise the problem is
+  {  // Make sure that the exported SP is feasible, otherwise the problem is
     // infeasible
     // cplex.setOut(env.getNullStream());
     // this is only to faster check the model
     IloNum start = cplex.getCplexTime();
-    cplex.setParam(IloCplex::ClockType, 2);
-    cplex.setParam(IloCplex::Param::TimeLimit, 36000);
-    cplex.setParam(IloCplex::Param::Threads, 1);
-    cplex.setParam(IloCplex::Param::Preprocessing::Relax, 0);
-    cplex.setParam(IloCplex::Param::Preprocessing::Linear, 0);
-    cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 0);
-    cplex.setParam(IloCplex::Param::MIP::Strategy::Search, 1);
+    // cplex.setParam(IloCplex::ClockType, 2);
+    // cplex.setParam(IloCplex::Param::TimeLimit, 36000);
+    // cplex.setParam(IloCplex::Param::Threads, 1);
+    // cplex.setParam(IloCplex::Param::Preprocessing::Relax, 0);
+    // cplex.setParam(IloCplex::Param::Preprocessing::Linear, 0);
+    // cplex.setParam(IloCplex::Param::Preprocessing::Reduce, 0);
+    // cplex.setParam(IloCplex::Param::MIP::Strategy::Search, 1);
     cplex.setParam(IloCplex::Param::Benders::Strategy, 3);
     // cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
     if (!cplex.solve()) {
-      console->error(" Subproblem is infeasible!");
+      console->error(" Extenssive form is infeasible!");
       exit(0);
     }
     console->info("-obj= " + std::to_string(cplex.getObjValue()));

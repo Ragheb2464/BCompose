@@ -67,7 +67,7 @@ def main():
     logger.info('Setting the instances to be solved...')
     # '04', '05', '06', '07', '08', '09', '10', '11']  # [04,05,06,07,08,09,10,11]
     INSTANCE_LIST = ['10']
-    COST_CAP_RATIOS = [9]  # [3,5,7,9]
+    COST_CAP_RATIOS = [5]  # [3,5,7,9]
     CORRELATION = [0.2]  # [0,0.2,0.8]
     SCENARIOS = [64]  # [16,32,64]
 

@@ -3,55 +3,36 @@
 
 void SetCplexSettings(MasterModel &master_model) noexcept {
   master_model.cplex.setParam(IloCplex::Param::Emphasis::Numerical,
-                              Settings::CplexSetting::NumericalEmphasis);
-  master_model.cplex.setParam(IloCplex::Param::Advance,
-                              Settings::CplexSetting::AdvInd);
+                              _NumericalEmphasis);
+  master_model.cplex.setParam(IloCplex::Param::Advance, _AdvInd);
   master_model.cplex.setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq,
-                              Settings::CplexSetting::HeurFreq);
-  master_model.cplex.setParam(IloCplex::Param::MIP::Strategy::LBHeur,
-                              Settings::CplexSetting::LBHeur);
-  master_model.cplex.setParam(IloCplex::Param::RandomSeed,
-                              Settings::CplexSetting::RandomSeed);
-  master_model.cplex.setParam(IloCplex::Param::ClockType,
-                              Settings::CplexSetting::ClockType);
-  master_model.cplex.setParam(IloCplex::Param::MIP::Strategy::Probe,
-                              Settings::CplexSetting::Probe);
-  master_model.cplex.setParam(IloCplex::Param::Emphasis::MIP,
-                              Settings::CplexSetting::MIPEmphasis);
-  master_model.cplex.setParam(IloCplex::Param::RootAlgorithm,
-                              Settings::CplexSetting::MP_RootAlg);
-  master_model.cplex.setParam(IloCplex::Param::MIP::Cuts::Cliques,
-                              Settings::CplexSetting::Cliques);
-  master_model.cplex.setParam(IloCplex::Param::MIP::Cuts::Covers,
-                              Settings::CplexSetting::Covers);
-  master_model.cplex.setParam(IloCplex::DisjCuts,
-                              Settings::CplexSetting::DisjCuts);
+                              _HeurFreq);
+  master_model.cplex.setParam(IloCplex::Param::MIP::Strategy::LBHeur, _LBHeur);
+  master_model.cplex.setParam(IloCplex::Param::RandomSeed, _RandomSeed);
+  master_model.cplex.setParam(IloCplex::Param::ClockType, _ClockType);
+  master_model.cplex.setParam(IloCplex::Param::MIP::Strategy::Probe, _Probe);
+  master_model.cplex.setParam(IloCplex::Param::Emphasis::MIP, _MIPEmphasis);
+  master_model.cplex.setParam(IloCplex::Param::RootAlgorithm, _MP_RootAlg);
+  master_model.cplex.setParam(IloCplex::Param::MIP::Cuts::Cliques, _Cliques);
+  master_model.cplex.setParam(IloCplex::Param::MIP::Cuts::Covers, _Covers);
+  master_model.cplex.setParam(IloCplex::DisjCuts, _DisjCuts);
   master_model.cplex.setParam(IloCplex::Param::MIP::Cuts::FlowCovers,
-                              Settings::CplexSetting::FlowCovers);
-  master_model.cplex.setParam(IloCplex::FlowPaths,
-                              Settings::CplexSetting::FlowPaths);
-  master_model.cplex.setParam(IloCplex::FracCuts,
-                              Settings::CplexSetting::FracCuts);
+                              _FlowCovers);
+  master_model.cplex.setParam(IloCplex::FlowPaths, _FlowPaths);
+  master_model.cplex.setParam(IloCplex::FracCuts, _FracCuts);
   master_model.cplex.setParam(IloCplex::Param::MIP::Cuts::GUBCovers,
-                              Settings::CplexSetting::GUBCovers);
-  master_model.cplex.setParam(IloCplex::ImplBd, Settings::CplexSetting::ImplBd);
-  master_model.cplex.setParam(IloCplex::LiftProjCuts,
-                              Settings::CplexSetting::LiftProjCuts);
-  master_model.cplex.setParam(IloCplex::MIRCuts,
-                              Settings::CplexSetting::MIRCuts);
-  master_model.cplex.setParam(IloCplex::MCFCuts,
-                              Settings::CplexSetting::MCFCuts);
-  master_model.cplex.setParam(IloCplex::ZeroHalfCuts,
-                              Settings::CplexSetting::ZeroHalfCuts);
-  master_model.cplex.setParam(IloCplex::VarSel, Settings::CplexSetting::VarSel);
-  master_model.cplex.setParam(IloCplex::NodeSel,
-                              Settings::CplexSetting::NodeSel);
-  master_model.cplex.setParam(IloCplex::NodeLim,
-                              Settings::StoppingConditions::node_limit);
-  master_model.cplex.setParam(
-      IloCplex::Param::MIP::Tolerances::MIPGap,
-      Settings::StoppingConditions::optimality_gap / 100.0);
-  if (Settings::Solver::solver >= 2) {
+                              _GUBCovers);
+  master_model.cplex.setParam(IloCplex::ImplBd, _ImplBd);
+  master_model.cplex.setParam(IloCplex::LiftProjCuts, _LiftProjCuts);
+  master_model.cplex.setParam(IloCplex::MIRCuts, _MIRCuts);
+  master_model.cplex.setParam(IloCplex::MCFCuts, _MCFCuts);
+  master_model.cplex.setParam(IloCplex::ZeroHalfCuts, _ZeroHalfCuts);
+  master_model.cplex.setParam(IloCplex::VarSel, _VarSel);
+  master_model.cplex.setParam(IloCplex::NodeSel, _NodeSel);
+  master_model.cplex.setParam(IloCplex::NodeLim, _node_limit);
+  master_model.cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap,
+                              _optimality_gap / 100.0);
+  if (_solver >= 2) {
     master_model.cplex.setOut(master_model.env.getNullStream());
   }
 }

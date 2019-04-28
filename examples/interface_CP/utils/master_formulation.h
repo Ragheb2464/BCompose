@@ -33,7 +33,7 @@ void CreateMasterModel(const std::shared_ptr<spdlog::logger> console) {
                               .c_str());  // I have named the variables for
                                           // consistancy when readdin the data
   }
-  theta = IloNumVarArray(env, 1, 0, IloInfinity);
+  theta = IloNumVarArray(env, 1, -1e7, IloInfinity);
   theta[0].setName(("theta_" + std::to_string(0)).c_str());
   model.add(y_var);
   model.add(theta);

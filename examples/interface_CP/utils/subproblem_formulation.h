@@ -157,6 +157,18 @@ void CreateSubproblemModels(const std::shared_ptr<spdlog::logger> console) {
     }
   }
   model.add(constraints);
+
+  console->info("    Exporting formulation for subproblem " +
+                std::to_string(0) + "...");
+  {
+    cplex.setWarning(env.getNullStream());
+    // WARNING: Exported model must be named as SP_{s}.sav
+    // NOTE: Even if there is one subproblem, it must be named as SP_0.sav
+    const std::string export_dir = "../../models/";
+    cplex.exportModel(
+        (export_dir + "SP_" + std::to_string(0) + ".sav").c_str());
+  }
+
   console->info("  -solving it");
   {  // Make sure that the exported SP is feasible, otherwise the problem is
     // infeasible
@@ -172,17 +184,6 @@ void CreateSubproblemModels(const std::shared_ptr<spdlog::logger> console) {
       exit(0);
     }
     console->error(" Obj val is " + std::to_string(cplex.getObjValue()));
-  }
-
-  console->info("    Exporting formulation for subproblem " +
-                std::to_string(0) + "...");
-  {
-    cplex.setWarning(env.getNullStream());
-    // WARNING: Exported model must be named as SP_{s}.sav
-    // NOTE: Even if there is one subproblem, it must be named as SP_0.sav
-    const std::string export_dir = "../../models/";
-    cplex.exportModel(
-        (export_dir + "SP_" + std::to_string(0) + ".sav").c_str());
   }
 
   console->info("  -Done!");

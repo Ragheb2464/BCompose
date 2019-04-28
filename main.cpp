@@ -23,12 +23,12 @@
 #include "externals/util/rand.h"
 #include "externals/util/type_conversion.h"
 
-#include "./contrib/control/solver_settings.h"
 #include "contrib/MP/master.h"
 #include "contrib/SP/subproblem.h"
 #include "contrib/heuristic/heuristic.h"
 #include "contrib/pre_processor/lifter.h"
 #include "contrib/shared_info/structures.h"
+#include "solver_settings.h"
 
 #include "contrib/analyzer/analyzer.h"
 
@@ -60,26 +60,27 @@ int main(int argc, char *argv[]) {
     console->error("Directory shouldn't end with '/'");
     exit(0);
   }
-  SharedInfo shared_info{}; // here you can find all the info which is possibly
+  SharedInfo shared_info{};  // here you can find all the info which is possibly
   // shared among master and subproblems
 
   if (std::thread::hardware_concurrency() <
-      Settings::Parallelization::num_worker_processors +
-          Settings::Parallelization::num_master_processors) {
+      _num_worker_processors + _num_master_processors) {
     console->info(
         "This system has at most " +
         std::to_string(std::thread::hardware_concurrency()) +
         " while you want to use " +
-        std::to_string(Settings::Parallelization::num_worker_processors +
-                       Settings::Parallelization::num_master_processors));
-    exit(911);
+        std::to_string(_num_worker_processors + _num_master_processors));
+    // exit(911);
   }
+
+  //   console->info("Reading the solver settings...");
+  // std::unique_ptr<
 
   console->info("Importing master model...");
   std::unique_ptr<Master> MP{new Master()};
   MP->Initializer(console, shared_info, current_directory);
 
-  if (Settings::ImproveFormulations::improve_SP_representation) {
+  if (_improve_SP_representation) {
     console->info("Pre-processing the models...");
     LiftSPs(current_directory, shared_info);
   }
@@ -89,7 +90,7 @@ int main(int argc, char *argv[]) {
   SP->Initializer(console, shared_info, current_directory);
 
   console->info("Analyzing the problem...");
-  if (Settings::GlobalScenarios::num_creation) {
+  if (_num_creation) {
     AnalyzeSubproblems(console, shared_info);
   }
   console->info(" ->Applying PD...");
@@ -100,24 +101,24 @@ int main(int argc, char *argv[]) {
                 " seconds.");
   MP->SetInitTime();
 
-  if (Settings::Solver::solver == 0) {
+  if (_solver == 0) {
     MP->SolveWithCplexBC(console);
-  } else if (Settings::Solver::solver == 1) {
+  } else if (_solver == 1) {
     MP->SolveWithCplexBenders(console);
   } else {
     console->info("Setting up 1st phase...");
     MP->SolveRootNode(console, shared_info, SP);
 
-    if (Settings::Heuristic::run_as_heuristic) {
+    if (_run_as_heuristic) {
       console->info(" -Activating the heuristic...");
       MP->RunAsHeuristic(console, shared_info);
     }
 
-    if (Settings::Cleaner::clean_SPs) {
+    if (_clean_SPs) {
       console->info(" -Cleaning up the SPs");
       SP->Cleaner(console, shared_info);
     }
-    if (Settings::Cleaner::clean_master) {
+    if (_clean_master) {
       console->info(" -Cleaning up the master");
       MP->Cleaner(console);
     }
@@ -133,4 +134,4 @@ int main(int argc, char *argv[]) {
   MP->PrintFinalStats(console);
   console->info(" -Optimization terminated successfully!");
   return 0;
-} // end main
+}  // end main

@@ -110,7 +110,7 @@ void GenLRCuts(SubproblemModel *mip_sp_model, SharedInfo *shared_info,
 
     if (std::fabs(IloSum(gradient)) < 1e-7 ||
         (cut_violation - 1e-7 <= cut_violation_0 && iter >= 1) ||
-        iter >= Settings::RootLifter::aggressiveness) {
+        iter >= _lifter_aggressiveness) {
       break;
     }
     cut_violation_0 = cut_violation;

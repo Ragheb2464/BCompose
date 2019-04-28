@@ -104,7 +104,7 @@ void CreateSubproblemModels(const std::shared_ptr<Data_S> data,
           for (int j = 0; j < data->getNumCustomers(); j++) {
             expr += x_var[i][j];
           }
-          expr -= data->getU(i, s) * z_var[i];
+          expr -= std::fabs(data->getU(i, s)) * z_var[i];
           constraints.add(IloRange(env, -IloInfinity, expr, 0));
           expr.end();
         }
@@ -112,7 +112,7 @@ void CreateSubproblemModels(const std::shared_ptr<Data_S> data,
         if (true) {
           IloExpr expr(env);
           for (IloInt a = 0; a < data->getNumFacilityNode(); a++)
-            expr += data->getU(a, s) * z_var[a];
+            expr += std::fabs(data->getU(a, s)) * z_var[a];
           model.add(IloRange(env, ceil(max_demand), expr, IloInfinity));
           expr.end();
         }
@@ -137,8 +137,8 @@ void CreateSubproblemModels(const std::shared_ptr<Data_S> data,
       }
       model.add(constraints);
 
-      console->info("    Exporting formulation for subproblem " +
-                    std::to_string(s) + "...");
+      // console->info("    Exporting formulation for subproblem " +
+      //               std::to_string(s) + "...");
       {
         cplex.setWarning(env.getNullStream());
         // WARNING: Exported model must be named as SP_{s}.sav
@@ -153,7 +153,7 @@ void CreateSubproblemModels(const std::shared_ptr<Data_S> data,
         // infeasible
         cplex.setOut(env.getNullStream());
         // this is only to faster check the model
-        // cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
+        cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
         cplex.setParam(IloCplex::Param::Threads, 7);
         if (!cplex.solve()) {
           console->error(" Subproblem is infeasible!");

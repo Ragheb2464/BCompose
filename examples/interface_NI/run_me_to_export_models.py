@@ -83,8 +83,8 @@ def main():
                 subprocess.call('./main ' + arcgainname + ' ' +
                                 intd_arcname + ' ' + psiname + ' ' + scenname
                                 + ' ' + str(budget[inskey]) + ' ' + str(instanceNo[fcrkey]) + ' ' + str(snipno[snipnokey]), shell=True)
-                subprocess.call('cp' + " " + model_files_path +
-                                '/*.sav' + " " + pwd + '/contrib/opt_model_dir/', shell=True)
+                # subprocess.call('cp' + " " + model_files_path +
+                #                 '/*.sav' + " " + pwd + '/contrib/opt_model_dir/', shell=True)
                 # os.chdir(pwd)
                 # logger.info('Starting the optimization...')
                 # subprocess.call('./main  --model_dir=' + model_files_path +

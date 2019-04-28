@@ -7,7 +7,7 @@
 void SimpleWS(const uint64_t iteration, const MasterModel &master_model,
               SharedInfo &shared_info) {
   if (!iteration) {
-    const double core_value = Settings::ParetoCuts::initial_core_point;
+    const double core_value = _initial_core_point;
     for (IloInt var_id = 0;
          var_id < shared_info.master_variables_value.getSize(); ++var_id) {
       //
@@ -21,7 +21,7 @@ void SimpleWS(const uint64_t iteration, const MasterModel &master_model,
       }
     }
   } else {
-    const double alpha = Settings::WarmStart::alpha;
+    const double alpha = _alpha;
     assert(alpha >= 0 && alpha <= 1);
     for (IloInt var_id = 0;
          var_id < shared_info.master_variables_value.getSize(); ++var_id) {

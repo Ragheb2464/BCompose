@@ -30,12 +30,12 @@ void CreateMasterModel(const std::shared_ptr<Data_S> data,
   // console->info("    Creating master variables...");
   y_var = IloNumVarArray(env, data->getNumFacilityNode(), 0, 1);
   // naming
-  for (size_t i = 0; i < data->getNumFacilityNode(); i++) {
+  for (size_t i = 0; i < data->getNumFacilityNode(); ++i) {
     const int arc_id = i;
     y_var[arc_id].setName(("y_" + std::to_string(arc_id)).c_str());
   }
   theta = IloNumVarArray(env, data->getN_sc(), 0, IloInfinity);
-  for (int sp_id = 0; sp_id < data->getN_sc(); sp_id++) {  // naming
+  for (int sp_id = 0; sp_id < data->getN_sc(); ++sp_id) {  // naming
     //! WARNING: recourse variables must be name with "theta_id"
     theta[sp_id].setName(("theta_" + std::to_string(sp_id)).c_str());
   }
@@ -45,39 +45,36 @@ void CreateMasterModel(const std::shared_ptr<Data_S> data,
   // console->info("    Adding master objective...");
   {
     IloExpr expr(env);
-    for (int s = 0; s < data->getN_sc(); s++) {
-      expr += data->getP(s) * theta[s];
+    for (int s = 0; s < data->getN_sc(); ++s) {
+      expr += std::fabs(data->getP(s)) * theta[s];
     }
-    for (IloInt a = 0; a < data->getNumFacilityNode(); a++) {
-      expr += data->getF(a) * y_var[a];
+    for (IloInt a = 0; a < data->getNumFacilityNode(); ++a) {
+      expr += std::fabs(data->getF(a)) * y_var[a];
       // std::cout << data->getF(a) << '\n';
     }
     objective.setExpr(expr);
     (model).add(objective);
     expr.end();
   }
-  // console->info("    Adding constraints...");
+  // console->info("    Adding complete recourse constraints...");
   {
     if (true) {
-      float max_demand = 0;
+      double max_demand = 0;
       int sc_id;
-      for (int s = 0; s < data->getN_sc(); s++) {
-        float aux = 0;
-        for (int j = 0; j < data->getNumCustomers(); j++) {
-          aux += data->getD(s, j);
+      for (int s = 0; s < data->getN_sc(); ++s) {
+        double aux = 0;
+        for (int j = 0; j < data->getNumCustomers(); ++j) {
+          aux += std::abs(data->getD(s, j));
         }
         if (aux > max_demand) {
           max_demand = aux;
           sc_id = s;
         }
       }
-      // std::cout << "max_demand is " << max_demand << " for scenario " <<
-      // sc_id
-      //           << '\n';
-      for (int s = 0; s < data->getN_sc(); s++) {
+      for (int s = 0; s < data->getN_sc(); ++s) {
         IloExpr expr(env);
-        for (IloInt a = 0; a < data->getNumFacilityNode(); a++) {
-          expr += data->getU(a, s) * y_var[a];
+        for (IloInt a = 0; a < data->getNumFacilityNode(); ++a) {
+          expr += std::abs(data->getU(a, s)) * y_var[a];
         }
         model.add(IloRange(env, ceil(max_demand), expr, IloInfinity));
         expr.end();

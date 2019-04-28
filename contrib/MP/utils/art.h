@@ -143,7 +143,7 @@ void AddArtSPToMP(const std::string &model_directory, SharedInfo &shared_info,
   //! get the art SP... we have the strong considtion that the formulation for
   //! every SP must be the same
   //! first chose a non-retained SP to be loaded
-  if (Settings::GlobalScenarios::num_creation != 1) {
+  if (_num_creation != 1) {
     printf("%s\n", "Wrong art settings!");
     exit(0);
   }

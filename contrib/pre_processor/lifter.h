@@ -8,7 +8,8 @@
 #include <iomanip>
 #include <iostream>
 #include <mutex>
-#include "../control/solver_settings.h"
+
+#include "../../solver_settings.h"
 #include "../shared_info/structures.h"
 // Get declaration for lifter(char *export_name)
 #include "../pre_processor/model_refiner.h"
@@ -17,8 +18,7 @@ void LiftSPs(const std::string current_directory,
              const SharedInfo &shared_info) {
   double *obj_vals =
       (double *)malloc(shared_info.num_subproblems * sizeof(double));
-  const size_t num_threads = Settings::Parallelization::num_worker_processors +
-                             Settings::Parallelization::num_master_processors;
+  const size_t num_threads = _num_worker_processors + _num_master_processors;
   std::ios_base::sync_with_stdio(false);
   std::cin.tie(nullptr);
   // Now, we create the threadpool.
@@ -40,13 +40,12 @@ void LiftSPs(const std::string current_directory,
   // alloc_vec_size(shared_info.num_subproblems, obj_vals);
 
   for (uint64_t sp_id = 0; sp_id < shared_info.num_subproblems; ++sp_id) {
-    io_service.dispatch(boost::bind(
-        lifter, dir_vec[sp_id].c_str(), sp_id,
-        Settings::ImproveFormulations::aggressiveness,
-        Settings::StoppingConditions::lifter_time_limit_per_SP, obj_vals));
+    io_service.dispatch(boost::bind(lifter, dir_vec[sp_id].c_str(), sp_id,
+                                    _improver_aggressiveness,
+                                    _lifter_time_limit_per_SP, obj_vals));
     // lifter(dir_vec[sp_id].c_str(), sp_id,
-    //        Settings::ImproveFormulations::aggressiveness,
-    //        Settings::StoppingConditions::lifter_time_limit_per_SP);
+    //        _aggressiveness,
+    //        _lifter_time_limit_per_SP);
   }
 
   work.reset();
@@ -54,7 +53,7 @@ void LiftSPs(const std::string current_directory,
   io_service.stop();
 
   {
-    if (Settings::GlobalScenarios::num_retention) {
+    if (_num_retention) {
       const std::string path_to_SP_data_file =
           current_directory + "/contrib/pre_processor/SP_info.txt";
       std::ofstream file(path_to_SP_data_file, std::ofstream::trunc);

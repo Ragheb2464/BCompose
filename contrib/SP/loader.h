@@ -2,7 +2,7 @@
 #define CONTRIB_SP_LOADER_H
 
 // #include <omp.h>
-#include "../control/solver_settings.h"
+#include "../../solver_settings.h"
 #include "../shared_info/structures.h"
 /*!
   This function modifies the cplex settings for the loaded subproblem
@@ -10,10 +10,9 @@
 !*/
 void SetSPCplexSettings(SubproblemModel &subproblem_model) noexcept(true) {
   subproblem_model.cplex.setParam(IloCplex::Param::Threads, 1);
-  subproblem_model.cplex.setParam(IloCplex::RootAlg,
-                                  Settings::CplexSetting::SP_RootAlg);
+  subproblem_model.cplex.setParam(IloCplex::RootAlg, _SP_RootAlg);
   subproblem_model.cplex.setParam(IloCplex::Param::Emphasis::Numerical,
-                                  Settings::CplexSetting::NumericalEmphasis);
+                                  _NumericalEmphasis);
 
   // subproblem_model.cplex.setParam(
   //     IloCplex::Param::Simplex::Tolerances::Optimality,
@@ -127,7 +126,7 @@ void AddSlack(const uint64_t con_id, SubproblemModel &subproblem_model) {
 void HealthCheckAndNACExtraction(SubproblemModel &subproblem_model,
                                  const SharedInfo &shared_info) {
   {
-    if (!ProblemSpecificSettings::ProblemProperties::is_complete_recourse) {
+    if (!_is_complete_recourse) {
       for (IloInt con_id = 0; con_id < subproblem_model.constraints.getSize();
            ++con_id) {
         // std::string constraint_name =
@@ -190,7 +189,7 @@ void HealthCheckAndNACExtraction(SubproblemModel &subproblem_model,
 */
 void PerturbRHS(SubproblemModel &subproblem_model) {
   assert(false);
-  const double alpha = Settings::ParetoCuts::perturbation_weight;
+  const double alpha = _perturbation_weight;
   for (IloInt con_id = 0; con_id < subproblem_model.constraints.getSize();
        ++con_id) {
     // const std::string con_name =
@@ -287,8 +286,7 @@ void GetConstraintMatrix(SubproblemData &data,
 bool Loader(const std::shared_ptr<spdlog::logger> console,
             std::vector<SubproblemModel> &subproblem_model,
             SharedInfo &shared_info, const std::string &current_directory) {
-  if (Settings::GlobalScenarios::num_retention +
-      Settings::GlobalScenarios::num_creation) {
+  if (_num_retention + _num_creation) {
     shared_info.subproblem_data.resize(shared_info.num_recourse_variables);
   }
   for (uint64_t sp_id = 0; sp_id < shared_info.num_recourse_variables;
@@ -350,7 +348,7 @@ bool Loader(const std::shared_ptr<spdlog::logger> console,
       DropMasterVarsFromObj(subproblem_model[sp_id]);
       HealthCheckAndNACExtraction(subproblem_model[sp_id], shared_info);
 
-      if (false && Settings::GlobalScenarios::num_creation) {
+      if (false && _num_creation) {
         // we will only load the basic information, nothing for cplex
         // cuts or NAC.
         shared_info.subproblem_data[sp_id] = SubproblemData();

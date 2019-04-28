@@ -9,8 +9,8 @@
 */
 #include <mutex> // std::mutex
 
+#include "../../solver_settings.h"
 #include "../SP/subproblem.h"
-#include "../control/solver_settings.h"
 #include "../heuristic/heuristic.h"
 #include "../shared_info/structures.h"
 #include "structures.h"
@@ -28,8 +28,7 @@ public:
         recourse_variables_(_recourse_variables), solver_info_(_solver_info_),
         SP_(_SP) {
     solver_info_.previous_root_obj =
-        solver_info_.lp_phase_LB *
-        (100 - 2 * Settings::RootLifter::min_lift_percentage);
+        solver_info_.lp_phase_LB * (100 - 2 * _min_lift_percentage);
     solver_info_.LB_after_lifter = solver_info_.lp_phase_LB;
   }
 
@@ -120,13 +119,13 @@ void BendersCustomCutCallback::AddLazyCuts(
       continue;
     }
     total_violation += violation;
-    if (violation > Settings::ParetoCuts::violation_threshold) {
+    if (violation > _violation_threshold) {
       ++num_violated_cuts;
       violated_cuts.add(expr <= 0);
     }
     expr.end();
   }
-  if (total_violation > Settings::ParetoCuts::violation_threshold) {
+  if (total_violation > _violation_threshold) {
     context.rejectCandidate(violated_cuts);
   } else {
     num_violated_cuts = 0;
@@ -180,7 +179,7 @@ void BendersCustomCutCallback::AddLRCuts(
                      IloScalProd(shared_info_.dual_values[sp_id],
                                  shared_info_.copied_variables_value[sp_id]);
       } else if (shared_info_.subproblem_objective_value[sp_id] >
-                 Settings::ParetoCuts::violation_threshold) { // feas cuts
+                 _violation_threshold) { // feas cuts
         ++solver_info_.num_feas;
         fixed_part = shared_info_.subproblem_objective_value[sp_id];
         assert(fixed_part > 0);
@@ -206,7 +205,7 @@ void BendersCustomCutCallback::AddLRCuts(
     if (100 * std::fabs((context.getRelaxationObjective() -
                          solver_info_.previous_root_obj) /
                         (1e-75 + solver_info_.previous_root_obj)) <
-        Settings::RootLifter::min_lift_percentage) {
+        _min_lift_percentage) {
       console_->info(
           "  -Booster terminating because lift was " +
           std::to_string(100 *
