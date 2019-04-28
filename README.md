@@ -13,7 +13,7 @@
     - Python 2.6.6
     - Mac OS (e.g., Mojave)
 ## How It Works
-  - BCompose is to solve pre-decomposed MILP problems. This means that the user needs to export the master and subproblem(s) according the provided guidelines.
+  - BCompose is to solve pre-decomposed MILP problems. This means that the user needs to export the master and subproblem(s) following the provided guidelines.
     - This gives the user a full flexibility in decomposing the problem and exploiting its special structures.
 ## Examples
   - Examples on how to export the pre-decomposed problems are available for the following problems:
@@ -28,9 +28,13 @@
   - All the examples are created using C++.
 ## How To Run
   - After exporting the proper formulations for the master (MP) and subproblem (SP) into the "models/" directory, run following command:
-    - python run_me.py
+    ```
+    python run_me.py
+    ```
   - or:
-    - ./BCompose  --model_dir=? --current_dir=?
+    ```
+     ./BCompose  --model_dir=? --current_dir=?
+    ```
 
 
 #ToBeCompleted
