@@ -48,7 +48,7 @@ inline static const float _min_lift_percentage = 0.3;  // in percentages
       2: more aggressive
       3: very aggressive
 */
-inline static const bool _improve_SP_representation = true;
+inline static const bool _improve_SP_representation = false;
 inline static const uint32_t _improver_aggressiveness = 0;
 
 // =========================Solver
@@ -166,12 +166,12 @@ inline static const uint32_t _max_num_iterations =
 
 inline static const float _optimality_gap = 0.01;  // 0.001;             // in %
 inline static const float _root_node_optimality_gap = 0.0005;  // in %
-inline  // static const  float _sp_tolerance = 0.001;               // in %
+inline static const float _sp_tolerance = 0.001;               // in %
 
-    inline static const float _branching_time_limit = 36000.0;  // in seconds
-inline static const float _root_node_time_limit = 7200.0;       // in seconds
-inline static const float _subpproblem_time_limit = 600.0;      // in seconds
-inline static const float _lifter_time_limit_per_SP = 600.0;    // in seconds
+inline static const float _branching_time_limit = 36000.0;    // in seconds
+inline static const float _root_node_time_limit = 7200.0;     // in seconds
+inline static const float _subpproblem_time_limit = 600.0;    // in seconds
+inline static const float _lifter_time_limit_per_SP = 600.0;  // in seconds
 
 inline static const float _min_lb_improvement =
     0.5;  // how much increase in the lb is considered as improvement
