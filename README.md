@@ -1,16 +1,21 @@
 # How To Use
 ## Minimum Requirements
-  - Linux
-    - gcc version 8.2.0 or Apple LLVM version 10.0.1 (clang-1001.0.46.4)
-    - IloCplex 12.8.0.0
-    - Boost libraries
-    - Python 2.6.6
+  - A complier compatible with c++17:
+    - e.g., gcc version 8.2.0 or Apple LLVM version 10.0.1 (clang-1001.0.46.4)
+  - IloCplex 12.8.0.0
+  - Boost libraries
+  - Python 2.6.6
 ## How It Works
   - BCompose is to solve pre-decomposed problems.
   - The user needs to export the master and subproblem(s) following the provided guidelines.
     - This gives the user a full flexibility in decomposing the problem and exploiting its special structures.
   - The exported models must be placed in 'models' directory.
-  - After doing this, refer to 'How To Run' to optimizer the problem.
+  - After doing this, refer to 'How To Run' to optimize the problem.
+## Exporting the pre-decomposed models
+  - BCompose generally works with the subproblem formulation of the generalized Benders decomposition.
+    - More details can be found in our paper entitled "The Benders Dual Decomposition Method".
+  - There are few constraint and variable naming conventions which the user needs to follow in order for BCompose to operate normally.
+  - For now, please refer to the provided examples under the 'examples' folder for more details on such conventions. I will soon provide a complete guideline.
 ## Examples
   - Examples on how to export the pre-decomposed problems are available for the following problems:
     - Fixed-charge capacitated facility location problem:
@@ -21,7 +26,7 @@
       - strong/weak formulation;
     - Stochastic network interdiction problem;
     - Covering location problem;
-  - All the examples are created using C++.
+  - All the examples are created in C++.
 ## How To Run
   - After exporting the proper formulations for the master (MP) and subproblem (SP) into the "models/" directory, run following command:
     ```
