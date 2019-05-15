@@ -18,7 +18,7 @@ void GenClassicalCuts(SubproblemModel *sp_model, SharedInfo *shared_info_,
     if (!sp_model->cplex.solve()) {
       std::cout << "ERROR: Feasibility problem is infeasible!" << std::endl;
       sp_model->cplex.exportModel(("SP_" + std::to_string(sp_id)).c_str());
-      exit(911);
+      std::abort();
     }
     shared_info_->subproblem_objective_value[sp_id] =
         sp_model->cplex.getObjValue();
@@ -27,7 +27,7 @@ void GenClassicalCuts(SubproblemModel *sp_model, SharedInfo *shared_info_,
       std::cout << "ERROR:: Objective of the feasibility problem is "
                 << shared_info_->subproblem_objective_value[sp_id]
                 << "!. Most likely numeric issue." << std::endl;
-      exit(911);
+      std::abort();
     }
     sp_model->cplex.getDuals(shared_info_->dual_values[sp_id],
                              sp_model->NAC_constraints);
@@ -39,7 +39,8 @@ void GenClassicalCuts(SubproblemModel *sp_model, SharedInfo *shared_info_,
     std::cout
         << "According to the settings, the subproblem must always be feasible"
         << std::endl;
-    throw IloCplex::Exception(-1, "Infeasible Subproblem!");
+    sp_model->cplex.exportModel("SP_.lp");
+    std::abort();
   }
 }
 

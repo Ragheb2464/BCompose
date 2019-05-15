@@ -2,7 +2,7 @@
 #define CONTRIB_ANALYZER_H
 
 /*!
-  This is provide the user with a set of useful metrics to impprove the
+  This is provide the user with a set of useful metrics to improve the
   performance, like suggesting to used primalheuristic because of many infeas
   cuts or use VIs bbecause of waek root node bound
 !*/

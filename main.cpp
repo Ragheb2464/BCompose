@@ -6,7 +6,6 @@
 @date     8/10/2018
 @brief    This part creates the parallelization framework.
 */
-// TODO:  user sanetizers,
 
 #include <chrono>
 #include <iostream>
@@ -60,44 +59,43 @@ int main(int argc, char *argv[]) {
     console->error("Directory shouldn't end with '/'");
     exit(0);
   }
-  SharedInfo shared_info{};  // here you can find all the info which is possibly
+  SharedInfo shared_info{}; // here you can find all the info which is possibly
   // shared among master and subproblems
 
   if (std::thread::hardware_concurrency() <
       _num_worker_processors + _num_master_processors) {
-    console->info(
+    console->warn(
         "This system has at most " +
         std::to_string(std::thread::hardware_concurrency()) +
         " while you want to use " +
         std::to_string(_num_worker_processors + _num_master_processors));
-    // exit(911);
+    std::terminate();
   }
 
-  //   console->info("Reading the solver settings...");
-  // std::unique_ptr<
+  std::unique_ptr<Master> MP = std::make_unique<Master>();
+  std::shared_ptr<Subproblem> SP = std::make_shared<Subproblem>();
 
-  console->info("Importing master model...");
-  std::unique_ptr<Master> MP{new Master()};
+  console->info("Importing the master model...");
   MP->Initializer(console, shared_info, current_directory);
-
+  assert(shared_info.num_subproblems);
   if (_improve_SP_representation) {
-    console->info("Pre-processing the models...");
+    console->info("Improving the representations...");
     LiftSPs(current_directory, shared_info);
   }
-
-  console->info("Importing subproblem models...");
-  std::shared_ptr<Subproblem> SP = std::make_shared<Subproblem>();
-  SP->Initializer(console, shared_info, current_directory);
-
-  console->info("Analyzing the problem...");
+  if (_solver == 2) {
+    console->info("Importing subproblem models...");
+    SP->Initializer(console, shared_info, current_directory);
+  }
   if (_num_creation) {
+    console->info("Analyzing the problem...");
     AnalyzeSubproblems(console, shared_info);
   }
-  console->info(" ->Applying PD...");
-  MP->PartialDecompsoition(model_directory, console, shared_info,
-                           current_directory);
-
-  console->info("Initalization took " + std::to_string(MP->GetDuration()) +
+  if (_num_retention + _num_creation || _solver == 0 || _solver == 1) {
+    console->info("Applying PD...");
+    MP->PartialDecompsoition(model_directory, console, shared_info,
+                             current_directory);
+  }
+  console->info("Initialization took " + std::to_string(MP->GetDuration()) +
                 " seconds.");
   MP->SetInitTime();
 
@@ -105,15 +103,13 @@ int main(int argc, char *argv[]) {
     MP->SolveWithCplexBC(console);
   } else if (_solver == 1) {
     MP->SolveWithCplexBenders(console);
-  } else {
+  } else if (_solver == 2) {
     console->info("Setting up 1st phase...");
     MP->SolveRootNode(console, shared_info, SP);
-
     if (_run_as_heuristic) {
       console->info(" -Activating the heuristic...");
       MP->RunAsHeuristic(console, shared_info);
     }
-
     if (_clean_SPs) {
       console->info(" -Cleaning up the SPs");
       SP->Cleaner(console, shared_info);
@@ -122,16 +118,14 @@ int main(int argc, char *argv[]) {
       console->info(" -Cleaning up the master");
       MP->Cleaner(console);
     }
-
-    // console->info(" -Creating the parallel branches on master...");
-    // MP->ParallelPreparer(console, shared_info, 2);
-
     console->info(" -Switching to MIP MP...");
     MP->ConvertLPtoMIP();
     MP->BranchingPhase(console, shared_info, SP);
+  } else {
+    console->error("Wrong solver is chosen!");
+    return 0;
   }
-
   MP->PrintFinalStats(console);
   console->info(" -Optimization terminated successfully!");
   return 0;
-}  // end main
+} // end main

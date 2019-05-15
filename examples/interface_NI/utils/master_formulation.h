@@ -57,7 +57,7 @@ void CreateMasterModel(const std::shared_ptr<Data> data,
   model.add(IloRange(env, 0, expr1, data->getB()));
   expr1.end();
 
-  console->info("    Exporting formulation for master problem...");
+  // console->info("    Exporting formulation for master problem...");
   cplex.setWarning(env.getNullStream());
   // WARNING: Exported model must be named as MP.sav
   cplex.exportModel("../../models/MP.sav");

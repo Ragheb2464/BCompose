@@ -7,7 +7,7 @@
 @version  02.01.0isr
 @date     8/10/2018
 @brief    These settings allow controlling some of the
-          main features of BCompose to tune the performance.
+          main features of BCompose to tune its performance.
 **/
 
 //=========================Parallelization
@@ -48,8 +48,8 @@ inline static const float _min_lift_percentage = 0.3;  // in percentages
       2: more aggressive
       3: very aggressive
 */
-inline static const bool _improve_SP_representation = false;
-inline static const uint32_t _improver_aggressiveness = 0;
+inline static const bool _improve_SP_representation = true;
+inline static const uint32_t _improver_aggressiveness = 3;
 
 // =========================Solver
 /*
@@ -57,10 +57,6 @@ inline static const uint32_t _improver_aggressiveness = 0;
     0: Cplex's B&C
     1: IloBenders
     2: BCompose
-
-  NOTES:
-    - For options 0 and 1, num_retention must be equal to number of SPs
-        and num_creation=0
 */
 inline static const uint32_t _solver = 2;
 
@@ -71,9 +67,9 @@ inline static const uint32_t _solver = 2;
       0: random (default)
       1: maxcost (recommended)
       2: mincost
-      3: optimal:: NOTE, option 1 and 2 are only avaiable when SPs are
-        pre-processed
+      3: optimal
   NOTES:
+    - Strategy 1 and 2 are only avaiable when SPs are pre-processed
     - Number of the retaintions anything from 0 to number of subproblems
     - Number of creation subproblems can only be 0 or 1 at this version
 */
@@ -86,6 +82,7 @@ inline static const uint32_t _mood = 1;
   This setting allows to reduce the memory usage.
   NOTES:
     Make sure the warm start is off.
+    If the improver is on, the algorithm may require generating feasibility cuts
 */
 inline static const bool _is_complete_recourse = false;
 // =========================Pareto Cuts
@@ -116,7 +113,7 @@ inline static const float _alpha = 0.5;
     2 aggressive,
     3 very aggressive,
 */
-inline static const double _violation_threshold = 1e-2;
+inline static const double _violation_threshold = 1e-3;
 inline static const bool _clean_master = false;
 inline static const bool _clean_SPs = false;
 inline static const uint32_t _cleaner_aggressiveness = 0;
@@ -126,7 +123,7 @@ inline static const uint32_t _cleaner_aggressiveness = 0;
 inline static const uint32_t _RandomSeed = 2018;
 inline static const uint32_t _ClockType = 2;
 inline static const uint32_t _SimDisplay = 0;
-inline static const uint32_t _AdvInd = 1;
+inline static const uint32_t _AdvInd = 2;
 inline static const uint32_t _NumericalEmphasis = 0;
 inline static const uint32_t _SP_RootAlg = 1;  // primal
 inline static const uint32_t _MP_RootAlg = 0;
@@ -164,7 +161,7 @@ inline static const uint32_t _max_num_iterations_phase_I =
 inline static const uint32_t _max_num_iterations =
     1000;  // ++iter, each time a master solution is used to gen cuts,
 
-inline static const float _optimality_gap = 0.01;  // 0.001;             // in %
+inline static const float _optimality_gap = 0.001;             // in %
 inline static const float _root_node_optimality_gap = 0.0005;  // in %
 inline static const float _sp_tolerance = 0.001;               // in %
 
@@ -174,12 +171,12 @@ inline static const float _subpproblem_time_limit = 600.0;    // in seconds
 inline static const float _lifter_time_limit_per_SP = 600.0;  // in seconds
 
 inline static const float _min_lb_improvement =
-    0.5;  // how much increase in the lb is considered as improvement
+    0.0005;  // how much increase in the lb is considered as improvement
 inline static const uint32_t _max_num_non_improvement_iterations =
     10;  // for how many iterations the lb is allowed to not improve (by
          // min_lb_improvement) before stoping the LP phase
 
-// =========================UNDER DEVELOPMENT
+// =========================UNDER DEVELOPMENT=============================
 
 // =========================Heurstic Options
 

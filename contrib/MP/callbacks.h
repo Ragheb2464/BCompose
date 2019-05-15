@@ -17,12 +17,12 @@
 
 class BendersCustomCutCallback : public IloCplex::Callback::Function {
 public:
-  BendersCustomCutCallback(const std::shared_ptr<spdlog::logger> _console,
-                           const SharedInfo &_shared_info,
-                           const IloNumVarArray &_master_variables,
-                           const IloNumVarArray &_recourse_variables,
-                           const MasterSolverInfo &_solver_info_,
-                           const std::shared_ptr<Subproblem> _SP)
+  explicit BendersCustomCutCallback(
+      const std::shared_ptr<spdlog::logger> _console,
+      const SharedInfo &_shared_info, const IloNumVarArray &_master_variables,
+      const IloNumVarArray &_recourse_variables,
+      const MasterSolverInfo &_solver_info_,
+      const std::shared_ptr<Subproblem> _SP)
       : console_(_console), shared_info_(_shared_info),
         master_variables_(_master_variables),
         recourse_variables_(_recourse_variables), solver_info_(_solver_info_),
@@ -32,15 +32,16 @@ public:
     solver_info_.LB_after_lifter = solver_info_.lp_phase_LB;
   }
 
+  BendersCustomCutCallback(const BendersCustomCutCallback &) = delete;
   ~BendersCustomCutCallback() {
     master_variables_.end();
     recourse_variables_.end();
   }
 
-  void invoke(const IloCplex::Callback::Context &context);
-  void AddLazyCuts(const IloCplex::Callback::Context &context);
-  void AddLRCuts(const IloCplex::Callback::Context &context);
-  MasterSolverInfo &GetSolverInfo() { return solver_info_; }
+  inline void invoke(const IloCplex::Callback::Context &context);
+  inline void AddLazyCuts(const IloCplex::Callback::Context &context);
+  inline void AddLRCuts(const IloCplex::Callback::Context &context);
+  inline MasterSolverInfo &GetSolverInfo() { return solver_info_; }
 
 private:
   std::shared_ptr<spdlog::logger> console_;
@@ -49,16 +50,14 @@ private:
   IloNumVarArray recourse_variables_;
   MasterSolverInfo solver_info_;
   std::shared_ptr<Subproblem> SP_;
-  /* Empty constructor is forbidden. */
-  BendersCustomCutCallback() {}
-  /* Copy constructor is forbidden. */
-  BendersCustomCutCallback(const BendersCustomCutCallback &tocopy);
+  //
+  BendersCustomCutCallback(){};
   //
   std::mutex mtx_;
 };
 
-void BendersCustomCutCallback::invoke(
-    const IloCplex::Callback::Context &context) {
+inline void
+BendersCustomCutCallback::invoke(const IloCplex::Callback::Context &context) {
   switch (context.getId()) {
   case IloCplex::Callback::Context::Id::Candidate:
     if (!context.isCandidatePoint()) { // The model is always bounded
@@ -79,7 +78,7 @@ void BendersCustomCutCallback::invoke(
   }
 }
 
-void BendersCustomCutCallback::AddLazyCuts(
+inline void BendersCustomCutCallback::AddLazyCuts(
     const IloCplex::Callback::Context &context) {
   mtx_.lock();
   // assert(context.getId() == IloCplex::Callback::Context::Id::Candidate);
@@ -151,7 +150,7 @@ void BendersCustomCutCallback::AddLazyCuts(
   mtx_.unlock();
 }
 
-void BendersCustomCutCallback::AddLRCuts(
+inline void BendersCustomCutCallback::AddLRCuts(
     const IloCplex::Callback::Context &context) {
   mtx_.lock();
   if (solver_info_.gen_user_cuts) {

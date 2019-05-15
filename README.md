@@ -1,20 +1,16 @@
 # How To Use
 ## Minimum Requirements
   - Linux
-    - gcc version 8.2.0
+    - gcc version 8.2.0 or Apple LLVM version 10.0.1 (clang-1001.0.46.4)
     - IloCplex 12.8.0.0
     - Boost libraries
     - Python 2.6.6
-    - Linux OS (e.g., Oracle Linux Server 6.9)
-  - Mac
-    - g++ 8.2 or Apple LLVM version 10.0.1 (clang-1001.0.46.4)
-    - IloCplex 12.8.0.0
-    - Boost libraries
-    - Python 2.6.6
-    - Mac OS (e.g., Mojave)
 ## How It Works
-  - BCompose is to solve pre-decomposed MILP problems. This means that the user needs to export the master and subproblem(s) following the provided guidelines.
+  - BCompose is to solve pre-decomposed problems.
+  - The user needs to export the master and subproblem(s) following the provided guidelines.
     - This gives the user a full flexibility in decomposing the problem and exploiting its special structures.
+  - The exported models must be placed in 'models' directory.
+  - After doing this, refer to 'How To Run' to optimizer the problem.
 ## Examples
   - Examples on how to export the pre-decomposed problems are available for the following problems:
     - Fixed-charge capacitated facility location problem:
@@ -35,6 +31,7 @@
     ```
      ./BCompose  --model_dir=? --current_dir=?
     ```
-
+## Tune
+ - Some of the main features of BCompose can be tuned via the  global variables in the 'solver_setting.h' file.
 
 #ToBeCompleted

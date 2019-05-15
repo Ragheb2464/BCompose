@@ -6,13 +6,13 @@
 #include "../../shared_info/structures.h"
 #include "../structures.h"
 
-void PrintWarning(const uint64_t sp_id_1, const uint64_t sp_id_2) {
+inline void PrintWarning(const uint64_t sp_id_1, const uint64_t sp_id_2) {
   std::cout << " Subproblems SP_" << sp_id_1 << " and SP_" << sp_id_2
             << " are different!";
   std::cout << " WARNING, Turnning off the articulation ..." << std::endl;
 }
 
-uint64_t PickFirstSP(const SharedInfo &shared_info) {
+inline uint64_t PickFirstSP(const SharedInfo &shared_info) {
   uint64_t picked_sp_id = std::numeric_limits<uint64_t>::max();
   for (uint64_t sp_id = 0; sp_id < shared_info.num_subproblems; ++sp_id) {
     if (!shared_info.retained_subproblem_ids.count(sp_id)) {

@@ -81,19 +81,19 @@ public:
   }
   ///////////////////////////////////////////////////////
   // int getN_nodes()				{return n_nodes;}
-  int getNumFacilityNode() { return numFacilityNode; }
-  int getNumCustomers() { return numCustomers; }
-  int getN_sc() { return n_sc; }
-  double getF(int i) { return f[i]; }
-  double getP(int s) { return (double)1.0 / n_sc; }
-  double getU(int i, int s) {
+  inline int getNumFacilityNode() { return numFacilityNode; }
+  inline int getNumCustomers() { return numCustomers; }
+  inline int getN_sc() { return n_sc; }
+  inline double getF(int i) { return f[i]; }
+  inline double getP(int s) { return (double)1.0 / n_sc; }
+  inline double getU(int i, int s) {
     if (n_scCap > 1)
       return u[s][i];
     else
       return u[0][i];
   }
-  double getD(int s, int j) { return d[s][j]; }
-  double getC(int i, int j, int s) {
+  inline double getD(int s, int j) { return d[s][j]; }
+  inline double getC(int i, int j, int s) {
     if (n_scC > 1)
       return c[s][i][j];
     else

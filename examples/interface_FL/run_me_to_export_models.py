@@ -47,18 +47,18 @@ def main():
 
     try:
         logger.info('Compiling the export program with c++11...')
-        # logger.info(' -Compiling docopt...')
-        # arg_base = '{0} {1} -std=c++17 -DNDEBUG -DIL_STD -c ../../externals/docopt/docopt.cpp  -g'.format(
-        #     GCC, FLAG)
-        # subprocess.call(arg_base, shell=True)
-        # logger.info(' -Compiling exporter...')
-        # arg_base = '{0} {1} -I{2} -I{3} -std=c++17  -DIL_STD -c  main.cpp  -g'.format(
-        #     GCC, FLAG, CPLEXDIR, CONCERTDIR)
-        # subprocess.call(arg_base, shell=True)
-        # logger.info(" -Linking...")
-        # arg_base = '{0} {1} -L{2} -L{3}  -std=c++17 -o main main.o docopt.o  -ldl -lboost_system -lboost_thread-mt -lilocplex -lconcert -lcplex -lm -lpthread'.format(
-        #     GCC, FLAG, CPLEXLIB, CONCERTLIB)
-        # subprocess.call(arg_base, shell=True)
+        logger.info(' -Compiling docopt...')
+        arg_base = '{0} {1} -std=c++17 -DNDEBUG -DIL_STD -c ../../externals/docopt/docopt.cpp  -g'.format(
+            GCC, FLAG)
+        subprocess.call(arg_base, shell=True)
+        logger.info(' -Compiling exporter...')
+        arg_base = '{0} {1} -I{2} -I{3} -std=c++17  -DIL_STD -c  main.cpp  -g'.format(
+            GCC, FLAG, CPLEXDIR, CONCERTDIR)
+        subprocess.call(arg_base, shell=True)
+        logger.info(" -Linking...")
+        arg_base = '{0} {1} -L{2} -L{3}  -std=c++17 -o main main.o docopt.o  -ldl -lboost_system -lboost_thread-mt -lilocplex -lconcert -lcplex -lm -lpthread'.format(
+            GCC, FLAG, CPLEXLIB, CONCERTLIB)
+        subprocess.call(arg_base, shell=True)
     except Exception as e:
         logger.error('Failed to compile the exporter...')
         logger.error(e)
@@ -67,10 +67,10 @@ def main():
     #
     # [102, 103, 104, 111, 112, 113, 114,          121, 122, 123, 124, 131, 132, 133, 134]
     # [102, 103, 104, 111, 112, 113, 114,          121, 122, 123, 124, 131, 132, 133, 134]
-    ID = [134]
-    scenario = [1500]  # 1 500 1500
-    scenarioC = [1500]  # 0 250 500 1500
-    scenarioCap = [1500]  # 0 250 500 1500
+    ID = [102]
+    scenario = [250]  # 1 250 500 1500
+    scenarioC = [0]  # 0 250 500 1500
+    scenarioCap = [0]  # 0 250 500 1500
     for IDkey in range(len(ID)):
         for scenariokey in range(len(scenario)):
             for scenarioCkey in range(len(scenarioC)):

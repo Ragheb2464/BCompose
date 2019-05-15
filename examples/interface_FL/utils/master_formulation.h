@@ -64,19 +64,20 @@ void CreateMasterModel(const std::shared_ptr<Data_S> data,
       for (int s = 0; s < data->getN_sc(); ++s) {
         double aux = 0;
         for (int j = 0; j < data->getNumCustomers(); ++j) {
-          aux += std::abs(data->getD(s, j));
+          aux += std::fabs(data->getD(s, j));
         }
         if (aux > max_demand) {
           max_demand = aux;
           sc_id = s;
         }
       }
+
       for (int s = 0; s < data->getN_sc(); ++s) {
         IloExpr expr(env);
         for (IloInt a = 0; a < data->getNumFacilityNode(); ++a) {
-          expr += std::abs(data->getU(a, s)) * y_var[a];
+          expr += std::fabs(data->getU(a, s)) * y_var[a];
         }
-        model.add(IloRange(env, ceil(max_demand), expr, IloInfinity));
+        model.add(IloRange(env, ceil(max_demand + 1e-7), expr, IloInfinity));
         expr.end();
       }
     }

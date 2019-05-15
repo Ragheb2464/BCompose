@@ -64,8 +64,8 @@ def main():
 
     logger.info('Setting the instances to be solved...')
     snipno = [3]  # , 4]  # 4
-    budget = [50]  # 30, 40, 50, 60, 70, 80, 90]  # 30 40 50 60  70 80 90
-    instanceNo = [3]  # 0, 1, 2, 3, 4]  # 0 1 2 3 4
+    budget = [40]  # 30, 40, 50, 60, 70, 80, 90]  # 30 40 50 60  70 80 90
+    instanceNo = [2]  # 0, 1, 2, 3, 4]  # 0 1 2 3 4
     for snipnokey in range(len(snipno)):
         for inskey in range(len(budget)):
             for fcrkey in range(len(instanceNo)):

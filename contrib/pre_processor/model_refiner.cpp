@@ -100,16 +100,6 @@ void lifter(const char *model_dir, const int sp_id, const int aggressiveness,
         goto TERMINATE;
     }
     {
-      /*I just want the root node*/
-      // improtant, otherwise presolve will change the model
-      // status = CPXsetintparam(env, CPX_PARAM_COEREDIND, CPX_OFF);
-      // status = CPXsetintparam(env, CPX_PARAM_RELAXPREIND, CPX_OFF);
-      // status = CPXsetintparam(env, CPX_PARAM_REDUCE, CPX_OFF);
-      // status = CPXsetintparam(env, CPX_PARAM_PREPASS, CPX_OFF);
-      // status = CPXsetintparam(env, CPX_PARAM_REPEATPRESOLVE, CPX_OFF);
-      // status = CPXsetintparam(env, CPX_PARAM_AGGIND, CPX_OFF);
-      // status = CPXsetintparam(env, CPX_PARAM_BNDSTRENIND, CPX_OFF);
-      // status = CPXsetintparam(env, CPXPARAM_MIP_Limits_CutPasses, -1);
       status = CPXsetintparam(env, CPX_PARAM_CLIQUES, aggressiveness);
       status = CPXsetintparam(env, CPX_PARAM_COVERS, aggressiveness);
       status = CPXsetintparam(env, CPX_PARAM_DISJCUTS, aggressiveness);

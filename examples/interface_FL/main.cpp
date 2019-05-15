@@ -12,17 +12,17 @@
 #include <memory>
 #include <set>
 
-#include <ilcplex/ilocplex.h>
 #include "../../externals/docopt/docopt.h"
 #include "../../externals/spdlog/spdlog.h"
 #include "../../externals/util/pair_hasher.h"
+#include <ilcplex/ilocplex.h>
 
 #include "../../solver_settings.h"
 #include "utils/data.h"
 
-#include "utils/master_formulation.h"
-#include "utils/subproblem_formulation.h"
-// #include "utils/cplex_ext.h"
+// #include "utils/master_formulation.h"
+// #include "utils/subproblem_formulation.h"
+#include "utils/cplex_ext.h"
 
 // static const char USAGE[] =
 //     R"(Exports a .sav model for the master and each subproblem.
@@ -68,8 +68,8 @@ int main(int argc, char *argv[]) {
   data->readData(argv[1]);
 
   console->info(" -Exporting CPLEX models...");
-  CreateMasterModel(data, console);
+  // CreateMasterModel(data, console);
   CreateSubproblemModels(data, console);
   console->info(" -Done!");
   return 0;
-}  // end main
+} // end main

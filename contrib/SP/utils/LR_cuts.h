@@ -4,9 +4,10 @@
 #include "../../shared_info/structures.h"
 #include "level.h"
 
-double GetCutViolation(const IloNumArray &master_solution,
-                       const IloNumArray &sp_solution,
-                       const SharedInfo *shared_info, const uint64_t sp_id) {
+inline double GetCutViolation(const IloNumArray &master_solution,
+                              const IloNumArray &sp_solution,
+                              const SharedInfo *shared_info,
+                              const uint64_t sp_id) {
   double violation = -shared_info->recourse_variables_value[sp_id];
   violation += IloScalProd(master_solution, shared_info->dual_values[sp_id]);
   violation -= IloScalProd(sp_solution, shared_info->dual_values[sp_id]);
@@ -15,36 +16,39 @@ double GetCutViolation(const IloNumArray &master_solution,
   return violation;
 }
 
-void UpdateObjCoeff(SubproblemModel *mip_sp_model,
-                    const SharedInfo *shared_info, const uint64_t sp_id) {
+inline void UpdateObjCoeff(SubproblemModel *mip_sp_model,
+                           const SharedInfo *shared_info,
+                           const uint64_t sp_id) {
   mip_sp_model->objective.setExpr(mip_sp_model->regular_objective.getExpr() -
                                   IloScalProd(mip_sp_model->copied_variables,
                                               shared_info->dual_values[sp_id]));
 }
 
-void Solve(SubproblemModel *mip_sp_model) {
+inline void Solve(SubproblemModel *mip_sp_model) {
   assert(mip_sp_model->cplex.solve());
 }
 
-double GetcTx(const SubproblemModel *mip_sp_model) {
+inline double GetcTx(const SubproblemModel *mip_sp_model) {
   return mip_sp_model->cplex.getValue(
       mip_sp_model->regular_objective.getExpr());
 }
 
-void ExtractVariableValues(const SubproblemModel *mip_sp_model,
-                           SharedInfo *shared_info, const uint64_t sp_id) {
+inline void ExtractVariableValues(const SubproblemModel *mip_sp_model,
+                                  SharedInfo *shared_info,
+                                  const uint64_t sp_id) {
   mip_sp_model->cplex.getValues(shared_info->copied_variables_value[sp_id],
                                 mip_sp_model->copied_variables);
 }
 
-void UpdateGradients(IloNumArray &gradient, const SharedInfo *shared_info,
-                     const uint64_t sp_id) {
+inline void UpdateGradients(IloNumArray &gradient,
+                            const SharedInfo *shared_info,
+                            const uint64_t sp_id) {
   for (IloInt i = 0; i < shared_info->master_variables_value.getSize(); i++)
     gradient[i] = shared_info->master_variables_value[i] -
                   shared_info->copied_variables_value[sp_id][i];
 }
 
-double GetUB(SubproblemModel *lp_sp_model, const IloNumArray &var_val) {
+inline double GetUB(SubproblemModel *lp_sp_model, const IloNumArray &var_val) {
   double ub = IloInfinity;
   lp_sp_model->NAC_constraints.setBounds(var_val, var_val);
   if (lp_sp_model->cplex.solve()) {

@@ -8,7 +8,8 @@
   This function modifies the cplex settings for the loaded subproblem
   formulation.
 !*/
-void SetSPCplexSettings(SubproblemModel &subproblem_model) noexcept(true) {
+inline void SetSPCplexSettings(SubproblemModel &subproblem_model) noexcept(
+    true) {
   subproblem_model.cplex.setParam(IloCplex::Param::Threads, 1);
   subproblem_model.cplex.setParam(IloCplex::RootAlg, _SP_RootAlg);
   subproblem_model.cplex.setParam(IloCplex::Param::Emphasis::Numerical,
@@ -394,7 +395,7 @@ bool Loader(const std::shared_ptr<spdlog::logger> console,
   This func gets total number of the subproblems in the
 model_directory
 !*/
-uint64_t GetSubproblemCount() {
+inline uint64_t GetSubproblemCount() {
   uint64_t number_of_files = 0;
   const int possible_max = 1e5;  // some number you can expect.
   for (int s = 0; s < possible_max; s++) {

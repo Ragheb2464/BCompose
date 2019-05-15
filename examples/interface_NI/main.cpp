@@ -12,10 +12,10 @@
 #include <memory>
 #include <set>
 
-#include <ilcplex/ilocplex.h>
 #include "../../externals/docopt/docopt.h"
 #include "../../externals/spdlog/spdlog.h"
 #include "../../externals/util/pair_hasher.h"
+#include <ilcplex/ilocplex.h>
 
 #include "utils/data.h"
 
@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
   // Thread safe logger
   auto console = spdlog::stdout_logger_mt("stdout");
 
-  console->info(" -Loading the data...");
+  // console->info(" -Loading the data...");
   std::stringstream charvalue, charvalue2;
   charvalue << argv[5];
   charvalue2 << argv[7];
@@ -40,11 +40,11 @@ int main(int argc, char *argv[]) {
   data->readPsi(argv[3]);
   data->readScenario(argv[4]);
 
-  console->info(" -Exporting CPLEX models...");
+  // console->info(" -Exporting CPLEX models...");
   CreateMasterModel(data, console);
   CreateSubproblemModels(data, console);
   // console->info(" -Solving the extensive form...");
   // SolveExtForm(data, console);
-  console->info(" -Done!");
+  // console->info(" -Done!");
   return 0;
-}  // end main
+} // end main

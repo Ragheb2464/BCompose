@@ -7,7 +7,9 @@
 
 class Heuristic {
 public:
-  Heuristic(){};
+  Heuristic(const Heuristic &) = delete;
+  Heuristic operator=(const Heuristic &) = delete;
+  Heuristic() = default;
   ~Heuristic(){};
   /*This func counts how many times a var has taken a specific value in the
    * solutions extracted from the MIP SPs*/

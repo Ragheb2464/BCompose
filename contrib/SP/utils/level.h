@@ -4,7 +4,7 @@
 class Level {
 public:
   Level() {}
-  ~Level() {}
+  ~Level() { env_.end(); }
 
   void Initializer(const uint64_t var_size) {
     //! Create the model_
@@ -29,20 +29,20 @@ public:
     cplex_.setParam(IloCplex::Param::Threads, 1);
   }
 
-  void UpdateObjective() {
+  inline void UpdateObjective() {
     objective_.setExpr(IloScalProd(dual_vars_, dual_vars_) -
                        2 * IloScalProd(dual_vars_, best_dual_vals_));
   }
 
-  void UpdateConstraints(const double level) {
+  inline void UpdateConstraints(const double level) {
     for (int i = 0; i < constraints_.getSize(); i++) {
       constraints_[i].setLB(level);
     }
     // std::cout << "TODO: Check the updating is correct" << '\n';
   }
 
-  void AddLevelConstraint(const double cTx, const double level,
-                          const IloNumArray &gradient) {
+  inline void AddLevelConstraint(const double cTx, const double level,
+                                 const IloNumArray &gradient) {
     assert(IloSum(gradient));
     IloExpr expr = cTx + IloScalProd(gradient, dual_vars_) -
                    IloScalProd(gradient, dual_vals_);
@@ -51,7 +51,7 @@ public:
     model_.add(constraints_);
   }
 
-  void Solve() {
+  inline void Solve() {
     if (cplex_.solve()) {
       cplex_.getValues(dual_vals_, dual_vars_);
       // cplex_.exportModel("proj.lp");
@@ -64,34 +64,34 @@ public:
     }
   }
 
-  void SetInitialDualValues(const IloNumArray &dual) {
+  inline void SetInitialDualValues(const IloNumArray &dual) {
     assert(dual.getSize() == dual_vals_.getSize());
     for (IloInt i = 0; i < dual.getSize(); ++i) {
       dual_vals_[i] = dual[i];
       best_dual_vals_[i] = dual[i];
     }
   }
-  void GetBestDualValues(IloNumArray &dual) {
+  inline void GetBestDualValues(IloNumArray &dual) {
     assert(dual.getSize() == best_dual_vals_.getSize());
     for (IloInt i = 0; i < best_dual_vals_.getSize(); ++i) {
       dual[i] = best_dual_vals_[i];
     }
   }
-  void GetDualValues(IloNumArray &dual) {
+  inline void GetDualValues(IloNumArray &dual) {
     assert(dual.getSize() == dual_vals_.getSize());
     for (IloInt i = 0; i < dual.getSize(); ++i) {
       dual[i] = dual_vals_[i];
     }
   }
 
-  void UpdateBestDualValue(const IloNumArray &dual) {
+  inline void UpdateBestDualValue(const IloNumArray &dual) {
     assert(dual.getSize() == best_dual_vals_.getSize());
     for (IloInt i = 0; i < dual.getSize(); ++i) {
       best_dual_vals_[i] = dual[i];
     }
   }
   // void ExportModel() { cplex_.exportModel("p.lp"); }
-  void EndEnv() { env_.end(); }
+  inline void EndEnv() { env_.end(); }
 
 private:
   // the model_ stuff
@@ -104,6 +104,8 @@ private:
   IloNumVarArray dual_vars_;
   IloNumArray dual_vals_;
   IloNumArray best_dual_vals_;
+  //
+  Level(const Level &);
 };
 
 #endif

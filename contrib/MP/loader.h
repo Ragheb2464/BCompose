@@ -1,7 +1,7 @@
 #ifndef COTRIB_MP_LOADER_H
 #define COTRIB_MP_LOADER_H
 
-void SetCplexSettings(MasterModel &master_model) noexcept {
+inline void SetCplexSettings(MasterModel &master_model) noexcept {
   master_model.cplex.setParam(IloCplex::Param::Emphasis::Numerical,
                               _NumericalEmphasis);
   master_model.cplex.setParam(IloCplex::Param::Advance, _AdvInd);
@@ -37,7 +37,7 @@ void SetCplexSettings(MasterModel &master_model) noexcept {
   }
 }
 
-uint64_t ExtractVarId(const std::string &var_name) {
+inline uint64_t ExtractVarId(const std::string &var_name) {
   std::string temp_str;
   for (uint64_t j = 0; j < var_name.size(); j++) {
     if (var_name[j] >= '0' && var_name[j] <= '9') {
@@ -48,8 +48,8 @@ uint64_t ExtractVarId(const std::string &var_name) {
   return std::stoi(temp_str);
 }
 
-void GetMasterVariablesBound(const MasterModel &master_model,
-                             SharedInfo &shared_info) {
+inline void GetMasterVariablesBound(const MasterModel &master_model,
+                                    SharedInfo &shared_info) {
   shared_info.master_variables_lb =
       IloNumArray(master_model.env, master_model.master_variables.getSize());
   shared_info.master_variables_ub =

@@ -20,105 +20,119 @@
 */
 
 typedef IloArray<IloNumVarArray> IloNumVarArray2;
+typedef IloArray<IloNumVarArray2> IloNumVarArray3;
 
-void CreateSubproblemModels(const std::shared_ptr<Data> data,
+void CreateSubproblemModels(const std::shared_ptr<Data_S> data,
                             const std::shared_ptr<spdlog::logger> console) {
-  const int n_sc = 456;
+  double max_demand = 0;
+  double expected_obj = 0;
+  for (int s = 0; s < data->getN_sc(); s++) {
+    double aux = 0;
+    for (int j = 0; j < data->getNumCustomers(); j++) {
+      aux += std::fabs(data->getD(s, j));
+    }
+    if (aux > max_demand) {
+      max_demand = aux;
+    }
+  }
+
   IloEnv env;
   IloModel model;
   IloCplex cplex;
-  IloObjective obj;
-  IloNumVarArray y;
-  IloNumVarArray2 piVar;
-  IloRangeArray con;
+  IloObjective objective;
+  IloNumVarArray3 x_var;
+  IloNumVarArray z_var;
+  IloRangeArray constraints;
+
   model = IloModel(env);
   cplex = IloCplex(model);
-  con = IloRangeArray(env);
-  obj = IloMinimize(env);
-  //
-  y = IloNumVarArray(env, data->getSizeD(), 0, 1, ILOINT);
-  for (size_t i = 0; i < data->getSizeD(); i++) {
-    y[i].setName(("y_" + std::to_string(i)).c_str());
-  }
-  (model).add(y);
-  piVar = IloNumVarArray2(env, data->getN_nodes2());
-  for (int i = 0; i < data->getN_nodes2(); i++) {
-    piVar[i] = IloNumVarArray(env, n_sc, 0, 1e10);
-    model.add(piVar[i]);
-  }
-  // obj
-  IloExpr expr(env);
-  for (int s = 0; s < n_sc; s++)
-    expr += data->getP(s) * piVar[data->getOrigin(s)][s];
-  obj.setExpr(expr);
-  (model).add(obj);
-  expr.end();
-  for (int s = 0; s < n_sc; s++) {
-    (con).add(IloRange(env, 1, piVar[data->getDestinations(s)][s], 1));
-  }
+  constraints = IloRangeArray(env);
+  objective = IloMinimize(env);
 
-  for (int s = 0; s < n_sc; s++) {
-    for (int a = 0; a < data->getSizeD(); a++) {
-      (con).add(IloRange(env, 0,
-                         piVar[data->getTailD(a)][s] -
-                             data->getQ(a) * piVar[data->getHeadD(a)][s],
-                         IloInfinity));
-    }
-  }
-  for (int s = 0; s < n_sc; s++) {
-    for (int a = 0; a < data->getSizeAD(); a++) {
-      (con).add(IloRange(env, 0,
-                         piVar[data->getTailAD(a)][s] -
-                             data->getR(a) * piVar[data->getHeadAD(a)][s],
-                         IloInfinity));
-    }
-  }
-  for (int s = 0; s < n_sc; s++) {
-    for (int a = 0; a < data->getSizeD(); a++) {
-      (con).add(IloRange(env, 0,
-                         (data->getRD(a) - data->getQ(a)) *
-                                 data->getPhi(s, data->getHeadD(a)) * y[a] +
-                             piVar[data->getTailD(a)][s] -
-                             data->getRD(a) * piVar[data->getHeadD(a)][s],
-                         IloInfinity));
-    }
-  }
-
-  for (int s = 0; s < n_sc; s++) {
-    for (int i = 0; i < data->getN_nodes2(); i++) {
-      if (data->getPhi(0, i) <= 0) {
-        model.add(IloRange(env, 0, piVar[i][s], 0));
+  {
+    z_var = IloNumVarArray(env, data->getNumFacilityNode(), 0, 1, ILOINT);
+    (model).add(z_var);
+    //
+    x_var = IloNumVarArray3(env, data->getNumFacilityNode());
+    for (int i = 0; i < data->getNumFacilityNode(); i++) {
+      x_var[i] = IloNumVarArray2(env, data->getNumCustomers());
+      for (int j = 0; j < data->getNumCustomers(); ++j) {
+        x_var[i][j] = IloNumVarArray(env, data->getN_sc(), 0, IloInfinity);
+        model.add(x_var[i][j]);
       }
     }
   }
 
-  IloExpr expr1(env);
-  for (IloInt a = 0; a < data->getSizeD(); a++) {
-    expr1 += data->getC(a) * y[a];
+  {
+    IloExpr expr(env);
+    for (int i = 0; i < data->getNumFacilityNode(); i++) {
+      expr += data->getF(i) * z_var[i];
+      assert(data->getF(i) >= 0);
+      for (int s = 0; s < data->getN_sc(); s++) {
+        for (int j = 0; j < data->getNumCustomers(); j++) {
+          expr +=
+              std::fabs(data->getP(s)) * data->getC(i, j, s) * x_var[i][j][s];
+          assert(data->getC(i, j, s) >= 0);
+        }
+      }
+    }
+    objective.setExpr(expr);
+    (model).add(objective);
   }
-  // std::cout << data->getB() << '\n';
-  model.add(IloRange(env, -IloInfinity, expr1, data->getB()));
-  expr1.end();
 
-  model.add(con);
-  // cplex.exportModel("f.lp");
-  { // Make sure that the exported SP is feasible, otherwise the problem is
-    // infeasible
-    cplex.setOut(env.getNullStream());
-    // this is only to faster check the model
+  {
+    for (int s = 0; s < data->getN_sc(); s++) {
+      // assignment
+      for (int j = 0; j < data->getNumCustomers(); j++) {
+        IloExpr expr(env);
+        for (int i = 0; i < data->getNumFacilityNode(); i++) {
+          expr += x_var[i][j][s];
+        }
+        constraints.add(
+            IloRange(env, std::fabs(data->getD(s, j)), expr, IloInfinity));
+        expr.end();
+      }
+      // capacity
+      for (int i = 0; i < data->getNumFacilityNode(); i++) {
+        IloExpr expr(env);
+        for (int j = 0; j < data->getNumCustomers(); j++) {
+          expr += x_var[i][j][s];
+        }
+        expr -= std::fabs(data->getU(i, s)) * z_var[i];
+        constraints.add(IloRange(env, -IloInfinity, expr, 0));
+        expr.end();
+      }
+    }
+  }
+
+  // SI cuts
+  if (true) {
+    for (int s = 0; s < data->getN_sc(); s++) {
+      for (int j = 0; j < data->getNumCustomers(); j++) {
+        for (int i = 0; i < data->getNumFacilityNode(); i++) {
+          constraints.add(IloRange(
+              env, -IloInfinity,
+              x_var[i][j][s] - std::fabs(data->getD(s, j)) * z_var[i], 0));
+        }
+      }
+    }
+  }
+
+  model.add(constraints);
+
+  {
     IloNum start = cplex.getCplexTime();
-    cplex.setParam(IloCplex::ClockType, 2);
-    cplex.setParam(IloCplex::Param::TimeLimit, 7200);
-    cplex.setParam(IloCplex::Param::Threads, 7);
+    // cplex.setOut(env.getNullStream());
+    cplex.setParam(IloCplex::Param::Threads, 8);
     cplex.setParam(IloCplex::Param::Benders::Strategy, 3);
-    // cplex.setParam(IloCplex::Param::MIP::Tolerances::MIPGap, 1.0);
     if (!cplex.solve()) {
       console->error(" Subproblem is infeasible!");
       exit(0);
     }
-    console->info("-obj= " + std::to_string(cplex.getObjValue()));
-    console->info("-Time= " + std::to_string(cplex.getCplexTime() - start));
-    console->info("-Gap= " + std::to_string(cplex.getMIPRelativeGap()));
+    console->info("-obj=        " + std::to_string(cplex.getObjValue()));
+    console->info("-Time=       " +
+                  std::to_string(cplex.getCplexTime() - start));
+    console->info("-Gap=        " + std::to_string(cplex.getMIPRelativeGap()));
     console->info(" ");
   }
 }

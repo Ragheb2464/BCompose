@@ -23,8 +23,8 @@
 
 class Master {
 public:
-  Master() {}
-  ~Master() {}
+  Master() = default;
+  ~Master() { master_model_.env.end(); }
 
   void Initializer(const std::shared_ptr<spdlog::logger> console,
                    SharedInfo &shared_info,
@@ -52,51 +52,53 @@ public:
                             const std::string &current_directory) {
     assert(shared_info.num_subproblems >= _num_retention);
     if (_num_creation && (shared_info.num_subproblems == 1 ||
-                          _num_retention == shared_info.num_subproblems)) {
-      console->error(
-          "   Having artificial subproblems does not make sense to me!");
-      exit(0);
+                          _num_retention == shared_info.num_subproblems ||
+                          _solver == 0 || _solver == 1)) {
+      console->error("Please turn off creation strategy.");
+      exit(911);
     }
-    // TODO: Use other techniques to pick global SPs
-    if (_num_retention + _num_creation) {
+    if (_solver == 0 || _solver == 1) {
+      assert(!_num_creation);
+      SelectAll(shared_info);
+    } else {
       if (_num_retention) { // picking SPs
-        if (_mood == 3) {
-          console->info("   Extracting global SP with optimal mood...");
+        if (_mood == 0 || !_improve_SP_representation) {
+          console->info("   Extracting global SP using random strategy...");
+          RandomSelection(shared_info, _num_retention);
         } else if (_mood == 1 && _improve_SP_representation) {
-          console->info("   Extracting global SP using MaxCost mood...");
+          console->info("   Extracting global SP using MaxCost strategy...");
           MaxCost(shared_info, _num_retention, current_directory);
         } else if (_mood == 2 && _improve_SP_representation) {
-          console->info("   Extracting global SP using MinCost mood...");
+          console->info("   Extracting global SP using MinCost strategy...");
           MinCost(shared_info, _num_retention, current_directory);
-        } else if (_mood == 0 || !_improve_SP_representation) {
-          console->info("   Extracting global SP using random mood...");
-          RandomSelection(shared_info, _num_retention);
+        } else if (_mood == 3) {
+          console->info("   Extracting global SP with optimal strategy...");
         } else {
-          console->error("Wrong seeting for partial decomposition");
+          console->error("Please choose right strategy for the PD.");
           exit(911);
         }
       }
-      { // creating SPs
-        if (_num_creation) {
-          GetArtificialSubproblemWeights(shared_info, solver_info_);
-        }
+      if (_num_creation) { // creating SPs
+        GetArtificialSubproblemWeights(shared_info, solver_info_);
       }
-      { // adding the chosen ones
-        console->info("    Adding these subproblems to master model:");
-        if (_num_creation) {
-          console->info("     Art_SP");
-          AddArtSPToMP(model_directory, shared_info, solver_info_,
-                       master_model_);
-        }
-        for (const uint64_t sp_id : shared_info.retained_subproblem_ids) {
-          console->info("     SP_" + std::to_string(sp_id));
-          AddSPToMP(sp_id, master_model_, current_directory);
-        }
+    }
+    { // adding the chosen ones
+      console->info("    Rebuilding the master model...");
+      if (_num_creation) {
+        console->info("    +Art_SP");
+        AddArtSPToMP(model_directory, shared_info, solver_info_, master_model_);
+      }
+      for (const uint64_t sp_id : shared_info.retained_subproblem_ids) {
+        console->info("    +SP_" + std::to_string(sp_id));
+        AddSPToMP(sp_id, master_model_, current_directory);
       }
     } // end if
+
+    console->info("   ->PD went through successfully.");
   }
 
-  bool CheckStoppingConditions(const std::shared_ptr<spdlog::logger> console) {
+  inline bool
+  CheckStoppingConditions(const std::shared_ptr<spdlog::logger> console) {
     // std::cout << solver_info_.lp_phase_UB << " " << solver_info_.LB << '\n';
     const double gap =
         std::min(100 * std::fabs((solver_info_.lp_phase_UB - solver_info_.LB) /
@@ -124,30 +126,29 @@ public:
 
   static void CheckCorrectness(const std::shared_ptr<spdlog::logger> console,
                                SharedInfo &shared_info) {
-    /*
-      IloNumArray previous_solution = shared_info.master_variables_value;
-        // checking if the solution or lb has improved
-        if (solver_info_.current_LB == solver_info_.LB) {
-          bool warn = true;
-          for (uint64_t i = 0; i < previous_solution.getSize();
-               ++i) { // check if the solution is the same
-            if (std::fabs(previous_solution[i] -
-                          shared_info.master_variables_value[i]) > 1e-15) {
-              warn = false;
-              break;
-            }
-          }
-          if (warn) {
-            console->warn(
-                "    --The LB didn't improve and the solution didn't change!!");
+    /*  IloNumArray previous_solution = shared_info.master_variables_value;
+      // checking if the solution or lb has improved
+      if (solver_info_.current_LB == solver_info_.LB) {
+        bool warn = true;
+        for (uint64_t i = 0; i < previous_solution.getSize();
+             ++i) { // check if the solution is the same
+          if (std::fabs(previous_solution[i] -
+                        shared_info.master_variables_value[i]) > 1e-15) {
+            warn = false;
+            break;
           }
         }
-        previous_solution.end();
-    */
+        if (warn) {
+          console->warn(
+              "    --The LB didn't improve and the solution didn't change!!");
+        }
+      }
+      previous_solution.end();*/
   }
 
-  void ExtractVariablesValue(const std::shared_ptr<spdlog::logger> console,
-                             SharedInfo &shared_info) {
+  inline void
+  ExtractVariablesValue(const std::shared_ptr<spdlog::logger> console,
+                        SharedInfo &shared_info) {
     if (!_run_ws || solver_info_.iteration >= _num_ws_iterations) {
       master_model_.cplex.getValues(shared_info.master_variables_value,
                                     master_model_.master_variables);
@@ -159,7 +160,7 @@ public:
     }
   }
 
-  void UpdateLBStats(const std::shared_ptr<spdlog::logger> console) {
+  inline void UpdateLBStats(const std::shared_ptr<spdlog::logger> console) {
     solver_info_.current_LB = master_model_.cplex.getObjValue();
     //! Checking if the lb has improved enough
     if (solver_info_.current_LB < solver_info_.LB) {
@@ -174,7 +175,7 @@ public:
     solver_info_.LB = solver_info_.current_LB;
   }
 
-  bool UpdateUBStats(const SharedInfo &shared_info) {
+  inline bool UpdateUBStats(const SharedInfo &shared_info) {
     if (_run_ws && solver_info_.iteration < _num_ws_iterations) {
       solver_info_.current_UB = IloInfinity;
       return false;
@@ -253,8 +254,8 @@ public:
     cuts.end();
   }
 
-  void AddCuts(const uint64_t sp_id, const double fixed_part, const bool status,
-               const IloNumArray &dual_values) {
+  inline void AddCuts(const uint64_t sp_id, const double fixed_part,
+                      const bool status, const IloNumArray &dual_values) {
     assert(dual_values.getSize() == master_model_.master_variables.getSize());
     IloExpr expr(master_model_.env);
     expr += fixed_part;
@@ -295,24 +296,22 @@ public:
       //! Solve the MP, apply VIs, store solution, etc.
       if (!master_model_.cplex.solve()) {
         if (master_model_.cplex.getStatus() == IloAlgorithm::Infeasible) {
-          console->error("   Status of the master problem is infeasible.");
+          console->error("   Master problem is infeasible.");
         } else if (master_model_.cplex.getStatus() == IloAlgorithm::Unbounded) {
-          console->error("   Status of the master problem is unbounded.");
+          console->error("   Master problem is unbounded.");
         } else {
-          console->error("   Status of the master problem is unkown.");
+          console->error("   Master problem is unkown.");
         }
         console->warn("------------------------------------------------------");
         console->warn("-Probably suffering from numerics.");
         console->warn(
             "-Maybe turn off AdvInd and/or turn on NumericalEmphasis.");
         console->warn("-I am exporting a MP_.lp for you to examine offline.");
-        console->warn("-If the problem presists, contact Ragheb at "
-                      "ragheb.rahmaniani@gmail.com.");
         console->warn("______________________________________________________");
         master_model_.cplex.exportModel("MP_.lp");
         exit(0);
       }
-      master_model_.cplex.exportModel("MP_.lp");
+      // master_model_.cplex.exportModel("MP_.lp");
       ExtractVariablesValue(console, shared_info);
       // std::cout << shared_info.master_variables_value << std::endl;
       UpdateLBStats(console);
@@ -327,7 +326,7 @@ public:
         if (shared_info.retained_subproblem_ids.count(sp_id)) {
           continue;
         }
-        const double fixed_part =
+        const IloNum fixed_part =
             shared_info.subproblem_objective_value[sp_id] -
             IloScalProd(shared_info.dual_values[sp_id],
                         shared_info.master_variables_value);
@@ -353,7 +352,7 @@ public:
     solver_info_.lp_time = GetDuration();
   }
 
-  void ConvertLPtoMIP() {
+  inline void ConvertLPtoMIP() {
     master_model_.model.add(IloConversion(
         master_model_.env, master_model_.master_variables, ILOINT));
   }
@@ -394,7 +393,7 @@ public:
   }
 
   void SolveWithCplexBenders(const std::shared_ptr<spdlog::logger> console) {
-    assert(_num_retention == master_model_.recourse_variables.getSize());
+    // assert(_num_retention == master_model_.recourse_variables.getSize());
     ConvertLPtoMIP();
     master_model_.cplex.setParam(IloCplex::Param::Threads,
                                  _num_worker_processors +
@@ -417,7 +416,7 @@ public:
   }
 
   void SolveWithCplexBC(const std::shared_ptr<spdlog::logger> console) {
-    assert(_num_retention == master_model_.recourse_variables.getSize());
+    // assert(_num_retention == master_model_.recourse_variables.getSize());
     ConvertLPtoMIP();
     master_model_.cplex.setParam(IloCplex::Param::Threads,
                                  _num_worker_processors +
@@ -443,7 +442,7 @@ public:
   // this func use the sols obbtined from the LR cuts to gen cuts and bounds
   void RunLRBasedHeuristic(SharedInfo &shared_info,
                            const std::shared_ptr<spdlog::logger> console,
-                           const std::shared_ptr<Subproblem> &SP) {
+                           const std::shared_ptr<Subproblem> SP) {
     if (!_use_root_lifter) {
       console->error(
           "Please turn on the use_root_lifter to use run_lagrang_heuristic");
@@ -497,9 +496,9 @@ public:
     master_model_.cplex.setParam(IloCplex::NodeLim, _node_limit);
   }
 
-  void SetCallbacks(const std::shared_ptr<spdlog::logger> console,
-                    SharedInfo &shared_info,
-                    const std::shared_ptr<Subproblem> SP) {
+  inline void SetCallbacks(const std::shared_ptr<spdlog::logger> console,
+                           SharedInfo &shared_info,
+                           const std::shared_ptr<Subproblem> SP) {
     assert(shared_info.num_subproblems >
            shared_info.retained_subproblem_ids.size());
     const uint64_t num_sp_workers =
@@ -525,7 +524,7 @@ public:
 
   void BranchingPhase(const std::shared_ptr<spdlog::logger> console,
                       SharedInfo &shared_info,
-                      const std::shared_ptr<Subproblem> &SP) {
+                      const std::shared_ptr<Subproblem> SP) {
     assert(shared_info.retained_subproblem_ids.size() !=
            shared_info.num_subproblems);
 
@@ -559,9 +558,9 @@ public:
     // std::cout << shared_info.master_variables_value << std::endl;
   }
 
-  void
+  inline void
   PrintStatus(const std::shared_ptr<spdlog::logger> console) noexcept(true) {
-    assert(solver_info_.global_UB >= solver_info_.LB - 1e-17);
+    assert(solver_info_.global_UB >= solver_info_.LB - 1e-7);
     std::string optimization_status = " UB=" + ValToStr(solver_info_.global_UB);
     optimization_status += " LB=" + ValToStr(solver_info_.LB) +
                            " LP_UB=" + ValToStr(solver_info_.lp_phase_UB);

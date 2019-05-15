@@ -36,7 +36,6 @@ void CreateSubproblemModels(const std::shared_ptr<Data_S> data,
       max_demand = aux;
     }
   }
-
   for (int s = 0; s < data->getN_sc(); ++s) {
     IloEnv env;
     IloModel model;

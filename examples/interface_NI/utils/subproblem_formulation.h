@@ -108,8 +108,8 @@ void CreateSubproblemModels(const std::shared_ptr<Data> data,
       }
       model.add(constraints);
 
-      console->info("    Exporting formulation for subproblem " +
-                    std::to_string(s) + "...");
+      // console->info("    Exporting formulation for subproblem " +
+      //               std::to_string(s) + "...");
       {
         cplex.setWarning(env.getNullStream());
         // WARNING: Exported model must be named as SP_{s}.sav

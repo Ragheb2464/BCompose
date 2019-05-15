@@ -96,6 +96,13 @@ void RandomSelection(SharedInfo &shared_info, const uint64_t num_retention) {
 
   assert(shared_info.retained_subproblem_ids.size() == num_retention);
 }
+inline void SelectAll(SharedInfo &shared_info) {
+  uint64_t t = 0;
+  assert(!shared_info.retained_subproblem_ids.size());
+  for (uint64_t sp_id = 0; sp_id < shared_info.num_subproblems; ++sp_id) {
+    shared_info.retained_subproblem_ids.insert(sp_id);
+  }
+}
 
 void RowCovering() {}
 

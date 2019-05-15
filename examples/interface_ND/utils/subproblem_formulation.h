@@ -150,7 +150,7 @@ void CreateSubproblemModels(const Data &data,
     }
 
     {  // Strong inequalities
-      if (false) {
+      if (true) {
         for (const auto &arc : data.arcs_info) {
           const int arc_id = arc.second.arc_id;
           for (int k = 0; k < data.num_od; k++) {

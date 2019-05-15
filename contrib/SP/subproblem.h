@@ -21,8 +21,13 @@
 
 class Subproblem {
 public:
-  Subproblem() {}
-  ~Subproblem() {}
+  Subproblem() = default;
+  ~Subproblem() {
+    for (uint64_t sp_id = 0; sp_id < subproblem_model_.size(); ++sp_id) {
+      subproblem_model_[sp_id].env.end();
+    }
+    subproblem_model_.clear();
+  }
 
   void Initializer(const std::shared_ptr<spdlog::logger> console,
                    SharedInfo &shared_info,
@@ -36,7 +41,6 @@ public:
 
     console->info("  ->Loading " + std::to_string(num_subproblems_) +
                   " subpropblems...");
-    //! TODO: Make it possible to load only one subproblem
     { // loading LP SPs
       Loader(console, subproblem_model_, shared_info, current_directory);
       for (uint64_t sp_id = 0; sp_id < num_subproblems_; ++sp_id) {
@@ -84,14 +88,14 @@ public:
     }
   }
 
-  void SetNumThreads(const std::shared_ptr<spdlog::logger> console,
-                     const uint64_t _num_threads) {
+  inline void SetNumThreads(const std::shared_ptr<spdlog::logger> console,
+                            const uint64_t _num_threads) {
     num_threads_ = _num_threads;
     console->info("  *Using up to " + std::to_string(num_threads_) +
                   " cores to generate cuts.");
   }
 
-  static void PerturbMasterSolution(SharedInfo &shared_info) {
+  inline static void PerturbMasterSolution(SharedInfo &shared_info) {
     const double alpha = _perturbation_weight;
     const double core_val = _initial_core_point;
     for (IloInt var_id = 0;
@@ -134,8 +138,8 @@ public:
     }
   }
 
-  void GenBendersCuts(const std::shared_ptr<spdlog::logger> console,
-                      SharedInfo &shared_info) {
+  inline void GenBendersCuts(const std::shared_ptr<spdlog::logger> console,
+                             SharedInfo &shared_info) {
     for (uint64_t sp_id = 0; sp_id < shared_info.num_subproblems; ++sp_id) {
       shared_info.subproblem_status[sp_id] = false;
       shared_info.dual_values[sp_id].clear();
@@ -272,7 +276,7 @@ public:
     solver_info_.iteration++;
   }
 
-  void DeleteLRSubproblems() {
+  inline void DeleteLRSubproblems() {
     for (uint64_t sp_id = 0; sp_id < LR_subproblem_model_.size(); ++sp_id) {
       LR_subproblem_model_[sp_id].env.end();
     }
@@ -287,6 +291,6 @@ private:
   uint64_t num_subproblems_ = 0, num_threads_ = 1;
   std::mutex mtx_;
   //
-  Subproblem(const Subproblem &copy);
+  Subproblem(const Subproblem &);
 };
 #endif
