@@ -49,6 +49,7 @@ struct SharedInfo {
   IloNumArray master_variables_lb;
   IloNumArray master_variables_ub;
   IloNumArray master_variables_value;
+  std::vector<double> master_variables_value_lp;
   IloNumArray master_vars_reduced_cost;
   IloNumArray recourse_variables_value;
 

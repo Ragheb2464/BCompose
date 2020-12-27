@@ -20,10 +20,10 @@ def main():
     model_files_path = "../../models"
     pwd = "../.."
 
-    CONCERTDIR = '/Applications/CPLEX_Studio129/concert/include/'
-    CPLEXDIR = '/Applications/CPLEX_Studio129/cplex/include/'
-    CPLEXLIB = '/Applications/CPLEX_Studio129/cplex/lib/x86-64_osx/static_pic/'
-    CONCERTLIB = '/Applications/CPLEX_Studio129/concert/lib/x86-64_osx/static_pic/'
+    CONCERTDIR = '/Applications/CPLEX_Studio128/concert/include/'
+    CPLEXDIR = '/Applications/CPLEX_Studio128/cplex/include/'
+    CPLEXLIB = '/Applications/CPLEX_Studio128/cplex/lib/x86-64_osx/static_pic/'
+    CONCERTLIB = '/Applications/CPLEX_Studio128/concert/lib/x86-64_osx/static_pic/'
     Sanitation_Flags = 'address,undefined,signed-integer-overflow,null,alignment,bool,builtin,bounds,float-cast-overflow,float-divide-by-zero,function,integer-divide-by-zero,return,signed-integer-overflow,implicit-conversion,unsigned-integer-overflow -fno-sanitize-recover=null -fsanitize-trap=alignment -fno-omit-frame-pointer'
     GCC = 'g++'
     OPT_FLAG = '-Ofast'
@@ -50,7 +50,7 @@ def main():
         logger.info(' -Compiling docopt...')
         arg_base = '{0} {1} -std=c++17 -DNDEBUG -DIL_STD -c ../../externals/docopt/docopt.cpp  -g'.format(
             GCC, FLAG)
-        # subprocess.call(arg_base, shell=True)
+        subprocess.call(arg_base, shell=True)
         logger.info(' -Compiling exporter...')
         arg_base = '{0} {1} -I{2} -I{3} -std=c++17  -DIL_STD -c  main.cpp  -g'.format(
             GCC, FLAG, CPLEXDIR, CONCERTDIR)
@@ -66,10 +66,10 @@ def main():
 
     logger.info('Setting the instances to be solved...')
     # '04', '05', '06', '07', '08', '09', '10', '11']  # [04,05,06,07,08,09,10,11]
-    INSTANCE_LIST = ['05']
-    COST_CAP_RATIOS = [9]  # [3,5,7,9]
-    CORRELATION = [0.8]  # [0,0.2,0.8]
-    SCENARIOS = [16]  # [16,32,64]
+    INSTANCE_LIST = ['04']
+    COST_CAP_RATIOS = [7]  # [3,5,7,9]
+    CORRELATION = [0]  # [0,0.2,0.8]
+    SCENARIOS = [64]  # [16,32,64]
 
     network_info = {}
     network_info['04'] = [10, 60, 10]

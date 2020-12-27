@@ -4,7 +4,10 @@
     - e.g., gcc version 8.2.0 or Apple LLVM version 10.0.1 (clang-1001.0.46.4)
   - IloCplex 12.8.0.0
   - Boost libraries
-  - Python 2.6.6
+  - Python3 [inside the code, "python3" is used to run some py modules.]
+    - import pickle
+    - import sys
+    - import pandas as pd
 ## How It Works
   - BCompose is to solve pre-decomposed problems.
   - The user needs to export the master and subproblem(s) following the provided guidelines.
@@ -30,7 +33,7 @@
 ## How To Run
   - After exporting the proper formulations for the master (MP) and subproblem (SP) into the "models/" directory, run following command:
     ```
-    python run_me.py
+    python3 run_me.py
     ```
   - or:
     ```

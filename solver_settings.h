@@ -20,9 +20,10 @@
     - Didive number of the processors on your system to balace the workload.
     - BCompose will may dynamically change number of the master or worker
       processors to improve performance.
+    - New CPLEX update (12.8 and 12.9) seem to have some bug when _num_master_processors>1
 */
-inline static const uint32_t _num_worker_processors = 4;
-inline static const uint32_t _num_master_processors = 4;
+inline static const uint32_t _num_worker_processors = 11;
+inline static const uint32_t _num_master_processors = 1;
 
 // =========================Root Lifter
 /*
@@ -36,7 +37,7 @@ inline static const uint32_t _num_master_processors = 4;
   The use can also control the stopping condition of the root lifter.
 */
 inline static const bool _use_root_lifter = false;
-inline static const uint32_t _lifter_aggressiveness = 0;
+inline static const uint32_t _lifter_aggressiveness = 1;
 inline static const float _min_lift_percentage = 0.3;  // in percentages
 
 // =========================Improve Formulations
@@ -44,12 +45,23 @@ inline static const float _min_lift_percentage = 0.3;  // in percentages
   This setting allows the user to  to improve the representation of the cut
   generation subproblems. Agressivness of this method can be tuned:
       0: moderate
-      1: agressive
+      1: aggressive
       2: more aggressive
       3: very aggressive
 */
 inline static const bool _improve_SP_representation = true;
-inline static const uint32_t _improver_aggressiveness = 3;
+inline static const uint32_t _improver_aggressiveness = 1;
+
+// =========================ML
+/*
+ *This component allows the use of a pretrained ML model to predict the final values for y vars.
+ * Currently only supports the two heuristic modes (i.e., no guarantee of optimality when turned on)
+ *
+     0: Stops at the root node with the predicted values
+     1: Tries to resolves the false predictions iteratively [more accurate results in slightly more time]
+ */
+inline static const bool _deploy_ml = true;
+inline static const bool _ml_strategy = 0;
 
 // =========================Solver
 /*
@@ -73,7 +85,7 @@ inline static const uint32_t _solver = 2;
     - Number of the retaintions anything from 0 to number of subproblems
     - Number of creation subproblems can only be 0 or 1 at this version
 */
-inline static const uint32_t _num_retention = 0;
+inline static const uint32_t _num_retention = 1;
 inline static const uint32_t _num_creation = 0;
 inline static const uint32_t _mood = 1;
 
@@ -155,11 +167,11 @@ inline static const uint32_t _NodeSel = 1;
   This setting allows the user control the stopping condition of the algorithm.
 */
 inline static const uint64_t _node_limit =
-    9223372036800000000;  // defualt 9223372036800000000
+        9223372036800000000;  // defualt 9223372036800000000
 inline static const uint32_t _max_num_iterations_phase_I =
-    1000;  // ++iter, each time a master solution is used to gen cuts,
+        1000;  // ++iter, each time a master solution is used to gen cuts,
 inline static const uint32_t _max_num_iterations =
-    1000;  // ++iter, each time a master solution is used to gen cuts,
+        1000;  // ++iter, each time a master solution is used to gen cuts,
 
 inline static const float _optimality_gap = 0.001;             // in %
 inline static const float _root_node_optimality_gap = 0.0005;  // in %
@@ -171,10 +183,10 @@ inline static const float _subpproblem_time_limit = 600.0;    // in seconds
 inline static const float _lifter_time_limit_per_SP = 600.0;  // in seconds
 
 inline static const float _min_lb_improvement =
-    0.0005;  // how much increase in the lb is considered as improvement
+        0.0005;  // how much increase in the lb is considered as improvement
 inline static const uint32_t _max_num_non_improvement_iterations =
-    10;  // for how many iterations the lb is allowed to not improve (by
-         // min_lb_improvement) before stoping the LP phase
+        10;  // for how many iterations the lb is allowed to not improve (by
+// min_lb_improvement) before stoping the LP phase
 
 // =========================UNDER DEVELOPMENT=============================
 
@@ -182,30 +194,30 @@ inline static const uint32_t _max_num_non_improvement_iterations =
 
 // this heuristic will be complementary to the convergence
 inline static const uint32_t _run_lagrang_heuristic =
-    0;  // number of iterations to run this heuristic
+        0;  // number of iterations to run this heuristic
 
 // this heuristic may compromise global convergence
 inline static const bool _run_lagrang_fixer = false;
 inline static const float _tolerance =
-    0.98;  // recomm: if the LR does few iter,
-           // this value must be closer to one
+        0.98;  // recomm: if the LR does few iter,
+// this value must be closer to one
 
 // This heuristic may compromise the convergence to true optimal sol
 inline static const bool _run_as_heuristic = false;
 inline static const float _heur_aggressiveness =
-    0.2;  // any number between (0,0.5), the larger,
-          // the more aggressive is the heuristics
+        0.2;  // any number between (0,0.5), the larger,
+// the more aggressive is the heuristics
 inline static const uint64_t _frequency =
-    1000;  // any_integer_numbr: specifies number
-           // of nodes to run the heuristics...
-           // 0: only at the root, <= -1 never
+        1000;  // any_integer_numbr: specifies number
+// of nodes to run the heuristics...
+// 0: only at the root, <= -1 never
 inline static const int _start_node =
-    1000;  // after how many nodes activate the heuristic
+        1000;  // after how many nodes activate the heuristic
 
 // =========================Advanced Cuts
 inline static const bool _gen_combinatorial_cuts =
-    false;  // WARNING must trun off if the problem is not binary
+        false;  // WARNING must trun off if the problem is not binary
 inline static const bool _gen_strengthened_combinatorial_cuts =
-    false;  // conditions apply
+        false;  // conditions apply
 
 #endif

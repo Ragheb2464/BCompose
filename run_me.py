@@ -15,13 +15,13 @@ logger.basicConfig(level=logger.INFO,
                    format='[%(asctime)s]: [%(levelname)s]: %(message)s')
 
 # the absolute paths
-model_files_path = "/Users/raghebrahmaniani/BCompose/models"
-pwd = "/Users/raghebrahmaniani/BCompose"
+model_files_path = "/Users/rragheb/MyProjects/BCompose/models"
+pwd = "/Users/rragheb/MyProjects/BCompose"
 # cplex
-CONCERTDIR = '/Applications/CPLEX_Studio129/concert/include/'
-CPLEXDIR = '/Applications/CPLEX_Studio129/cplex/include/'
-CPLEXLIB = '/Applications/CPLEX_Studio129/cplex/lib/x86-64_osx/static_pic/'
-CONCERTLIB = '/Applications/CPLEX_Studio129/concert/lib/x86-64_osx/static_pic/'
+CONCERTDIR = '/Applications/CPLEX_Studio128/concert/include/'
+CPLEXDIR = '/Applications/CPLEX_Studio128/cplex/include/'
+CPLEXLIB = '/Applications/CPLEX_Studio128/cplex/lib/x86-64_osx/static_pic/'
+CONCERTLIB = '/Applications/CPLEX_Studio128/concert/lib/x86-64_osx/static_pic/'
 # compiler
 GCC = 'g++'
 # compiler flags
@@ -35,7 +35,7 @@ OPT_FLAG = '-DIL_STD -Ofast'
 FLAG = DEBUG_FLAG
 DEBUG_SYMBOLS = '-g'
 # DEBUG_SYMBOLS = ' '
-# FLAG = OPT_FLAG
+FLAG = OPT_FLAG
 
 
 def Initializer():
@@ -51,20 +51,20 @@ def Compiler():
     try:
         logger.info('Compiling the solver with c++17...')
         #
-        logger.info(' -Compiling pre-processor...')
-        arg_base = '{0} {1} -I{2} -I{3} -c -o  model_refiner.o  contrib/pre_processor/model_refiner.cpp {4}'.format(
-            GCC, FLAG, CPLEXDIR, CONCERTDIR, DEBUG_SYMBOLS)
-        subprocess.call(arg_base, shell=True)
-        #
-        logger.info(' -Compiling docopt...')
-        arg_base = '{0} {1} -std=c++17 -DNDEBUG -DIL_STD -c externals/docopt/docopt.cpp {2}'.format(
-            GCC, FLAG, DEBUG_SYMBOLS)
-        subprocess.call(arg_base, shell=True)
-        #
-        logger.info(' -Compiling rss...')
-        arg_base = '{0} {1}  -std=c++17  -DIL_STD -c  externals/rss/current_rss.cpp  {2}'.format(
-            GCC, FLAG, DEBUG_SYMBOLS)
-        subprocess.call(arg_base, shell=True)
+        # logger.info(' -Compiling pre-processor...')
+        # arg_base = '{0} {1} -I{2} -I{3} -c -o  model_refiner.o  contrib/pre_processor/model_refiner.cpp {4}'.format(
+        #     GCC, FLAG, CPLEXDIR, CONCERTDIR, DEBUG_SYMBOLS)
+        # subprocess.call(arg_base, shell=True)
+        # #
+        # logger.info(' -Compiling docopt...')
+        # arg_base = '{0} {1} -std=c++17 -DNDEBUG -DIL_STD -c externals/docopt/docopt.cpp {2}'.format(
+        #     GCC, FLAG, DEBUG_SYMBOLS)
+        # subprocess.call(arg_base, shell=True)
+        # #
+        # logger.info(' -Compiling rss...')
+        # arg_base = '{0} {1}  -std=c++17  -DIL_STD -c  externals/rss/current_rss.cpp  {2}'.format(
+        #     GCC, FLAG, DEBUG_SYMBOLS)
+        # subprocess.call(arg_base, shell=True)
         #
         logger.info(' -Compiling BCompose...')
         arg_base = '{0} {1} -I{2} -I{3} -std=c++17  -DIL_STD -c  main.cpp {4}'.format(
