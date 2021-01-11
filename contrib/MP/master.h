@@ -14,6 +14,7 @@
 #include "../SP/subproblem.h"
 #include "../heuristic/heuristic.h"
 #include "../shared_info/structures.h"
+#include "../ML/ML.h"
 #include "callbacks.h"
 #include "loader.h"
 #include "structures.h"
@@ -289,7 +290,15 @@ public:
                          _num_worker_processors + _num_master_processors - 1.0));
 
         console->info("Optimizing the LP...");
-        SetSartTime();
+        //container for the ML training
+        shared_info.master_variables_daul_vals_sum_lp = IloNumArray(master_model_.env,
+                                                                    master_model_.master_variables.getSize());
+        shared_info.master_variables_vals_sum_lp = IloNumArray(master_model_.env,
+                                                               master_model_.master_variables.getSize());
+        shared_info.lp_sols.resize(master_model_.master_variables.getSize());
+        shared_info.dual_sols.resize(master_model_.master_variables.getSize());
+        shared_info.rc_sols.resize(master_model_.master_variables.getSize());
+        //
         while (true) {
             if (CheckStoppingConditions(console)) {
                 break;
@@ -333,9 +342,25 @@ public:
                                     shared_info.master_variables_value);
                 AddCuts(sp_id, fixed_part, shared_info.subproblem_status[sp_id],
                         shared_info.dual_values[sp_id]);
+                //ml info
+                if (shared_info.subproblem_status[sp_id]) {
+                    for (int i = 0; i < master_model_.master_variables.getSize(); ++i) {
+                        shared_info.dual_sols[i].push_back(shared_info.dual_values[sp_id][i]);
+                    }
+                }
             }
+            //ml info
+            IloNumArray rc_(master_model_.env);
+            master_model_.cplex.getReducedCosts(rc_,master_model_.master_variables);
+            for (int i = 0; i < master_model_.master_variables.getSize(); ++i) {
+                shared_info.lp_sols[i].push_back(shared_info.master_variables_value[i]);
+                shared_info.rc_sols[i].push_back(rc_[i]);
+
+            }
+
             master_model_.model.add(master_model_.opt_cuts);
             master_model_.model.add(master_model_.feas_cuts);
+
 
             //! Display current status
             PrintStatus(console);
@@ -348,6 +373,7 @@ public:
         solver_info_.lp_iteration = solver_info_.iteration;
         master_model_.cplex.solve();
         shared_info.master_vars_reduced_cost = IloNumArray(master_model_.env);
+        shared_info.master_variables_value_lp = IloNumArray(master_model_.env);
         master_model_.cplex.getReducedCosts(shared_info.master_vars_reduced_cost,
                                             master_model_.master_variables);
         solver_info_.lp_time = GetDuration();
@@ -578,8 +604,8 @@ public:
         console->info(optimization_status);
     }
 
-    inline void PrintFinalStats(
-            const std::shared_ptr<spdlog::logger> console) noexcept(true) {
+    inline void PrintFinalStats(const SharedInfo &shared_info,
+                                const std::shared_ptr<spdlog::logger> console) noexcept(true) {
         console->info(" ");
         console->info("***********************************");
         console->info("SOLVER:");
@@ -648,6 +674,9 @@ public:
 
         console->info("MEMORY:");
         console->info("  -Usage             = " + CurrentRssHuman());
+        if (_deploy_ml) {
+            ML::GetAccuracy(shared_info, console);
+        }
         console->info("***********************************");
         console->info(" ");
     }
@@ -666,6 +695,17 @@ public:
                 std::chrono::steady_clock::now() - solver_info_.start_time;
         solver_info_.duration = diff.count();
         return solver_info_.duration;
+    }
+
+    inline float GetRootObj() {
+        return solver_info_.lp_phase_LB;
+    }
+    inline float GetGlobalUB() {
+        return solver_info_.global_UB;
+    }
+
+    inline float GetFinalGap() {
+        return 100 * (solver_info_.global_UB - solver_info_.LB) / (solver_info_.global_UB + 1e-7);
     }
 
 private:

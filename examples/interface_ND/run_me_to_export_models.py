@@ -1,4 +1,3 @@
-
 __author_____ = 'Ragheb Rahmaniani'
 __email______ = 'Ragheb.Rahmaniani@Gmail.Com'
 __copyright__ = 'All Rights Reserved.'
@@ -6,7 +5,6 @@ __revision___ = '02.01.0isr'
 __update_____ = '8/11/2018'
 __note_______ = 'This python scripts can be used to run the algorithm.\
                  It can be used to solve R data set from SND problems'
-
 
 import logging as logger
 import os
@@ -66,10 +64,10 @@ def main():
 
     logger.info('Setting the instances to be solved...')
     # '04', '05', '06', '07', '08', '09', '10', '11']  # [04,05,06,07,08,09,10,11]
-    INSTANCE_LIST = ['04']
-    COST_CAP_RATIOS = [7]  # [3,5,7,9]
-    CORRELATION = [0]  # [0,0.2,0.8]
-    SCENARIOS = [64]  # [16,32,64]
+    INSTANCE_LIST = ['04', '05', '06', '07', '08', '09', '10', '11','14']
+    COST_CAP_RATIOS = [3,5,7,9]  # [3,5,7,9]
+    CORRELATION = [0,0.2,0.8]  # [0,0.2,0.8]
+    SCENARIOS = [16]  # [16,32,64]
 
     network_info = {}
     network_info['04'] = [10, 60, 10]
@@ -92,7 +90,7 @@ def main():
         for capacity_ratio in COST_CAP_RATIOS:
             logger.info('Loading the data files...')
             instance_file_name = 'r' + instance + \
-                '.' + str(capacity_ratio) + '.dow'
+                                 '.' + str(capacity_ratio) + '.dow'
             logger.info('  Network file {0} is picked!'.format(
                 instance_file_name))
             instance_file_path = './data_files/' + instance_file_name
@@ -101,14 +99,15 @@ def main():
                 for num_scenario in SCENARIOS:
 
                     scenario_file_name = 'r' + \
-                        instance + '-' + str(correlation) + \
-                        '-' + str(num_scenario)
+                                         instance + '-' + str(correlation) + \
+                                         '-' + str(num_scenario)
                     logger.info('  Scenario file {0} is picked!'.format(
-                                scenario_file_name))
+                        scenario_file_name))
                     scenario_file_path = './data_files/scenarios/' + scenario_file_name
 
-                    logger.info('Running the export command:  ./main --num_nodes={0}  --num_od={1} --num_arcs={2} --num_scenario={3} --file_path={4} --scenario_path={5}'.format(
-                        num_nodes, num_od, num_arcs, num_scenario, instance_file_path, scenario_file_path))
+                    logger.info(
+                        'Running the export command:  ./main --num_nodes={0}  --num_od={1} --num_arcs={2} --num_scenario={3} --file_path={4} --scenario_path={5}'.format(
+                            num_nodes, num_od, num_arcs, num_scenario, instance_file_path, scenario_file_path))
                     logger.info('Starting the export...')
                     try:
                         subprocess.call('./main --num_nodes=' +
@@ -120,15 +119,19 @@ def main():
                                         scenario_file_path, shell=True)
                         subprocess.call('cp' + " " + model_files_path +
                                         '/*.sav' + " " + pwd + '/opt_model_dir/', shell=True)
-                        # os.chdir(pwd)
-                        # logger.info('Starting the optimization...')
-                        # subprocess.call('./main  --model_dir=' + model_files_path +
-                        #                 ' --current_dir=' + pwd, shell=True)
-                        # os.chdir(pwd + '/interface_ND')
+
+                        os.chdir("../..")
+                        logger.info('Starting the optimization...')
+                        subprocess.call('./main  --model_dir=' + "/Users/rragheb/MyProjects/BCompose/models" +
+                                        ' --current_dir=' + "/Users/rragheb/MyProjects/BCompose", shell=True)
+                        os.chdir('examples/interface_ND')
+
+
+
                     except Exception as e:
                         logger.error('Failed to export models')
                         logger.error(e)
-
+                    # exit(1)
     logger.info('Done With Exporting.')
 
 

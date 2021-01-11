@@ -75,9 +75,19 @@ BendersCustomCutCallback::invoke(const IloCplex::Callback::Context &context) {
             break;
         case IloCplex::Callback::Context::Id::Relaxation:
             // gen LRs only at the root
+//            if (solver_info_.gen_user_cuts && !context.getIntInfo(IloCplex::Callback::Context::Info::NodeCount)) {
             if (!context.getIntInfo(IloCplex::Callback::Context::Info::NodeCount)) {
                 AddLRCuts(context);
             }
+//
+//
+//            // run ML var fixing at the end of root node cycle
+//            if (!solver_info_.gen_user_cuts && !context.getIntInfo(IloCplex::Callback::Context::Info::NodeCount)) {
+//                shared_info_.ml_res = ML::RunML(shared_info_, console);
+//            }
+//
+
+
             break;
         default:
             console_->error("Unexpected context!");
@@ -173,10 +183,8 @@ inline void BendersCustomCutCallback::AddLRCuts(
                                    shared_info_.master_variables_value);
 
         SP_->GenBendersCuts(console_, shared_info_);
-        std::cout << "DDD1111D\n";
         SP_->GenAdvancedCuts(console_, shared_info_);
 
-        std::cout << "DDDD\n";
         uint64_t num_violated_cuts = 0;
         for (uint64_t sp_id = 0; sp_id < shared_info_.num_subproblems; ++sp_id) {
             if (shared_info_.retained_subproblem_ids.count(sp_id)) {

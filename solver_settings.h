@@ -49,8 +49,8 @@ inline static const float _min_lift_percentage = 0.3;  // in percentages
       2: more aggressive
       3: very aggressive
 */
-inline static const bool _improve_SP_representation = true;
-inline static const uint32_t _improver_aggressiveness = 1;
+inline static const bool _improve_SP_representation = false;
+inline static const uint32_t _improver_aggressiveness = 2;
 
 // =========================ML
 /*
@@ -60,7 +60,7 @@ inline static const uint32_t _improver_aggressiveness = 1;
      0: Stops at the root node with the predicted values
      1: Tries to resolves the false predictions iteratively [more accurate results in slightly more time]
  */
-inline static const bool _deploy_ml = true;
+inline static const bool _deploy_ml = false;
 inline static const bool _ml_strategy = 0;
 
 // =========================Solver
@@ -177,15 +177,15 @@ inline static const float _optimality_gap = 0.001;             // in %
 inline static const float _root_node_optimality_gap = 0.0005;  // in %
 inline static const float _sp_tolerance = 0.001;               // in %
 
-inline static const float _branching_time_limit = 36000.0;    // in seconds
-inline static const float _root_node_time_limit = 7200.0;     // in seconds
-inline static const float _subpproblem_time_limit = 600.0;    // in seconds
-inline static const float _lifter_time_limit_per_SP = 600.0;  // in seconds
+inline static const float _branching_time_limit = 600.0;    // in seconds
+inline static const float _root_node_time_limit = 720.0;     // in seconds
+inline static const float _subpproblem_time_limit = 60.0;    // in seconds
+inline static const float _lifter_time_limit_per_SP = 60.0;  // in seconds
 
 inline static const float _min_lb_improvement =
         0.0005;  // how much increase in the lb is considered as improvement
 inline static const uint32_t _max_num_non_improvement_iterations =
-        10;  // for how many iterations the lb is allowed to not improve (by
+        25;  // for how many iterations the lb is allowed to not improve (by
 // min_lb_improvement) before stoping the LP phase
 
 // =========================UNDER DEVELOPMENT=============================

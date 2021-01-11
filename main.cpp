@@ -9,6 +9,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <fstream>
 #include <map>
 #include <memory>
 #include <set>
@@ -31,6 +32,7 @@
 #include "solver_settings.h"
 
 #include "contrib/analyzer/analyzer.h"
+
 
 static const char USAGE[] =
         R"(Applies decomposition to solve the input instance.
@@ -123,15 +125,9 @@ int main(int argc, char *argv[]) {
 
 
         if (_deploy_ml) {
-//            std::string
-            for (int i = 0; i < shared_info.master_variables_value.getSize(); ++i) {
-                shared_info.master_variables_value_lp.push_back(shared_info.master_variables_value[i]);
-            }
-
-            std::unordered_map<std::string, IloNumArray> ml_res = ML::GetScores(
-                    shared_info.master_variables_value, shared_info.master_vars_reduced_cost, console);
+            shared_info.master_variables_value_lp.add(shared_info.master_variables_value);
+            shared_info.ml_res = ML::RunML(shared_info, console);
         }
-//        exit(1);
         console->info(" -Switching to MIP MP...");
         MP->ConvertLPtoMIP();
         MP->BranchingPhase(console, shared_info, SP);
@@ -141,18 +137,31 @@ int main(int argc, char *argv[]) {
     }
 
 
-    MP->PrintFinalStats(console);
+    MP->PrintFinalStats(shared_info, console);
+
     console->info(" -Optimization terminated successfully!");
+    if (MP->GetFinalGap() < 0.1) {
+        std::ofstream outfile;
+        outfile.open("logNoRootLifter.txt", std::ios_base::app); // append instead of overwrite
+        for (int i = 0; i < shared_info.master_variables_value.getSize(); ++i) {
 
 
-    for (int i = 0; i < shared_info.master_variables_value.getSize(); ++i) {
-        double sp_obj_coeff = 0;
-        std::cout
-                << shared_info.master_variable_obj_coeff[i] << " "
-                << shared_info.master_variables_value_lp[i] << " "
-                << shared_info.master_vars_reduced_cost[i] << " "
-                << shared_info.master_variables_value[i] << std::endl;
-
+            std::string lp_str = "";
+            std::string d_str = "";
+            std::string rc_str = "";
+            for (int j = 0; j < shared_info.lp_sols[i].size(); ++j) {
+                lp_str += std::to_string(shared_info.lp_sols[i][j]) + "_";
+                d_str += std::to_string(shared_info.dual_sols[i][j]) + "_";
+                rc_str += std::to_string(shared_info.rc_sols[i][j]) + "_";
+            }
+            outfile
+                    << MP->GetRootObj() << " " << MP->GetGlobalUB() << " "
+                    << (shared_info.master_variable_obj_coeff[i] - GetIloMin(shared_info.master_variable_obj_coeff)) /
+                       (1e-7 + GetIloMax(shared_info.master_variable_obj_coeff) -
+                        GetIloMin(shared_info.master_variable_obj_coeff)) << " "
+                    << lp_str << " " << d_str << " " << rc_str << " "
+                    << shared_info.master_variables_value[i] << std::endl;
+        }
     }
 
     return 0;
