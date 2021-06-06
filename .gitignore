@@ -6,6 +6,10 @@
 *.sav
 *.log
 
+*.txt
+opt_model_dir/*.csv
+models/*.sav
+
 ### C ###
 *.d
 

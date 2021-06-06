@@ -125,9 +125,10 @@ int main(int argc, char *argv[]) {
 
 
         if (_deploy_ml) {
-            shared_info.master_variables_value_lp.add(shared_info.master_variables_value);
-            shared_info.ml_res = ML::RunML(shared_info, console);
+            MP->RunML(console, shared_info, SP);
         }
+
+
         console->info(" -Switching to MIP MP...");
         MP->ConvertLPtoMIP();
         MP->BranchingPhase(console, shared_info, SP);
@@ -136,33 +137,11 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-
     MP->PrintFinalStats(shared_info, console);
-
-    console->info(" -Optimization terminated successfully!");
     if (MP->GetFinalGap() < 0.1) {
-        std::ofstream outfile;
-        outfile.open("logNoRootLifter.txt", std::ios_base::app); // append instead of overwrite
-        for (int i = 0; i < shared_info.master_variables_value.getSize(); ++i) {
-
-
-            std::string lp_str = "";
-            std::string d_str = "";
-            std::string rc_str = "";
-            for (int j = 0; j < shared_info.lp_sols[i].size(); ++j) {
-                lp_str += std::to_string(shared_info.lp_sols[i][j]) + "_";
-                d_str += std::to_string(shared_info.dual_sols[i][j]) + "_";
-                rc_str += std::to_string(shared_info.rc_sols[i][j]) + "_";
-            }
-            outfile
-                    << MP->GetRootObj() << " " << MP->GetGlobalUB() << " "
-                    << (shared_info.master_variable_obj_coeff[i] - GetIloMin(shared_info.master_variable_obj_coeff)) /
-                       (1e-7 + GetIloMax(shared_info.master_variable_obj_coeff) -
-                        GetIloMin(shared_info.master_variable_obj_coeff)) << " "
-                    << lp_str << " " << d_str << " " << rc_str << " "
-                    << shared_info.master_variables_value[i] << std::endl;
-        }
+        ML::ExportHistory(shared_info, console, _ml_freq, true);//export entire history
     }
+    console->info(" -Optimization terminated successfully!");
 
     return 0;
 } // end main

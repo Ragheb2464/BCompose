@@ -60,8 +60,9 @@ inline static const uint32_t _improver_aggressiveness = 2;
      0: Stops at the root node with the predicted values
      1: Tries to resolves the false predictions iteratively [more accurate results in slightly more time]
  */
-inline static const bool _deploy_ml = false;
+inline static const bool _deploy_ml = true;
 inline static const bool _ml_strategy = 0;
+inline static const int _ml_freq = 10;
 
 // =========================Solver
 /*

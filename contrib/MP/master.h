@@ -152,6 +152,7 @@ public:
     ExtractVariablesValue(const std::shared_ptr<spdlog::logger> console,
                           SharedInfo &shared_info) {
         if (!_run_ws || solver_info_.iteration >= _num_ws_iterations) {
+
             master_model_.cplex.getValues(shared_info.master_variables_value,
                                           master_model_.master_variables);
             master_model_.cplex.getValues(shared_info.recourse_variables_value,
@@ -177,11 +178,21 @@ public:
         solver_info_.LB = solver_info_.current_LB;
     }
 
+    inline bool IsSolInt(const IloNumArray &sol) const {
+        for (int i = 0; i < sol.getSize(); ++i) {
+            if (std::abs(sol[i] - std::round(sol[i])) > 1e-3) { return false; }
+        }
+        return true;
+    }
+
     inline bool UpdateUBStats(const SharedInfo &shared_info) {
         if (_run_ws && solver_info_.iteration < _num_ws_iterations) {
             solver_info_.current_UB = IloInfinity;
             return false;
         }
+        /*
+         * We have artificial and retained SPs
+         */
         solver_info_.current_UB = 0;
         // getting second-stage costs
         for (uint64_t sp_id = 0; sp_id < shared_info.subproblem_status.size();
@@ -207,6 +218,9 @@ public:
 
         if (solver_info_.current_UB < solver_info_.lp_phase_UB) {
             solver_info_.lp_phase_UB = solver_info_.current_UB;
+        }
+        if (IsSolInt(shared_info.master_variables_value) && solver_info_.global_UB > solver_info_.current_UB) {
+            solver_info_.global_UB = solver_info_.current_UB;
         }
         return true;
     }
@@ -256,8 +270,8 @@ public:
         cuts.end();
     }
 
-    inline void AddCuts(const uint64_t sp_id, const double fixed_part,
-                        const bool status, const IloNumArray &dual_values) {
+    inline void AddCutForSP(const uint64_t sp_id, const double fixed_part,
+                            const bool status, const IloNumArray &dual_values) {
         assert(dual_values.getSize() == master_model_.master_variables.getSize());
         IloExpr expr(master_model_.env);
         expr += fixed_part;
@@ -275,6 +289,47 @@ public:
                     IloRange(master_model_.env, -IloInfinity, expr, 0));
         }
         expr.end();
+    }
+
+    inline void AddCuts(const SharedInfo &shared_info) {
+        for (uint64_t sp_id = 0; sp_id < shared_info.num_subproblems; ++sp_id) {
+            if (shared_info.retained_subproblem_ids.count(sp_id)) {
+                continue;
+            }
+            const IloNum fixed_part =
+                    shared_info.subproblem_objective_value[sp_id] -
+                    IloScalProd(shared_info.dual_values[sp_id],
+                                shared_info.master_variables_value);
+            AddCutForSP(sp_id, fixed_part, shared_info.subproblem_status[sp_id],
+                        shared_info.dual_values[sp_id]);
+        }
+    }
+
+
+    int FixMasterVars(const SharedInfo &shared_info, const IloNumArray &sol) {
+        assert(sol.getSize() == master_model_.master_variables.getSize());
+        uint64_t num_fixed_lb{0};
+        uint64_t num_fixed_ub{0};
+        double tolerance = _heur_aggressiveness;
+        for (int var_id = 0; var_id < master_model_.master_variables.getSize(); ++var_id) {
+            if (std::fabs(sol[var_id] - master_model_.master_variables[var_id].getLB()) < tolerance) {
+                master_model_.master_variables[var_id].setUB(
+                        master_model_.master_variables[var_id].getLB());
+                ++num_fixed_lb;
+            } else if (std::fabs(sol[var_id] - master_model_.master_variables[var_id].getUB()) < tolerance) {
+                master_model_.master_variables[var_id].setLB(
+                        master_model_.master_variables[var_id].getUB());
+                ++num_fixed_ub;
+            }
+        }
+//        console->info("    -num_fixed_lb= " + std::to_string(num_fixed_lb) + " num_fixed_ub= " +
+//                      std::to_string(num_fixed_ub));
+        return num_fixed_lb + num_fixed_ub;
+    }
+
+    inline void UnfixMasterVars(const SharedInfo &shared_info) {
+        master_model_.master_variables.setBounds(shared_info.master_variables_lb,
+                                                 shared_info.master_variables_ub);
     }
 
     void SolveRootNode(const std::shared_ptr<spdlog::logger> console,
@@ -310,7 +365,7 @@ public:
                 } else if (master_model_.cplex.getStatus() == IloAlgorithm::Unbounded) {
                     console->error("   Master problem is unbounded.");
                 } else {
-                    console->error("   Master problem is unkown.");
+                    console->error("   Master problem is unknown.");
                 }
                 console->warn("------------------------------------------------------");
                 console->warn("-Probably suffering from numerics.");
@@ -320,52 +375,29 @@ public:
                 console->warn("______________________________________________________");
                 master_model_.cplex.exportModel("MP_.lp");
                 exit(0);
-            }
-            // master_model_.cplex.exportModel("MP_.lp");
-            ExtractVariablesValue(console, shared_info);
-            // std::cout << shared_info.master_variables_value << std::endl;
-            UpdateLBStats(console);
 
+            }
+            ExtractVariablesValue(console, shared_info);
+            UpdateLBStats(console);
             //! Generate cuts
             SP->GenBendersCuts(console, shared_info);
-
             UpdateUBStats(shared_info);
-
-            //! Add cuts to master
-            for (uint64_t sp_id = 0; sp_id < shared_info.num_subproblems; ++sp_id) {
-                if (shared_info.retained_subproblem_ids.count(sp_id)) {
-                    continue;
-                }
-                const IloNum fixed_part =
-                        shared_info.subproblem_objective_value[sp_id] -
-                        IloScalProd(shared_info.dual_values[sp_id],
-                                    shared_info.master_variables_value);
-                AddCuts(sp_id, fixed_part, shared_info.subproblem_status[sp_id],
-                        shared_info.dual_values[sp_id]);
-                //ml info
-                if (shared_info.subproblem_status[sp_id]) {
-                    for (int i = 0; i < master_model_.master_variables.getSize(); ++i) {
-                        shared_info.dual_sols[i].push_back(shared_info.dual_values[sp_id][i]);
-                    }
-                }
+            //! Create the cuts exprs
+            AddCuts(shared_info);
+            //! ML info
+            if (_deploy_ml) {
+                IloNumArray rc_(master_model_.env);
+                master_model_.cplex.getReducedCosts(rc_, master_model_.master_variables);
+                ML::RecordHistory(shared_info, rc_);
             }
-            //ml info
-            IloNumArray rc_(master_model_.env);
-            master_model_.cplex.getReducedCosts(rc_,master_model_.master_variables);
-            for (int i = 0; i < master_model_.master_variables.getSize(); ++i) {
-                shared_info.lp_sols[i].push_back(shared_info.master_variables_value[i]);
-                shared_info.rc_sols[i].push_back(rc_[i]);
-
-            }
-
+            //! Apply the cuts
             master_model_.model.add(master_model_.opt_cuts);
             master_model_.model.add(master_model_.feas_cuts);
-
-
             //! Display current status
             PrintStatus(console);
             solver_info_.iteration++;
             solver_info_.lp_phase_LB = solver_info_.LB;
+//
             if (solver_info_.iteration >= _max_num_iterations_phase_I) {
                 break;
             }
@@ -373,7 +405,7 @@ public:
         solver_info_.lp_iteration = solver_info_.iteration;
         master_model_.cplex.solve();
         shared_info.master_vars_reduced_cost = IloNumArray(master_model_.env);
-        shared_info.master_variables_value_lp = IloNumArray(master_model_.env);
+//        shared_info.master_variables_value_lp = IloNumArray(master_model_.env);
         master_model_.cplex.getReducedCosts(shared_info.master_vars_reduced_cost,
                                             master_model_.master_variables);
         solver_info_.lp_time = GetDuration();
@@ -384,6 +416,30 @@ public:
                 master_model_.env, master_model_.master_variables, ILOINT));
     }
 
+
+    void RunML(const std::shared_ptr<spdlog::logger> console,
+               SharedInfo &shared_info, const std::shared_ptr<Subproblem> SP) {
+        ML::ExportHistory(shared_info, console, _ml_freq, false);
+        shared_info.ml_res = ML::RunML(console);
+        IloNumArray sol(master_model_.env);
+        for (const int s : shared_info.ml_res.at("pred")) {
+            sol.add(s);
+        }
+        FixMasterVars(shared_info, sol);
+        if (master_model_.cplex.solve()) {
+            ExtractVariablesValue(console, shared_info);
+            UpdateLBStats(console);
+            //! Generate cuts
+            SP->GenBendersCuts(console, shared_info);
+            UpdateUBStats(shared_info);
+            //! Create the cuts exprs
+            AddCuts(shared_info);
+        } else {
+            console->error("ML infeas.");
+        }
+        UnfixMasterVars(shared_info);
+    }
+
     bool RunAsHeuristic(const std::shared_ptr<spdlog::logger> console,
                         SharedInfo &shared_info) {
         if (_frequency < 0) {
@@ -391,31 +447,9 @@ public:
         }
         console->warn("Activating the heuristic, I wont guarantee an optimal "
                       "or even a feasible solution, although do my best");
-        double tolerance = _heur_aggressiveness;
-        uint64_t num_fixed_lb{0};
-        uint64_t num_fixed_ub{0};
-        for (int var_id = 0; var_id < shared_info.master_variables_value.getSize();
-             ++var_id) {
-            if (std::fabs(shared_info.master_variables_value[var_id] -
-                          master_model_.master_variables[var_id].getLB()) <
-                tolerance) {
-                master_model_.master_variables[var_id].setUB(
-                        master_model_.master_variables[var_id].getLB());
-                ++num_fixed_lb;
-            } else if (std::fabs(shared_info.master_variables_value[var_id] -
-                                 master_model_.master_variables[var_id].getUB()) <
-                       tolerance) {
-                master_model_.master_variables[var_id].setLB(
-                        master_model_.master_variables[var_id].getUB());
-                ++num_fixed_ub;
-            }
-        }
-        console->info("   Heuristic could decide on fate of " +
-                      std::to_string(num_fixed_lb + num_fixed_ub) +
-                      " master variables out of " +
+        const int n_fixed = FixMasterVars(shared_info, shared_info.master_variables_value);
+        console->info("   Heuristic could decide on fate of " + std::to_string(n_fixed) + " master variables out of " +
                       std::to_string(shared_info.master_variables_value.getSize()));
-        console->info("    -num_fixed_lb= " + std::to_string(num_fixed_lb) +
-                      " num_fixed_ub= " + std::to_string(num_fixed_ub));
         return true;
     }
 
@@ -495,17 +529,7 @@ public:
                 shared_info.master_variables_value[var_id] = heur.GenRandVarVal(var_id);
             }
             SP->GenBendersCuts(console, shared_info);
-            for (uint64_t sp_id = 0; sp_id < shared_info.num_subproblems; ++sp_id) {
-                if (shared_info.retained_subproblem_ids.count(sp_id)) {
-                    continue;
-                }
-                const double fixed_part =
-                        shared_info.subproblem_objective_value[sp_id] -
-                        IloScalProd(shared_info.dual_values[sp_id],
-                                    shared_info.master_variables_value);
-                AddCuts(sp_id, fixed_part, shared_info.subproblem_status[sp_id],
-                        shared_info.dual_values[sp_id]);
-            }
+            AddCuts(shared_info);
             master_model_.model.add(master_model_.opt_cuts);
             master_model_.model.add(master_model_.feas_cuts);
             // std::cout << shared_info.master_variables_value << std::endl;
@@ -700,6 +724,7 @@ public:
     inline float GetRootObj() {
         return solver_info_.lp_phase_LB;
     }
+
     inline float GetGlobalUB() {
         return solver_info_.global_UB;
     }

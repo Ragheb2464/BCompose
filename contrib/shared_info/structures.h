@@ -56,7 +56,7 @@ struct SharedInfo {
     IloNumArray recourse_variables_value;
 
 //    std::vector<double> master_variables_value_lp;
-    IloNumArray master_variables_value_lp;
+//    IloNumArray master_variables_value_lp;
     IloNumArray master_variables_daul_vals_sum_lp;
     IloNumArray master_variables_vals_sum_lp;
     std::vector<std::vector<float>> lp_sols;
